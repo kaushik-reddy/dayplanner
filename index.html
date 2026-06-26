@@ -3210,9 +3210,8 @@
     if(task.origTime){ evts.push({cls:'added', act:'Originally planned for <b>'+escapeHtml((task.origKey?fmtDateShort(task.origKey)+' ':'')+fmtTime(task.origTime))+'</b>', meta:''}); }
     (task.changes||[]).forEach(c=>{
       const label={moved:'Moved',rescheduled:'Rescheduled',swapped:'Swapped'}[c.type]||'Changed';
-      const crossDay=c.fromKey&&c.toKey&&c.fromKey!==c.toKey;
-      const fromLbl=(crossDay?fmtDateShort(c.fromKey)+' ':'')+fmtTime(c.from);
-      const toLbl=(crossDay?fmtDateShort(c.toKey)+' ':'')+fmtTime(c.to);
+      const fromLbl=(c.fromKey?fmtDateShort(c.fromKey)+' ':'')+fmtTime(c.from);
+      const toLbl=(c.toKey?fmtDateShort(c.toKey)+' ':'')+fmtTime(c.to);
       evts.push({cls:'change', act:label+' '+escapeHtml(fromLbl)+' → <b>'+escapeHtml(toLbl)+'</b>', meta:c.at?fmtDateTime(c.at):''});
     });
     if(task.startedAt){ evts.push({cls:'start', act:'Started', meta:fmtDateTime(task.startedAt)}); }
@@ -3244,9 +3243,8 @@
       const label={moved:'Moved',rescheduled:'Rescheduled',swapped:'Swapped'}[c.type]||'Changed';
       const ic={moved:'move',rescheduled:'clock',swapped:'swap'}[c.type]||'repeat';
       let when=''; if(c.at){ const dt=new Date(c.at); when=dt.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' · '+dt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}); }
-      const crossDay = c.fromKey && c.toKey && c.fromKey!==c.toKey;
-      const fromLbl = (crossDay ? fmtDateShort(c.fromKey)+' ' : '') + fmtTime(c.from);
-      const toLbl = (crossDay ? fmtDateShort(c.toKey)+' ' : '') + fmtTime(c.to);
+      const fromLbl = (c.fromKey ? fmtDateShort(c.fromKey)+' ' : '') + fmtTime(c.from);
+      const toLbl = (c.toKey ? fmtDateShort(c.toKey)+' ' : '') + fmtTime(c.to);
       rows+='<div class="hist-row"><span class="h-ic">'+svgIco(ic,13)+'</span><div class="h-main"><div class="h-act">'+label+' '+escapeHtml(fromLbl)+' → <b>'+escapeHtml(toLbl)+'</b></div><div class="h-meta">'+escapeHtml(when)+'</div></div></div>';
     });
     historyList.innerHTML=rows;
