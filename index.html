@@ -1616,6 +1616,23 @@
     .nav-btn{ width:34px; height:34px; font-size:15px; }
     .viewtab{ font-size:12.5px; padding:9px 12px; }
 
+    /* bookings page + day timeline — mobile critical */
+    .bk-pagetitle{ font-size:21px; }
+    .bk-pagehead{ margin-bottom:18px; }
+    .bk-cal{ padding:12px 10px 4px; }
+    .bk-cal-date{ font-size:14.5px; }
+    .bk-cal-legend{ gap:10px 12px; font-size:10.5px; }
+    .bk-hourlbl{ font-size:9px; width:38px; }
+    .bk-hourline{ left:42px; }
+    .bk-nowline{ left:42px; }
+    .bk-cal-events{ left:44px; }
+    .bk-cal-empty{ left:44px; }
+    .bk-ev{ padding:4px 6px; }
+    .bk-ev-n{ font-size:11px; }
+    .bk-linkbtn{ font-size:12.5px; padding:11px 8px; }
+    .bkd-srow{ gap:10px; }
+    .bkd-sval{ font-size:13px; }
+
     /* hero countdown — biggest offender, scale down + tighten */
     .hero{ min-height: 170px; }
     .hero-title{ font-size: 23px; margin-bottom: 14px; }
@@ -1741,6 +1758,11 @@
   .sb-note{ font-size:11.5px; color:var(--ink-dim); margin-top:3px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
   .sb-end{ flex-shrink:0; display:flex; align-items:center; gap:9px; }
   .sb-badge{ flex-shrink:0; white-space:nowrap; }
+  .sb-reason{ display:inline-block; font-weight:600; color:var(--brass); margin-right:6px; }
+  .bkd-prio{ display:inline-block; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px; }
+  .bkd-prio-low{ background:rgba(120,140,170,0.16); color:#9fb0cc; }
+  .bkd-prio-medium{ background:rgba(201,151,74,0.16); color:var(--brass); }
+  .bkd-prio-high{ background:rgba(196,108,98,0.18); color:var(--red-soft); }
   .sb-actions{ display:flex; gap:6px; flex-shrink:0; }
   .sb-act{ width:32px; height:32px; border-radius:9px; border:1px solid var(--line); background:transparent; color:var(--ink-dim); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:border-color .15s, color .15s; }
   .sb-act:hover{ border-color:var(--brass); color:var(--brass); }
@@ -1813,6 +1835,35 @@
   .bk-setup-ic{ width:60px; height:60px; border-radius:50%; margin:0 auto 18px; display:flex; align-items:center; justify-content:center; background:var(--brass-soft); color:var(--brass); }
   .bk-setup-title{ font-family:var(--font-display); font-size:22px; font-weight:600; margin-bottom:10px; }
   .bk-setup-text{ font-size:13.5px; color:var(--ink-dim); line-height:1.55; }
+  /* day timeline (calendar) */
+  .bk-calwrap{ margin:0 0 26px; }
+  .bk-cal{ border:1px solid var(--line); border-radius:16px; background:var(--bg-card); padding:14px 14px 6px; }
+  .bk-cal-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+  .bk-cal-date{ font-family:var(--font-display); font-size:16px; font-weight:600; text-align:center; flex:1; min-width:0; }
+  .bk-cal-rel{ color:var(--brass); }
+  .bk-cal-nav{ flex-shrink:0; width:34px; height:34px; border-radius:9px; border:1px solid var(--line); background:transparent; color:var(--ink-dim); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:border-color .15s, color .15s; }
+  .bk-cal-nav:hover{ border-color:var(--brass); color:var(--brass); }
+  .bk-cal-legend{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; font-size:11px; color:var(--ink-faint); margin-bottom:12px; padding-left:2px; }
+  .bk-lg{ display:inline-flex; align-items:center; gap:6px; }
+  .bk-lgdot{ width:11px; height:11px; border-radius:4px; }
+  .bk-lgdot.personal{ background:var(--brass); }
+  .bk-lgdot.booked{ background:#6ea3c9; }
+  .bk-today-btn{ margin-left:auto; background:transparent; border:1px solid var(--line); color:var(--ink-dim); border-radius:999px; padding:4px 12px; font-family:inherit; font-size:11px; font-weight:600; cursor:pointer; }
+  .bk-today-btn:hover{ border-color:var(--brass); color:var(--brass); }
+  .bk-cal-grid{ position:relative; margin-left:2px; }
+  .bk-hourline{ position:absolute; left:46px; right:0; height:1px; background:var(--line); opacity:0.6; }
+  .bk-hourlbl{ position:absolute; left:0; width:42px; text-align:right; font-size:10px; font-family:var(--font-mono); color:var(--ink-faint); }
+  .bk-nowline{ position:absolute; left:46px; right:0; height:2px; background:var(--red-soft); z-index:3; box-shadow:0 0 0 1px rgba(196,108,98,0.25); }
+  .bk-nowline::before{ content:''; position:absolute; left:-4px; top:-3px; width:8px; height:8px; border-radius:50%; background:var(--red-soft); }
+  .bk-cal-events{ position:absolute; left:48px; right:2px; top:0; bottom:0; }
+  .bk-ev{ position:absolute; box-sizing:border-box; border-radius:8px; padding:5px 8px; text-align:left; font-family:inherit; cursor:default; overflow:hidden; border:1px solid transparent; display:flex; flex-direction:column; gap:1px; line-height:1.15; min-height:20px; }
+  .bk-ev.personal{ background:rgba(201,151,74,0.16); border-color:rgba(201,151,74,0.4); color:var(--ink); }
+  .bk-ev.booked{ background:rgba(110,163,201,0.18); border-color:rgba(110,163,201,0.5); color:var(--ink); cursor:pointer; }
+  .bk-ev.booked:hover{ background:rgba(110,163,201,0.3); }
+  .bk-ev.bk-st-pending{ border-style:dashed; }
+  .bk-ev-t{ font-size:10px; font-family:var(--font-mono); color:var(--ink-faint); }
+  .bk-ev-n{ font-size:11.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bk-cal-empty{ position:absolute; left:48px; right:2px; top:50%; transform:translateY(-50%); text-align:center; font-size:12.5px; color:var(--ink-faint); pointer-events:none; }
   /* booking detail modal */
   #bkdName .sb-badge{ vertical-align:middle; }
   .bkd-field{ padding:13px 0; border-bottom:1px solid var(--line); }
@@ -1874,6 +1925,12 @@
   .bk-form{ margin-top:22px; display:flex; flex-direction:column; gap:13px; }
   .bk-form .field input, .bk-form .field textarea{ width:100%; box-sizing:border-box; background:var(--bg); border:1px solid var(--line); color:var(--ink); font-size:16px; font-family:inherit; padding:12px 14px; border-radius:11px; }
   .bk-form .field textarea{ min-height:72px; resize:vertical; }
+  .bk-field-label{ font-size:11px; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; margin:4px 0 -4px; }
+  .bk-select{ width:100%; box-sizing:border-box; -webkit-appearance:none; appearance:none; background:var(--bg) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23a08a6a' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>") no-repeat right 14px center; border:1px solid var(--line); color:var(--ink); font-size:16px; font-family:inherit; padding:12px 38px 12px 14px; border-radius:11px; cursor:pointer; }
+  .bk-select:focus{ outline:none; border-color:var(--brass); }
+  .bk-prio{ display:flex; gap:8px; }
+  .bk-prio button{ flex:1; background:var(--bg); border:1px solid var(--line); color:var(--ink-dim); border-radius:11px; padding:11px 8px; font-family:inherit; font-size:13.5px; font-weight:600; cursor:pointer; transition:border-color .15s, color .15s, background .15s; }
+  .bk-prio button.on{ background:var(--brass); border-color:var(--brass); color:#15110A; }
   .bk-confirm-card{ text-align:center; padding:12px 0; }
   .bk-confirm-ic{ width:64px; height:64px; border-radius:50%; margin:0 auto 18px; background:rgba(111,168,138,0.16); color:var(--green); display:flex; align-items:center; justify-content:center; }
   .bk-confirm-title{ font-family:var(--font-display); font-size:26px; font-weight:600; margin-bottom:10px; }
@@ -2661,7 +2718,17 @@
           +'<div class="bk-sec-label" style="margin-top:6px">Your details</div>'
           +'<div class="field"><input id="bkName" type="text" placeholder="Your name" autocomplete="name" maxlength="80"></div>'
           +'<div class="field"><input id="bkEmail" type="email" placeholder="Email — so you can track your request" autocomplete="email" maxlength="120"></div>'
-          +'<div class="field"><textarea id="bkNote" placeholder="What\'s this about? (optional)" maxlength="500"></textarea></div>'
+          +'<div class="bk-field-label">Reason for the meet</div>'
+          +'<div class="field"><select id="bkReason" class="bk-select">'
+            +'<option value="">Pick a reason…</option>'
+            +'<option>Casual Talk</option><option>Work Talk</option><option>Friends Catch-up</option>'
+            +'<option>Wife Time</option><option>Family Time</option><option>Coffee</option>'
+            +'<option>Quick Sync</option><option>Brainstorm</option><option>Celebration</option>'
+            +'<option value="__custom">Custom (one word)…</option></select></div>'
+          +'<div class="field" id="bkReasonCustomWrap" style="display:none"><input id="bkReasonCustom" type="text" placeholder="One word only" maxlength="20"></div>'
+          +'<div class="bk-field-label">Priority</div>'
+          +'<div class="bk-prio" id="bkPrio"><button type="button" data-p="low">Low</button><button type="button" data-p="medium" class="on">Medium</button><button type="button" data-p="high">High</button></div>'
+          +'<div class="field"><textarea id="bkNote" placeholder="Anything to add? (optional)" maxlength="500"></textarea></div>'
           +'<button class="btn btn-primary" id="bkConfirm" style="width:100%">Request '+fmt12(selSlot)+' – '+fmt12(selSlot+bd)+'</button>'
           +'<div id="bkErr" style="color:var(--red-soft);font-size:12.5px;text-align:center;display:none"></div>'
           +'</div>';
@@ -2687,6 +2754,10 @@
       }
       if(fr) fr.addEventListener('change', onRange);
       if(to) to.addEventListener('change', onRange);
+      const rsel=document.getElementById('bkReason'), rcw=document.getElementById('bkReasonCustomWrap'), rci=document.getElementById('bkReasonCustom');
+      if(rsel) rsel.addEventListener('change',()=>{ const cu=rsel.value==='__custom'; if(rcw) rcw.style.display=cu?'':'none'; if(cu&&rci) rci.focus(); });
+      if(rci) rci.addEventListener('input',()=>{ const w=rci.value.replace(/\s+/g,''); if(rci.value!==w) rci.value=w; }); // one word only — no spaces
+      view.querySelectorAll('#bkPrio button').forEach(b=>b.addEventListener('click',()=>{ view.querySelectorAll('#bkPrio button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); }));
       const c=document.getElementById('bkConfirm'); if(c) c.addEventListener('click', submit);
     }
     function t2m(v){ const p=String(v||'').split(':'); return (parseInt(p[0],10)||0)*60+(parseInt(p[1],10)||0); }
@@ -2695,13 +2766,16 @@
       const name=(document.getElementById('bkName').value||'').trim();
       const email=(document.getElementById('bkEmail').value||'').trim();
       const note=(document.getElementById('bkNote').value||'').trim();
+      const rsel=document.getElementById('bkReason'); let reason=(rsel&&rsel.value)||'';
+      if(reason==='__custom'){ const rci=document.getElementById('bkReasonCustom'); reason=(rci&&rci.value||'').replace(/\s+/g,'').slice(0,20); }
+      const prioBtn=document.querySelector('#bkPrio button.on'); const priority=(prioBtn&&prioBtn.dataset.p)||'medium';
       const errEl=document.getElementById('bkErr');
       if(!name){ errEl.textContent='Please enter your name.'; errEl.style.display='block'; document.getElementById('bkName').focus(); return; }
       const btn=document.getElementById('bkConfirm'); btn.disabled=true; btn.textContent='Sending request…';
       const bookedMin=selSlot, bookedDur=bookDur();
       try{
         const r=await fetch(BOOK_API+'?book='+encodeURIComponent(token), { method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ date:selDate, time:minToTimeStr(bookedMin), duration:bookedDur, name, email, note }) });
+          body: JSON.stringify({ date:selDate, time:minToTimeStr(bookedMin), duration:bookedDur, name, email, reason, priority, note }) });
         if(r.status===409){ errEl.textContent='Sorry, that slot was just taken. Please pick another.'; errEl.style.display='block'; btn.disabled=false; btn.textContent='Send request'; selSlot=null; selEnd=null; await refresh(true); return; }
         if(!r.ok) throw new Error('http '+r.status);
         const res=await r.json(); const ref=res.booking&&res.booking.ref;
@@ -2795,7 +2869,7 @@
     function render(){
       if(!last){ shell(header('','')+'<div class="tk-skel"></div>'); return; }
       const r=last; const owner=esc(r.owner||'them'); const bookUrl=r.bookToken?(location.origin+location.pathname+'?book='+r.bookToken):'';
-      let state=r.status||'pending'; if(r.expired) state=(state==='accepted'?'accepted':'expired');
+      let state=r.status||'pending'; if(r.expired && state!=='accepted' && state!=='cancelled' && state!=='declined') state='expired';
       let h='';
       if(state==='expired'){
         h=header('Expired','grey')
@@ -2808,9 +2882,9 @@
           +meetCard(r.date,r.time,r.duration,{accent:true,label:'Meeting with '+owner});
       } else if(state==='declined' || state==='cancelled'){
         h=header(state==='cancelled'?'Cancelled':'Declined','bad')+steps(0,true)
-          +hero('declined',state==='cancelled'?'Booking cancelled':'Time not available','Sorry \u2014 <b>'+owner+'</b> couldn\u2019t take this slot.'+(bookUrl?' Pick another that works for you.':''))
+          +hero('declined',state==='cancelled'?'Booking cancelled':'Time not available',state==='cancelled'?('This booking was cancelled and the slot is now free. This tracking link is no longer active.'+(bookUrl?' Want to book again?':'')):('Sorry \u2014 <b>'+owner+'</b> couldn\u2019t take this slot.'+(bookUrl?' Pick another that works for you.':'')))
           +meetCard(r.date,r.time,r.duration,{muted:true,strike:true})
-          +(bookUrl?btnLink(bookUrl,'Pick another time','primary'):'');
+          +(bookUrl?btnLink(bookUrl,state==='cancelled'?'Book a new time':'Pick another time','primary'):'');
       } else if(state==='reschedule_proposed' && r.proposed){
         h=header('Action needed','warn')+steps(2,false)
           +hero('reschedule_proposed','New time proposed','<b>'+owner+'</b> suggested a different time. Accept it, or pick another that suits you.')
@@ -2841,6 +2915,7 @@
         const r=await fetch(BOOK_API+'?track='+encodeURIComponent(ref), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action }) });
         if(r.status===409){ if(msg){ msg.textContent='That time was just taken — please pick another.'; msg.className='bk-custom-msg err'; } busyAct=false; return; }
         const res=await r.json(); if(res && res.ok!==false){ last=Object.assign(last||{}, res); }
+        if(action==='cancel' && res && res.cancelled){ last.status='cancelled'; last.expired=true; busyAct=false; render(); return; }
       }catch(e){}
       busyAct=false; await load();
     }
@@ -5410,7 +5485,7 @@
     }
     return null;
   }
-  function bookingSub(b){ return (b.note||'')+(b.email?((b.note?' · ':'')+b.email):''); }
+  function bookingSub(b){ const bits=[]; if(b.reason) bits.push(b.reason); if(b.note) bits.push(b.note); if(b.email) bits.push(b.email); return bits.join(' · '); }
 
   // Keep the planner in sync with the server's bookings: add new, move/update rescheduled, remove cancelled.
   function bookingTitle(b){ return (b.status==='accepted'?'Booking · ':'Request · ')+(b.name||'Guest'); }
@@ -5427,7 +5502,7 @@
       const loc=findBookedTask(b.id); const sub=bookingSub(b); const title=bookingTitle(b);
       if(!loc){
         const d=new Date(b.date+'T00:00:00'); const data=loadDay(d); data.tasks=data.tasks||[];
-        data.tasks.push({ id:'booked_'+b.id, time:b.time, duration:b.duration||30, title, sub, categories:['#meeting'], priority:'high', booked:true, bookingId:b.id, bookingStatus:b.status||'pending', createdAt:Date.now() });
+        data.tasks.push({ id:'booked_'+b.id, time:b.time, duration:b.duration||30, title, sub, categories:['#meeting'], priority:(b.priority||'high'), booked:true, bookingId:b.id, bookingStatus:b.status||'pending', createdAt:Date.now() });
         saveDay(d, data);
         if(!set.has(b.id)){ added++; lastName=b.name||lastName; }
         changed=true;
@@ -5549,7 +5624,7 @@
       +'<div class="sb-ic">'+svgIco('calendar',16)+'</div>'
       +'<div class="sb-main"><div class="sb-name"><span class="sb-nm">'+escapeHtml(b.name||'Guest')+'</span></div>'
       +'<div class="sb-when">'+escapeHtml(when)+' · '+escapeHtml(fmtTime(b.time))+' · '+dur+'m</div>'
-      +(b.note?'<div class="sb-note">'+escapeHtml(b.note)+'</div>':'')
+      +((b.reason||b.note)?'<div class="sb-note">'+(b.reason?'<span class="sb-reason">'+escapeHtml(b.reason)+'</span>':'')+(b.note?escapeHtml(b.note):'')+'</div>':'')
       +'</div>'
       +'<div class="sb-end"><span class="sb-badge sb-'+meta.c+'">'+meta.t+'</span><span class="sb-chev">'+svgIco('chevR',16)+'</span></div>'
       +'</div></button>';
@@ -5594,6 +5669,8 @@
     body+='<div class="bkd-summary">'
       +'<div class="bkd-srow"><span class="bkd-slabel">Time</span><span class="bkd-sval mono">'+escapeHtml(fmtTime(b.time))+' – '+escapeHtml(fmtTime(endT))+'</span></div>'
       +'<div class="bkd-srow"><span class="bkd-slabel">Duration</span><span class="bkd-sval mono">'+dur+' min</span></div>'
+      +(b.reason?'<div class="bkd-srow"><span class="bkd-slabel">Reason</span><span class="bkd-sval">'+escapeHtml(b.reason)+'</span></div>':'')
+      +'<div class="bkd-srow"><span class="bkd-slabel">Priority</span><span class="bkd-sval"><span class="bkd-prio bkd-prio-'+(b.priority||'medium')+'">'+({low:'Low',medium:'Medium',high:'High'}[b.priority||'medium'])+'</span></span></div>'
       +'<div class="bkd-srow"><span class="bkd-slabel">Status</span><span class="bkd-sval"><span class="sb-badge sb-'+meta.c+'">'+meta.t+'</span></span></div>'
       +'</div>';
     if(b.email) body+='<div class="bkd-field"><span class="bkd-lbl">Email</span><a class="bkd-val bkd-link" href="mailto:'+escapeHtml(b.email)+'">'+escapeHtml(b.email)+'</a></div>';
@@ -5639,24 +5716,73 @@
     const link=bkLink();
     const pretty=link.replace(/^https?:\/\//,'').replace(/^file:\/\/\//,'');
     body.innerHTML=
-      '<div class="bk-grid">'
-      +'<div class="bk-col bk-col-left">'
-        +'<div class="bk-linkcard">'
-          +'<div class="bk-linkcard-label"><span class="bk-live-dot"></span>Your booking link · live</div>'
-          +'<div class="bk-linkbox"><span class="bk-linkurl" title="'+escapeHtml(link)+'">'+escapeHtml(pretty)+'</span></div>'
-          +'<div class="bk-linkactions"><button type="button" class="btn btn-primary bk-linkbtn" id="bkPageCopy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15"/></svg>Copy link</button>'
-            +'<button type="button" class="btn btn-secondary bk-linkbtn" id="bkPageShare"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button></div>'
+      '<div class="bk-linkcard">'
+        +'<div class="bk-linkcard-label"><span class="bk-live-dot"></span>Your booking link · live</div>'
+        +'<div class="bk-linkbox"><span class="bk-linkurl" title="'+escapeHtml(link)+'">'+escapeHtml(pretty)+'</span></div>'
+        +'<div class="bk-linkactions"><button type="button" class="btn btn-primary bk-linkbtn" id="bkPageCopy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15"/></svg>Copy link</button>'
+          +'<button type="button" class="btn btn-secondary bk-linkbtn" id="bkPageShare"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button></div>'
+      +'</div>'
+      +'<div class="bk-calwrap" id="bkCalWrap"></div>'
+      +'<div class="bk-grid">'
+        +'<div class="bk-col bk-col-left">'
+          +'<div class="section-title bk-sec">Requests &amp; upcoming <span class="bk-count" id="bkActiveCount"></span></div><div id="bkPageActive"></div>'
         +'</div>'
-        +'<div class="section-title bk-sec">Requests &amp; upcoming <span class="bk-count" id="bkActiveCount"></span></div><div id="bkPageActive"></div>'
-      +'</div>'
-      +'<div class="bk-col bk-col-right">'
-        +'<div class="section-title bk-sec">History <span class="bk-count" id="bkHistoryCount"></span></div><div id="bkPageHistory"></div>'
-      +'</div>'
+        +'<div class="bk-col bk-col-right">'
+          +'<div class="section-title bk-sec">History <span class="bk-count" id="bkHistoryCount"></span></div><div id="bkPageHistory"></div>'
+        +'</div>'
       +'</div>';
     const copy=document.getElementById('bkPageCopy'); if(copy) copy.addEventListener('click',()=>{ if(navigator.clipboard) navigator.clipboard.writeText(link); copy.innerHTML='Copied'; copy.classList.add('copied'); setTimeout(()=>{ renderBookingsPage(); },1400); });
     const share=document.getElementById('bkPageShare'); if(share) share.addEventListener('click',()=>{ if(navigator.share){ navigator.share({ title:'Book time with me', url:link }).catch(()=>{}); } else { if(navigator.clipboard) navigator.clipboard.writeText(link); flashToast('Link copied — paste it anywhere'); } });
+    renderBookingDay();
     fillBookingLists();
     bkPoll(true);
+  }
+
+  // ---- Teams/Outlook-style day timeline: your personal time vs slots booked by others ----
+  let bkCalDate=dateKey(new Date());
+  function bkRelLabel(dk){ const t=dateKey(new Date()); const tm=new Date(); tm.setDate(tm.getDate()+1); const yd=new Date(); yd.setDate(yd.getDate()-1);
+    if(dk===t) return 'Today'; if(dk===dateKey(tm)) return 'Tomorrow'; if(dk===dateKey(yd)) return 'Yesterday'; return ''; }
+  function renderBookingDay(){
+    const wrap=document.getElementById('bkCalWrap'); if(!wrap) return;
+    const d=new Date(bkCalDate+'T00:00:00');
+    let tasks=[]; try{ tasks=(loadDay(d).tasks||[]).filter(t=>!t.cancelled && t.time); }catch(e){}
+    const cfg=(typeof bkCfg==='function')?bkCfg():{}; let wins=(cfg.windows&&cfg.windows.length)?cfg.windows:[[cfg.startMin||540,cfg.endMin||1020]];
+    let lo=Math.min.apply(null,wins.map(w=>w[0])), hi=Math.max.apply(null,wins.map(w=>w[1]));
+    tasks.forEach(t=>{ const s=timeToMinutes(t.time), e=s+(t.duration||30); if(s<lo)lo=s; if(e>hi)hi=e; });
+    lo=Math.max(0,Math.floor(lo/60)*60); hi=Math.min(1440,Math.ceil(hi/60)*60); if(hi-lo<240){ hi=Math.min(1440,lo+240); }
+    const PX=0.78, H=(hi-lo)*PX;
+    // lane packing for overlaps
+    const evs=tasks.map(t=>({s:timeToMinutes(t.time), e:timeToMinutes(t.time)+(t.duration||30), t})).sort((a,b)=>a.s-b.s||a.e-b.e);
+    const laneEnd=[]; evs.forEach(ev=>{ let pl=false; for(let i=0;i<laneEnd.length;i++){ if(laneEnd[i]<=ev.s){ ev.lane=i; laneEnd[i]=ev.e; pl=true; break; } } if(!pl){ ev.lane=laneEnd.length; laneEnd.push(ev.e); } });
+    const lanes=Math.max(1,laneEnd.length);
+    let lines=''; for(let m=lo;m<=hi;m+=60){ const y=(m-lo)*PX; lines+='<div class="bk-hourline" style="top:'+y+'px"></div><div class="bk-hourlbl" style="top:'+(y-6)+'px">'+escapeHtml(fmtTime(minToTime(m))).replace(':00','')+'</div>'; }
+    // now line
+    let nowLine=''; if(bkCalDate===dateKey(new Date())){ const nm=new Date().getHours()*60+new Date().getMinutes(); if(nm>=lo&&nm<=hi){ nowLine='<div class="bk-nowline" style="top:'+((nm-lo)*PX)+'px"></div>'; } }
+    let blocks='';
+    evs.forEach(ev=>{ const t=ev.t; const top=(ev.s-lo)*PX, h=Math.max(20,(ev.e-ev.s)*PX);
+      const wpc=100/lanes, leftpc=ev.lane*wpc;
+      const booked=!!t.booked; const stt=t.bookingStatus||'';
+      const cls='bk-ev '+(booked?('booked bk-st-'+stt):'personal');
+      const who=booked?(((t.title||'').replace(/^.*?·\s*/,''))||'Guest'):(t.title||'Busy');
+      const timeStr=fmtTime(t.time);
+      blocks+='<button type="button" class="'+cls+'"'+(booked&&t.bookingId?(' data-bid="'+escapeHtml(t.bookingId)+'"'):'')+' style="top:'+top+'px;height:'+h+'px;left:calc('+leftpc+'% + 2px);width:calc('+wpc+'% - 4px)">'
+        +'<span class="bk-ev-t">'+escapeHtml(timeStr)+'</span><span class="bk-ev-n">'+escapeHtml(who)+'</span></button>';
+    });
+    const rel=bkRelLabel(bkCalDate); const dlong=new Date(bkCalDate+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+    wrap.innerHTML='<div class="bk-cal">'
+      +'<div class="bk-cal-head">'
+        +'<button type="button" class="bk-cal-nav" id="bkDayPrev" aria-label="Previous day">'+svgIco('chevL',18)+'</button>'
+        +'<div class="bk-cal-date"><span class="bk-cal-rel">'+(rel?escapeHtml(rel)+' · ':'')+'</span>'+escapeHtml(dlong)+'</div>'
+        +'<button type="button" class="bk-cal-nav" id="bkDayNext" aria-label="Next day">'+svgIco('chevR',18)+'</button>'
+      +'</div>'
+      +'<div class="bk-cal-legend"><span class="bk-lg"><span class="bk-lgdot personal"></span>Your time</span><span class="bk-lg"><span class="bk-lgdot booked"></span>Booked by others</span>'+(rel==='Today'?'':' <button type="button" class="bk-today-btn" id="bkDayToday">Today</button>')+'</div>'
+      +'<div class="bk-cal-grid" style="height:'+H+'px">'+lines+nowLine+'<div class="bk-cal-events">'+(blocks||'')+'</div>'
+        +(evs.length?'':'<div class="bk-cal-empty">Nothing scheduled — your day is open.</div>')
+      +'</div></div>';
+    const pv=document.getElementById('bkDayPrev'); if(pv) pv.addEventListener('click',()=>{ const x=new Date(bkCalDate+'T00:00:00'); x.setDate(x.getDate()-1); bkCalDate=dateKey(x); renderBookingDay(); });
+    const nx=document.getElementById('bkDayNext'); if(nx) nx.addEventListener('click',()=>{ const x=new Date(bkCalDate+'T00:00:00'); x.setDate(x.getDate()+1); bkCalDate=dateKey(x); renderBookingDay(); });
+    const td=document.getElementById('bkDayToday'); if(td) td.addEventListener('click',()=>{ bkCalDate=dateKey(new Date()); renderBookingDay(); });
+    wrap.querySelectorAll('.bk-ev[data-bid]').forEach(el=>el.addEventListener('click',()=>openBookingDetail(el.dataset.bid)));
   }
 
   let bkDraft=null;
