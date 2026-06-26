@@ -465,6 +465,7 @@
   .task-head{
     display:flex; justify-content:space-between; align-items:baseline; gap:10px;
   }
+  .task-titlewrap{ display:flex; align-items:center; gap:7px; flex-wrap:wrap; min-width:0; margin-bottom:2px; }
   .task-title{
     font-size: clamp(13px, 3.3vw, 14px);
     font-weight:600;
@@ -472,6 +473,7 @@
     margin-bottom: 2px;
     word-break:break-word;
   }
+  .task-titlewrap .task-title{ margin-bottom:0; }
   .task.done .task-title{ text-decoration: line-through; text-decoration-color: var(--ink-faint); }
   .task-sub{ font-size: clamp(11.5px, 2.8vw, 12px); color: var(--ink-dim); }
 
@@ -3247,8 +3249,9 @@
       const body=document.createElement('div'); body.className='task-body';
 
       const head=document.createElement('div'); head.className='task-head';
-      head.innerHTML=`<div class="task-title">${highlightTitle(task.title)}</div>`+prioHtml(task.priority);
-      if(task.booked){ const _bs=task.bookingStatus||'pending'; const _bm=({pending:['Pending','amber'],accepted:['Accepted','green'],reschedule_proposed:['Awaiting guest','blue']})[_bs]||['Pending','amber']; const _bdg=document.createElement('span'); _bdg.className='sb-badge sb-'+_bm[1]; _bdg.textContent=_bm[0]; head.appendChild(_bdg); }
+      let _bookBadge='';
+      if(task.booked){ const _bs=task.bookingStatus||'pending'; const _bm=({pending:['Pending','amber'],accepted:['Accepted','green'],reschedule_proposed:['Awaiting guest','blue']})[_bs]||['Pending','amber']; _bookBadge='<span class="sb-badge sb-'+_bm[1]+'">'+_bm[0]+'</span>'; }
+      head.innerHTML='<div class="task-titlewrap"><span class="task-title">'+highlightTitle(task.title)+'</span>'+_bookBadge+'</div>'+prioHtml(task.priority);
       body.appendChild(head);
       if(task.sub){ const sub=document.createElement('div'); sub.className='task-sub'; sub.textContent=task.sub; body.appendChild(sub); }
       if(task.carryCount){
