@@ -1838,6 +1838,15 @@
   .bk-linkurl{ flex:1; min-width:0; font-family:var(--font-mono); font-size:12.5px; color:var(--ink-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .bk-linkactions{ display:flex; gap:9px; }
   .bk-linkbtn{ flex:1; display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:11px 14px; font-size:13px; }
+  .bk-gcard{ display:flex; align-items:center; gap:13px; background:var(--bg-card); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:24px; }
+  .bk-g-ic{ width:40px; height:40px; flex-shrink:0; border-radius:11px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.05); color:var(--ink-dim); }
+  .bk-g-ic.ok{ background:rgba(111,168,138,0.16); color:var(--green); }
+  .bk-g-body{ flex:1; min-width:0; }
+  .bk-g-title{ font-size:13.5px; font-weight:600; color:var(--ink); }
+  .bk-g-sub{ font-size:11.5px; color:var(--ink-faint); line-height:1.45; margin-top:2px; }
+  .bk-g-btn{ flex-shrink:0; display:inline-flex; align-items:center; text-decoration:none; background:var(--brass); color:#15110A; font-weight:700; font-size:12.5px; padding:9px 16px; border-radius:999px; }
+  .bk-g-btn.ghost{ background:transparent; border:1px solid var(--line); color:var(--ink-dim); }
+  .bk-g-btn.ghost:hover{ border-color:var(--brass); color:var(--brass); }
   .bk-sec{ display:flex; align-items:center; gap:9px; }
   .bk-count{ font-family:var(--font-mono); font-size:11px; font-weight:700; color:#15110A; background:var(--brass); min-width:18px; height:18px; padding:0 5px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; }
   .bk-count:empty{ display:none; }
@@ -1997,6 +2006,8 @@
   .tk-confirm-q{ font-size:14px; font-weight:600; color:var(--ink); margin-bottom:14px; }
   .tk-confirm-row{ display:flex; gap:10px; }
   .tk-confirm-row .btn{ flex:1; margin-top:0; }
+  .tk-meet-soon{ display:flex; align-items:flex-start; gap:9px; margin-top:18px; padding:13px 15px; border:1px dashed var(--line); border-radius:12px; background:var(--bg); font-size:12.5px; color:var(--ink-dim); line-height:1.45; text-align:left; }
+  .tk-meet-soon svg{ flex-shrink:0; color:var(--brass); margin-top:1px; }
   .tk-booklink{ display:flex; align-items:center; gap:8px; margin-top:18px; padding:11px 14px; border:1px solid var(--line); border-radius:11px; background:var(--bg); font-family:var(--font-mono); font-size:12px; color:var(--ink-dim); }
   .tk-booklink .ico{ color:var(--brass); flex-shrink:0; }
   .tk-booklink span{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -2924,9 +2935,13 @@
           +meetCard(r.date,r.time,r.duration,{muted:true,strike:true})
           +(bookUrl?btnLink(bookUrl,'Request a new time','secondary'):'');
       } else if(state==='accepted'){
+        const meetBtn = r.meet&&r.meet.ready
+          ? '<a class="btn btn-primary bk-track-btn" href="'+esc(r.meet.link)+'" target="_blank" rel="noopener"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="13" height="12" rx="2.5"/><path d="M15.5 10l5-3v10l-5-3z"/></svg>Join Google Meet</a>'
+          : (r.meet&&!r.meet.ready ? '<div class="tk-meet-soon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>Your Google Meet link opens 10 minutes before the meeting — check back here.</div>' : '');
         h=header('Confirmed','ok')+steps(4,false)
           +hero('accepted','You\u2019re confirmed','<b>'+owner+'</b> accepted your booking. See you then!')
-          +meetCard(r.date,r.time,r.duration,{accent:true,label:'Meeting with '+owner});
+          +meetCard(r.date,r.time,r.duration,{accent:true,label:'Meeting with '+owner})
+          +meetBtn;
       } else if(state==='declined' || state==='cancelled'){
         const isCan=state==='cancelled';
         h=header(isCan?'Cancelled':'Declined','bad')+steps(0,true)
@@ -5630,7 +5645,8 @@
 
   async function acceptBooking(id){
     const b=(bkLastBookings||[]).find(x=>x.id===id);
-    const res=await manageBooking('accept', id);
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone||''; }catch(e){}
+    const res=await manageBooking('accept', id, { tz });
     if(res.error){ flashToast('Could not accept — try again','err'); return; }
     reconcileBookings(bkLastBookings); await bkPublish(); refreshBookings();
     flashToast('Accepted — '+((b&&b.name)||'guest')+' will see it on their link');
@@ -5656,12 +5672,14 @@
       if(!r.ok) return bkLastBookings;
       const res=await r.json(); const bookings=res.bookings||[];
       bkLastBookings=bookings; reconcileBookings(bookings);
-      if(bookingsView && bookingsView.style.display!=='none' && !bkEditId){ fillBookingLists(); if(document.getElementById('bkCalWrap')) renderBookingDay(); }
+      bkGoogleConnected=!!res.googleConnected;
+      if(bookingsView && bookingsView.style.display!=='none' && !bkEditId){ fillBookingLists(); if(document.getElementById('bkCalWrap')) renderBookingDay(); if(typeof renderGoogleCard==='function') renderGoogleCard(); }
       return bookings;
     }catch(e){ return bkLastBookings; }
   }
 
   let bkEditId=null;
+  let bkGoogleConnected=false;
   const BK_STATUS={ pending:{t:'Pending',c:'amber'}, accepted:{t:'Accepted',c:'green'}, reschedule_proposed:{t:'Awaiting guest',c:'blue'}, declined:{t:'Declined',c:'red'}, cancelled:{t:'Cancelled',c:'red'} };
   function bkDShort(dk){ try{ return new Date(dk+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }catch(e){ return dk; } }
   function bkDLong(dk){ try{ return new Date(dk+'T00:00:00').toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'}); }catch(e){ return dk; } }
@@ -5738,6 +5756,7 @@
       +'<div class="bkd-srow"><span class="bkd-slabel">Status</span><span class="bkd-sval"><span class="sb-badge sb-'+meta.c+'">'+meta.t+'</span></span></div>'
       +'</div>';
     if(b.email) body+='<div class="bkd-field"><span class="bkd-lbl">Email</span><a class="bkd-val bkd-link" href="mailto:'+escapeHtml(b.email)+'">'+escapeHtml(b.email)+'</a></div>';
+    if(b.meetLink) body+='<div class="bkd-field"><span class="bkd-lbl">Google Meet</span><a class="bkd-val bkd-link" href="'+escapeHtml(b.meetLink)+'" target="_blank" rel="noopener">'+escapeHtml(b.meetLink.replace(/^https?:\/\//,''))+'</a></div>';
     if(b.note) body+='<div class="bkd-field"><span class="bkd-lbl">What it\u2019s about</span><div class="bkd-val">'+escapeHtml(b.note)+'</div></div>';
     if(st==='reschedule_proposed'&&b.proposed) body+='<div class="bkd-field"><span class="bkd-lbl">You proposed</span><div class="bkd-val">'+escapeHtml(bkDShort(b.proposed.date))+' · '+escapeHtml(fmtTime(b.proposed.time))+'</div></div>';
     if(hist.length){
@@ -5790,6 +5809,7 @@
         +'<div class="bk-linkactions"><button type="button" class="btn btn-primary bk-linkbtn" id="bkPageCopy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15"/></svg>Copy link</button>'
           +'<button type="button" class="btn btn-secondary bk-linkbtn" id="bkPageShare"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button></div>'
       +'</div>'
+      +'<div class="bk-gcard" id="bkGCard"></div>'
       +'<div class="bk-grid">'
         +'<div class="bk-col bk-col-left">'
           +'<div class="section-title bk-sec">Requests &amp; bookings <span class="bk-count" id="bkActiveCount"></span></div><div id="bkPageActive"></div>'
@@ -5801,9 +5821,27 @@
       +'</div>';
     const copy=document.getElementById('bkPageCopy'); if(copy) copy.addEventListener('click',()=>{ if(navigator.clipboard) navigator.clipboard.writeText(link); copy.innerHTML='Copied'; copy.classList.add('copied'); setTimeout(()=>{ renderBookingsPage(); },1400); });
     const share=document.getElementById('bkPageShare'); if(share) share.addEventListener('click',()=>{ if(navigator.share){ navigator.share({ title:'Book time with me', url:link }).catch(()=>{}); } else { if(navigator.clipboard) navigator.clipboard.writeText(link); flashToast('Link copied — paste it anywhere'); } });
+    renderGoogleCard();
     renderBookingDay();
     fillBookingLists();
     bkPoll(true);
+  }
+
+  // ---- Google Meet connection card (auto-create Meet links on accept) ----
+  function gmeetIco(s){ return '<svg width="'+(s||16)+'" height="'+(s||16)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="13" height="12" rx="2.5"/><path d="M15.5 10l5-3v10l-5-3z"/></svg>'; }
+  function renderGoogleCard(){
+    const el=document.getElementById('bkGCard'); if(!el) return;
+    const tok=localStorage.getItem(BK_TOKEN_KEY), sec=localStorage.getItem(BK_SECRET_KEY);
+    const authUrl=BOOK_API+'/gauth/start?book='+encodeURIComponent(tok||'')+'&secret='+encodeURIComponent(sec||'');
+    if(bkGoogleConnected){
+      el.innerHTML='<div class="bk-g-ic ok">'+gmeetIco(18)+'</div>'
+        +'<div class="bk-g-body"><div class="bk-g-title">Google Meet connected</div><div class="bk-g-sub">Every booking you accept gets a Meet link — added to your calendar &amp; emailed to the guest.</div></div>'
+        +'<a class="bk-g-btn ghost" href="'+escapeHtml(authUrl)+'" target="_blank" rel="noopener">Reconnect</a>';
+    } else {
+      el.innerHTML='<div class="bk-g-ic">'+gmeetIco(18)+'</div>'
+        +'<div class="bk-g-body"><div class="bk-g-title">Add Google Meet to bookings</div><div class="bk-g-sub">Connect your Google Calendar to auto-create a Meet link whenever you accept a booking.</div></div>'
+        +'<a class="bk-g-btn" href="'+escapeHtml(authUrl)+'" target="_blank" rel="noopener">Connect</a>';
+    }
   }
 
   // ---- Teams/Outlook-style day timeline: your personal time vs slots booked by others ----
