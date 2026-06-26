@@ -3788,12 +3788,14 @@
     const task=(data.tasks||[]).find(t=>t.id===editingTaskId);
     const title = task ? task.title : 'this task';
     askConfirm('Delete this task?', '“'+String(title)+'” will be permanently removed. This can’t be undone.', 'Delete', ()=>{
-      if(task && task.bookingId && typeof cancelBooking==='function'){
-        cancelBooking(task.bookingId);
+      if(task && task.bookingId){
+        // booked task: remove locally for sure + best-effort cancel on the server
+        if(typeof removeBookingLocally==='function') removeBookingLocally(task.bookingId);
+        else { const d2=loadDay(currentDate); d2.tasks=d2.tasks.filter(t=>t.id!==editingTaskId); saveDay(currentDate,d2); renderStructure(); }
       } else {
-        const d2=loadDay(currentDate); d2.tasks=d2.tasks.filter(t=>t.id!==editingTaskId); saveDay(currentDate,d2);
+        const d2=loadDay(currentDate); d2.tasks=d2.tasks.filter(t=>t.id!==editingTaskId); saveDay(currentDate,d2); renderStructure();
       }
-      closeEditor(); renderStructure();
+      closeEditor();
       flashToast('Task deleted');
     });
   });
@@ -5158,7 +5160,7 @@
   // ============================================================
   const BK_TOKEN_KEY='planner_book_token', BK_SECRET_KEY='planner_book_secret',
         BK_CFG_KEY='planner_book_config', BK_IMPORTED_KEY='planner_book_imported',
-        BK_ENABLED_KEY='planner_book_enabled';
+        BK_ENABLED_KEY='planner_book_enabled', BK_DISMISSED_KEY='planner_book_dismissed';
   const shareOverlay=document.getElementById('shareOverlay'), shareBody=document.getElementById('shareBody'),
         shareSaveBtn=document.getElementById('shareSave'), shareDisableBtn=document.getElementById('shareDisable'),
         shareCloseBtn=document.getElementById('shareClose'), shareBtn=document.getElementById('shareBtn');
@@ -5209,8 +5211,11 @@
   function reconcileBookings(bookings){
     let imported=[]; try{ imported=JSON.parse(localStorage.getItem(BK_IMPORTED_KEY)||'[]'); }catch(e){}
     const set=new Set(imported);
-    const active=(bookings||[]).filter(b=> b.status!=='declined' && b.status!=='cancelled');
+    const dismissed=new Set(bkDismissed());
+    // bookings the owner deleted locally are treated as inactive (never re-imported)
+    const active=(bookings||[]).filter(b=> b.status!=='declined' && b.status!=='cancelled' && !dismissed.has(b.id));
     const activeIds=new Set(active.map(b=>b.id));
+    const serverIds=new Set((bookings||[]).map(b=>b.id));
     let added=0, lastName='', changed=false;
     active.forEach(b=>{
       const loc=findBookedTask(b.id); const sub=bookingSub(b); const title=bookingTitle(b);
@@ -5245,6 +5250,8 @@
       }
     });
     localStorage.setItem(BK_IMPORTED_KEY, JSON.stringify([...set]));
+    // once a dismissed booking has fully left the server, forget it (keeps the set small)
+    if(dismissed.size){ const keep=[...dismissed].filter(id=>serverIds.has(id)); if(keep.length!==dismissed.size) localStorage.setItem(BK_DISMISSED_KEY, JSON.stringify(keep)); }
     if(changed) renderStructure();
     if(added>0){ bkPublish(); flashToast(added===1?('New request from '+lastName):(added+' new booking requests')); }
     else if(changed){ bkPublish(); }
@@ -5261,14 +5268,24 @@
     }catch(e){ return { error:'net' }; }
   }
 
-  async function cancelBooking(id){
-    const b=(bkLastBookings||[]).find(x=>x.id===id);
-    const res=await manageBooking('cancel', id);
-    if(res.error){ flashToast('Could not cancel — try again','err'); return; }
+  function bkDismissed(){ try{ return JSON.parse(localStorage.getItem(BK_DISMISSED_KEY)||'[]'); }catch(e){ return []; } }
+  function bkDismiss(id){ const d=bkDismissed(); if(d.indexOf(id)<0){ d.push(id); localStorage.setItem(BK_DISMISSED_KEY, JSON.stringify(d)); } }
+  // Robust local removal of a booking task: always removes it locally + stops it re-importing,
+  // then best-effort cancels on the server (so the guest is notified and the slot frees up).
+  async function removeBookingLocally(id){
     const loc=findBookedTask(id); if(loc){ loc.data.tasks.splice(loc.idx,1); saveDay(new Date(loc.key+'T00:00:00'), loc.data); }
     let imp=[]; try{ imp=JSON.parse(localStorage.getItem(BK_IMPORTED_KEY)||'[]'); }catch(e){}
     localStorage.setItem(BK_IMPORTED_KEY, JSON.stringify(imp.filter(x=>x!==id)));
-    renderStructure(); await bkPublish(); renderBookingsList();
+    bkDismiss(id);
+    renderStructure();
+    try{ await manageBooking('cancel', id); }catch(e){}
+    bkPublish();
+  }
+
+  async function cancelBooking(id){
+    const b=(bkLastBookings||[]).find(x=>x.id===id);
+    await removeBookingLocally(id);
+    renderBookingsList();
     flashToast('Booking with '+((b&&b.name)||'guest')+' cancelled');
   }
 
