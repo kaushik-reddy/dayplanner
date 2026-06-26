@@ -1462,14 +1462,15 @@
   html:has(.overlay.open), body:has(.overlay.open){ overflow:hidden; }
 
   /* ============ DESKTOP / WIDE LAYOUT (>=1000px) ============ */
-  /* Two-column dashboard: sticky overview sidebar + scrolling timeline. Mobile untouched. */
+  /* Dashboard: sticky overview sidebar + scrolling timeline (+ day-at-a-glance rail when wide). Mobile untouched. */
+  .planner-rail{ display:none; }
   @media (min-width: 1000px){
-    .wrap{ max-width: 1200px; }
+    .wrap{ max-width: min(1760px, 95vw); }
     #plannerView{
       display:grid;
-      grid-template-columns: 372px minmax(0, 1fr);
+      grid-template-columns: minmax(330px, 380px) minmax(0, 1fr);
       grid-template-areas: "head head" "aside main";
-      column-gap: 30px;
+      column-gap: 28px;
       align-items: start;
     }
     #plannerView > .header{ grid-area: head; }
@@ -1479,8 +1480,6 @@
     .planner-aside .day-progress{ margin:0; }
     .planner-main{ grid-area: main; min-width: 0; }
     .planner-main .timeline{ margin-top: 0; }
-    /* keep individual task cards from getting uncomfortably wide */
-    .planner-main .task{ max-width: 760px; }
 
     /* Audit: charts flow into a responsive multi-column grid */
     .audit-charts{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
@@ -1488,10 +1487,46 @@
     .audit-cards{ grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
   }
 
-  @media (min-width: 1320px){
-    .wrap{ max-width: 1320px; }
-    #plannerView{ grid-template-columns: 400px minmax(0, 1fr); }
+  /* 3-column dashboard on very wide screens: overview · timeline · day-at-a-glance */
+  @media (min-width: 1280px){
+    #plannerView{
+      grid-template-columns: minmax(330px, 380px) minmax(0, 1fr) minmax(300px, 360px);
+      grid-template-areas: "head head head" "aside main rail";
+      column-gap: 28px;
+    }
+    .planner-rail{ display:block; grid-area: rail; position: sticky; top: 24px; align-self: start; }
+    .audit-charts{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    #auditHeatCard, #auditBarsCard{ grid-column: 1 / -1; }
+    #auditDonutCard{ grid-column: span 2; }
   }
+
+  @media (min-width: 1600px){
+    #plannerView{ grid-template-columns: 400px minmax(0, 1fr) 400px; column-gap: 34px; }
+  }
+
+  /* day-at-a-glance rail card */
+  .rail-card{ background:var(--bg-card); border:1px solid var(--line); border-radius:18px; padding:16px clamp(13px,1vw,16px); }
+  .rail-card + .rail-card{ margin-top:16px; }
+  .rail-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-dim); font-weight:700; margin-bottom:14px; }
+  .rail-head .rh-count{ font-family:var(--font-mono); color:var(--ink-faint); font-weight:600; letter-spacing:0; }
+  .rail-list{ display:flex; flex-direction:column; gap:2px; }
+  .rail-item{ display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:transparent; border:none; border-radius:9px; padding:8px 9px; cursor:pointer; font-family:inherit; transition:background .15s; position:relative; }
+  .rail-item:hover{ background:rgba(255,255,255,0.04); }
+  .rail-item .ri-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; background:var(--ink-faint); }
+  .rail-item.running .ri-dot{ background:var(--brass); box-shadow:0 0 0 3px var(--brass-soft); }
+  .rail-item.completed .ri-dot{ background:var(--green); }
+  .rail-item.cancelled .ri-dot{ background:var(--red-soft); }
+  .rail-item.carried .ri-dot{ background:#7FA8C9; }
+  .rail-item.delayed .ri-dot{ background:var(--red-soft); }
+  .ri-time{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); flex-shrink:0; min-width:52px; }
+  .ri-title{ flex:1; min-width:0; font-size:12.5px; color:var(--ink-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rail-item.running .ri-title, .rail-item.current .ri-title{ color:var(--ink); font-weight:600; }
+  .rail-item.completed .ri-title{ text-decoration:line-through; text-decoration-color:var(--ink-faint); color:var(--ink-faint); }
+  .rail-item.cancelled .ri-title{ text-decoration:line-through; text-decoration-color:var(--red-soft); color:var(--ink-faint); }
+  .rail-item.current::before{ content:''; position:absolute; left:0; top:6px; bottom:6px; width:2px; border-radius:2px; background:var(--brass); }
+  .rail-stat{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 2px; font-size:12px; color:var(--ink-dim); border-bottom:1px solid var(--line); }
+  .rail-stat:last-child{ border-bottom:none; }
+  .rail-stat b{ color:var(--ink); font-family:var(--font-mono); font-weight:600; }
 
   @media (max-width: 480px){
     body{ padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
@@ -1645,6 +1680,8 @@
   <div class="day-summary" id="daySummary" style="display:none;"></div>
   <div class="empty-state" id="emptyState" style="display:none;">No tasks yet. Add your first one for the day.</div>
   </div><!-- /planner-main -->
+
+  <aside class="planner-rail" id="plannerRail"></aside>
 
   <div class="fab-dock" id="fabDock">
     <div class="fab-scrim" id="fabScrim"></div>
@@ -2711,6 +2748,28 @@
         (freeMin>0?`<span class="stat"><span class="ic">${svgIco('free',13)}</span><b>${fmtPlanned(freeMin)}</b> free</span>`:'')+
         (lastEnd!==null?`<span class="stat"><span class="ic">${svgIco('end',13)}</span>ends <b>${minToClock(lastEnd)}</b></span>`:'');
     } else { dayStats.innerHTML=''; }
+
+    // ---- day-at-a-glance rail (desktop ≥1280px only; hidden on mobile via CSS) ----
+    (function(){
+      const rail=document.getElementById('plannerRail'); if(!rail) return;
+      if(!data.tasks.length){ rail.innerHTML=''; return; }
+      const nowM = isToday(d) ? (new Date().getHours()*60+new Date().getMinutes()) : -1;
+      const items=data.tasks.map(t=>{
+        const s=taskState(t);
+        let cls=s;
+        if(s==='pending' && nowM>=0 && nowM>timeToMinutes(t.time)) cls='delayed';
+        const isCur = (s==='running') || (expandedTaskIds && expandedTaskIds.has(t.id) && s==='pending');
+        return '<button class="rail-item '+cls+(isCur?' current':'')+'" data-id="'+t.id+'"><span class="ri-dot"></span><span class="ri-time">'+escapeHtml(fmtTime(t.time))+'</span><span class="ri-title">'+escapeHtml(t.title)+'</span></button>';
+      }).join('');
+      const glance='<div class="rail-card"><div class="rail-head">At a glance</div>'+
+        '<div class="rail-stat">Completed <b>'+doneCount+' / '+total+'</b></div>'+
+        '<div class="rail-stat">Planned <b>'+(plannedMin?fmtPlanned(plannedMin):'0m')+'</b></div>'+
+        (freeMin>0?'<div class="rail-stat">Free time <b>'+fmtPlanned(freeMin)+'</b></div>':'')+
+        (lastEnd!==null?'<div class="rail-stat">Wraps by <b>'+minToClock(lastEnd)+'</b></div>':'')+
+      '</div>';
+      rail.innerHTML='<div class="rail-card"><div class="rail-head">Today\u2019s agenda <span class="rh-count">'+data.tasks.length+'</span></div><div class="rail-list">'+items+'</div></div>'+glance;
+      rail.querySelectorAll('.rail-item').forEach(it=>{ it.addEventListener('click',()=>{ const t=data.tasks.find(x=>x.id===it.getAttribute('data-id')); if(t) openTaskAudit(t); }); });
+    })();
     closeDayBtn.style.display=data.closed?'none':'block';
     closedBanner.style.display=data.closed?'block':'none';
     closeDayBtn.disabled=total===0;
