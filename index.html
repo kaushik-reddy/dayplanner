@@ -1668,6 +1668,68 @@
     .date-block .date-full{ font-size: 21px; }
     .viewtab{ font-size: 12px; padding: 8px 10px; }
   }
+
+  /* ===================== BOOKING ===================== */
+  body.booking-active .wrap,
+  body.booking-active #fabDock,
+  body.booking-active .topbar{ display:none !important; }
+  body.booking-active{ background:radial-gradient(120% 90% at 50% -10%, #1c1a16 0%, var(--bg) 60%); min-height:100vh; }
+  /* owner share modal */
+  .share-field{ margin-bottom:14px; }
+  .share-field > label{ display:block; font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:7px; font-weight:600; }
+  .share-link-row{ display:flex; gap:8px; }
+  .share-link-row input{ flex:1; min-width:0; }
+  .copy-btn{ flex-shrink:0; display:inline-flex; align-items:center; gap:6px; background:var(--brass); color:#15110A; border:none; border-radius:11px; padding:0 14px; font-weight:700; font-size:12.5px; font-family:inherit; cursor:pointer; }
+  .copy-btn.copied{ background:var(--green); }
+  .dow-toggle{ display:flex; gap:6px; }
+  .dow-toggle button{ flex:1; min-width:0; aspect-ratio:1; max-width:44px; border-radius:50%; border:1px solid var(--line); background:transparent; color:var(--ink-dim); font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; }
+  .dow-toggle button.on{ background:var(--brass); border-color:var(--brass); color:#15110A; }
+  .share-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .share-bookings{ margin-top:4px; display:flex; flex-direction:column; gap:8px; }
+  .sb-row{ display:flex; align-items:center; gap:11px; border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:var(--bg); }
+  .sb-ic{ width:32px; height:32px; border-radius:9px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:rgba(201,151,74,0.16); color:var(--brass); }
+  .sb-main{ flex:1; min-width:0; }
+  .sb-name{ font-size:13px; font-weight:600; color:var(--ink); }
+  .sb-when{ font-size:11px; color:var(--ink-faint); font-family:var(--font-mono); margin-top:2px; }
+  .sb-empty{ font-size:12.5px; color:var(--ink-faint); text-align:center; padding:14px; border:1px dashed var(--line); border-radius:12px; }
+  .bk-pillrow{ display:flex; gap:7px; flex-wrap:wrap; }
+  .bk-pill{ border:1px solid var(--line); background:transparent; color:var(--ink-dim); border-radius:999px; padding:8px 15px; font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
+  .bk-pill.on{ background:var(--brass); border-color:var(--brass); color:#15110A; }
+  .share-note{ font-size:11.5px; color:var(--ink-faint); line-height:1.5; margin-top:-4px; }
+
+  /* public booking page */
+  .booking-view{ max-width:560px; margin:0 auto; padding:calc(28px + env(safe-area-inset-top)) clamp(16px,5vw,28px) 60px; }
+  .bk-card{ background:var(--bg-card); border:1px solid var(--line); border-radius:22px; padding:clamp(20px,5vw,30px); box-shadow:0 24px 60px rgba(0,0,0,0.4); }
+  .bk-brand{ display:flex; align-items:center; gap:10px; font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--brass); font-weight:700; margin-bottom:18px; }
+  .bk-brand .ico{ color:var(--brass); }
+  .bk-title{ font-family:var(--font-display); font-size:clamp(24px,6vw,32px); font-weight:600; line-height:1.1; margin-bottom:8px; }
+  .bk-sub{ font-size:13px; color:var(--ink-dim); margin-bottom:22px; line-height:1.5; }
+  .bk-dur-pill{ display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600; color:var(--brass); background:var(--brass-soft); padding:5px 11px; border-radius:999px; margin-left:8px; }
+  .bk-sec-label{ font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; margin:0 0 12px; }
+  .bk-dates{ display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; margin-bottom:22px; scrollbar-width:none; }
+  .bk-dates::-webkit-scrollbar{ display:none; }
+  .bk-date{ flex-shrink:0; min-width:62px; text-align:center; border:1px solid var(--line); border-radius:14px; padding:10px 8px; background:var(--bg); cursor:pointer; font-family:inherit; transition:border-color .15s, background .15s; }
+  .bk-date.sel{ background:var(--brass); border-color:var(--brass); }
+  .bk-date.sel .bd-dow, .bk-date.sel .bd-day, .bk-date.sel .bd-mon{ color:#15110A; }
+  .bk-date:disabled{ opacity:0.32; cursor:not-allowed; }
+  .bd-dow{ font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); }
+  .bd-day{ font-family:var(--font-display); font-size:20px; font-weight:600; color:var(--ink); line-height:1.1; margin:3px 0; }
+  .bd-mon{ font-size:9.5px; text-transform:uppercase; color:var(--ink-faint); letter-spacing:0.06em; }
+  .bk-slots{ display:grid; grid-template-columns:repeat(auto-fill,minmax(92px,1fr)); gap:9px; }
+  .bk-slot{ border:1px solid var(--line); border-radius:11px; padding:11px 8px; background:var(--bg); color:var(--ink); font-family:var(--font-mono); font-size:13px; font-weight:600; cursor:pointer; transition:border-color .15s, background .15s, color .15s; }
+  .bk-slot:hover{ border-color:var(--brass); color:var(--brass); }
+  .bk-slot.sel{ background:var(--brass); border-color:var(--brass); color:#15110A; }
+  .bk-empty-slots{ text-align:center; color:var(--ink-faint); font-size:13px; padding:24px; border:1px dashed var(--line); border-radius:14px; }
+  .bk-form{ margin-top:22px; display:flex; flex-direction:column; gap:13px; }
+  .bk-form .field input, .bk-form .field textarea{ width:100%; box-sizing:border-box; background:var(--bg); border:1px solid var(--line); color:var(--ink); font-size:16px; font-family:inherit; padding:12px 14px; border-radius:11px; }
+  .bk-form .field textarea{ min-height:72px; resize:vertical; }
+  .bk-confirm-card{ text-align:center; padding:12px 0; }
+  .bk-confirm-ic{ width:64px; height:64px; border-radius:50%; margin:0 auto 18px; background:rgba(111,168,138,0.16); color:var(--green); display:flex; align-items:center; justify-content:center; }
+  .bk-confirm-title{ font-family:var(--font-display); font-size:26px; font-weight:600; margin-bottom:10px; }
+  .bk-confirm-detail{ font-size:14px; color:var(--ink-dim); line-height:1.6; }
+  .bk-confirm-detail b{ color:var(--ink); }
+  .bk-confirm-when{ display:inline-flex; align-items:center; gap:8px; margin:18px 0; padding:12px 18px; border:1px solid var(--brass-soft); background:var(--brass-soft); border-radius:14px; font-family:var(--font-mono); font-size:14px; color:var(--ink); }
+  .bk-footer{ text-align:center; margin-top:26px; font-size:11px; color:var(--ink-faint); }
 </style>
 </head>
 <body>
@@ -1737,6 +1799,7 @@
       <button class="slot-btn" id="slotsBtn"><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>See free time slots</button>
       <button class="swap-btn" id="swapBtn"><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v15M7 4 3.5 7.5M7 4l3.5 3.5"/><path d="M17 20V5M17 20l3.5-3.5M17 20l-3.5-3.5"/></svg>Swap two tasks</button>
       <button class="select-btn" id="selectBtn"><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 12l2.8 2.8L16.5 9"/></svg>Select &amp; move tasks</button>
+      <button class="slot-btn" id="shareBtn"><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share booking link</button>
       <button class="close-day" id="closeDayBtn">Close checklist for the day</button>
     </div>
     <button class="fab" id="fabToggle" aria-label="Quick actions" title="Quick actions">
@@ -1803,6 +1866,27 @@
 
     <div class="section-title">Timeline log · every action recorded</div>
     <div id="auditLog"></div>
+  </div>
+</div>
+
+<!-- Public booking page (rendered when ?book=TOKEN is present) -->
+<div id="bookingView" class="booking-view" style="display:none;"></div>
+
+<!-- Owner: share booking link modal -->
+<div class="overlay" id="shareOverlay">
+  <div class="modal modal-form modal-share">
+    <div class="modal-head">
+      <div class="ta-titles">
+        <h2>Your booking link</h2>
+        <div class="ta-when">Share it — people see only free slots, never your tasks.</div>
+      </div>
+      <button type="button" class="modal-close" id="shareClose" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+    </div>
+    <div class="modal-body" id="shareBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" id="shareDisable" style="display:none;">Turn off</button>
+      <button class="btn btn-primary" id="shareSave">Save &amp; publish</button>
+    </div>
   </div>
 </div>
 
@@ -2151,6 +2235,149 @@
 (function(){
   const STORAGE_PREFIX = 'planner_day_';
   const IMG_CACHE_KEY = 'planner_img_cache_v1';
+
+  // ============================================================
+  // PUBLIC BOOKING MODE  (?book=TOKEN) — self-contained visitor page.
+  // Shows only free/busy slots; never reveals the owner's tasks/data.
+  // ============================================================
+  const BOOK_API = 'https://planner-sync.kaushik4432.workers.dev';
+  const _bookToken = new URLSearchParams(location.search).get('book');
+  if(_bookToken){ runBookingMode(_bookToken); return; }
+
+  function runBookingMode(token){
+    const view = document.getElementById('bookingView');
+    document.body.classList.add('booking-active');
+    view.style.display = 'block';
+    document.title = 'Book a time';
+
+    const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const pad = n => String(n).padStart(2,'0');
+    const fmt12 = m => { let h=Math.floor(m/60), mi=m%60; const p=h>=12?'pm':'am'; let hh=h%12||12; return hh+':'+pad(mi)+p; };
+    const keyOf = d => d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+    const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    let owner='', cfg=null, blocked={}, dates=[], selDate=null, selSlot=null;
+
+    function shell(inner){ view.innerHTML = '<div class="bk-card">'+inner+'</div><div class="bk-footer">Powered by your private day planner · only free slots are shared</div>'; }
+
+    function loading(){ shell('<div class="bk-brand">'+brandIco()+'Scheduling</div><div class="bk-sub" style="margin:0">Loading availability…</div>'); }
+    function brandIco(){ return '<svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17M8 2.5v4M16 2.5v4"/></svg>'; }
+
+    function errCard(msg){ shell('<div class="bk-brand">'+brandIco()+'Scheduling</div><div class="bk-title">Link unavailable</div><div class="bk-sub">'+esc(msg)+'</div>'); }
+
+    function buildDates(){
+      dates=[]; const horizon=(cfg.horizonDays||14); const allow=cfg.days||[1,2,3,4,5];
+      const today=new Date(); today.setHours(0,0,0,0);
+      for(let i=0;i<=horizon;i++){
+        const d=new Date(today); d.setDate(today.getDate()+i);
+        if(allow.indexOf(d.getDay())>=0) dates.push(d);
+      }
+    }
+
+    function slotsFor(d){
+      const k=keyOf(d); const busy=blocked[k]||[];
+      const dur=cfg.durationMin||30, step=cfg.slotMin||30, s0=cfg.startMin||540, s1=cfg.endMin||1020;
+      const now=new Date(); const isToday=keyOf(now)===k; const nowMin=now.getHours()*60+now.getMinutes();
+      const out=[];
+      for(let s=s0; s+dur<=s1; s+=step){
+        if(isToday && s <= nowMin+5) continue;
+        const clash=busy.some(b=> s < b[1] && b[0] < s+dur);
+        if(!clash) out.push(s);
+      }
+      return out;
+    }
+
+    function render(){
+      const durLabel=(cfg.durationMin||30)+' min';
+      let h='<div class="bk-brand">'+brandIco()+'Scheduling</div>';
+      h+='<div class="bk-title">Book time with '+esc(owner||'me')+'</div>';
+      h+='<div class="bk-sub">Pick an open slot below. You\'ll only see times that are free.<span class="bk-dur-pill">'+brandIco()+durLabel+'</span></div>';
+      // dates
+      h+='<div class="bk-sec-label">Choose a day</div><div class="bk-dates">';
+      if(!dates.length){ h+='<div class="bk-empty-slots" style="min-width:100%">No open days right now. Check back soon.</div>'; }
+      dates.forEach((d,i)=>{
+        const k=keyOf(d); const has=slotsFor(d).length>0;
+        h+='<button class="bk-date'+(k===selDate?' sel':'')+'" data-k="'+k+'" data-i="'+i+'"'+(has?'':' disabled')+'>'
+          +'<div class="bd-dow">'+DOW[d.getDay()]+'</div><div class="bd-day">'+d.getDate()+'</div><div class="bd-mon">'+MON[d.getMonth()]+'</div></button>';
+      });
+      h+='</div>';
+      // slots
+      if(selDate){
+        const d=dates.find(x=>keyOf(x)===selDate);
+        const slots=d?slotsFor(d):[];
+        h+='<div class="bk-sec-label">Available times</div>';
+        if(!slots.length){ h+='<div class="bk-empty-slots">No open times this day. Try another.</div>'; }
+        else{ h+='<div class="bk-slots">'; slots.forEach(s=>{ h+='<button class="bk-slot'+(s===selSlot?' sel':'')+'" data-s="'+s+'">'+fmt12(s)+'</button>'; }); h+='</div>'; }
+      }
+      // form
+      if(selDate && selSlot!=null){
+        h+='<div class="bk-form">'
+          +'<div class="bk-sec-label" style="margin-top:6px">Your details</div>'
+          +'<div class="field"><input id="bkName" type="text" placeholder="Your name" autocomplete="name" maxlength="80"></div>'
+          +'<div class="field"><input id="bkEmail" type="email" placeholder="Email (optional)" autocomplete="email" maxlength="120"></div>'
+          +'<div class="field"><textarea id="bkNote" placeholder="What\'s this about? (optional)" maxlength="500"></textarea></div>'
+          +'<button class="btn btn-primary" id="bkConfirm" style="width:100%">Confirm booking · '+fmt12(selSlot)+'</button>'
+          +'<div id="bkErr" style="color:var(--red-soft);font-size:12.5px;text-align:center;display:none"></div>'
+          +'</div>';
+      }
+      shell(h);
+      wire();
+    }
+
+    function wire(){
+      view.querySelectorAll('.bk-date:not([disabled])').forEach(b=>b.addEventListener('click',()=>{ selDate=b.dataset.k; selSlot=null; render(); view.querySelector('.bk-sec-label')&&0; }));
+      view.querySelectorAll('.bk-slot').forEach(b=>b.addEventListener('click',()=>{ selSlot=parseInt(b.dataset.s,10); render(); const f=document.getElementById('bkName'); f&&f.focus(); }));
+      const c=document.getElementById('bkConfirm'); if(c) c.addEventListener('click', submit);
+    }
+
+    async function submit(){
+      const name=(document.getElementById('bkName').value||'').trim();
+      const email=(document.getElementById('bkEmail').value||'').trim();
+      const note=(document.getElementById('bkNote').value||'').trim();
+      const errEl=document.getElementById('bkErr');
+      if(!name){ errEl.textContent='Please enter your name.'; errEl.style.display='block'; document.getElementById('bkName').focus(); return; }
+      const btn=document.getElementById('bkConfirm'); btn.disabled=true; btn.textContent='Booking…';
+      try{
+        const r=await fetch(BOOK_API+'?book='+encodeURIComponent(token), { method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ date:selDate, time:minToTimeStr(selSlot), duration:cfg.durationMin||30, name, email, note }) });
+        if(r.status===409){ errEl.textContent='Sorry, that slot was just taken. Please pick another.'; errEl.style.display='block'; btn.disabled=false; btn.textContent='Confirm booking'; await refresh(true); return; }
+        if(!r.ok) throw new Error('http '+r.status);
+        confirmed(name, email);
+      }catch(e){ errEl.textContent='Something went wrong. Please try again.'; errEl.style.display='block'; btn.disabled=false; btn.textContent='Confirm booking'; }
+    }
+    function minToTimeStr(m){ return pad(Math.floor(m/60))+':'+pad(m%60); }
+
+    function confirmed(name, email){
+      const d=dates.find(x=>keyOf(x)===selDate);
+      const dlabel=d?DOW[d.getDay()]+', '+MON[d.getMonth()]+' '+d.getDate():selDate;
+      shell('<div class="bk-confirm-card">'
+        +'<div class="bk-confirm-ic"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"/></svg></div>'
+        +'<div class="bk-confirm-title">You\'re booked!</div>'
+        +'<div class="bk-confirm-when">'+brandIco()+dlabel+' · '+fmt12(selSlot)+'</div>'
+        +'<div class="bk-confirm-detail">Thanks, <b>'+esc(name)+'</b>. Your '+( (cfg.durationMin||30) )+'-minute slot with <b>'+esc(owner||'me')+'</b> is confirmed.'
+        +(email?'<br>A copy of these details is yours to keep.':'')+'</div>'
+        +'<button class="btn btn-secondary" id="bkAgain" style="margin-top:22px">Book another time</button>'
+        +'</div>');
+      const a=document.getElementById('bkAgain'); if(a) a.addEventListener('click',()=>{ selSlot=null; refresh(true); });
+    }
+
+    async function refresh(keepDate){
+      try{
+        const r=await fetch(BOOK_API+'?book='+encodeURIComponent(token), { method:'GET' });
+        if(!r.ok) throw new Error('http '+r.status);
+        const res=await r.json();
+        if(!res || !res.config){ errCard('This booking link is not active yet. Please check back later.'); return; }
+        owner=res.owner||''; cfg=res.config; blocked=res.blocked||{};
+        buildDates();
+        if(!keepDate || !dates.some(d=>keyOf(d)===selDate)){ selDate = dates.length?keyOf(dates[0]):null; }
+        render();
+      }catch(e){ errCard('Could not load this booking link. Please try again.'); }
+    }
+
+    loading();
+    refresh(false);
+  }
 
   // ---------- inline SVG icon set (replaces all emoji/glyphs) ----------
   const ICON_PATHS = {
@@ -4502,17 +4729,187 @@
     window.addEventListener('pagehide', ()=>{ if(syncCode && syncDirty){ try{ navigator.sendBeacon && navigator.sendBeacon(SYNC_API, new Blob([JSON.stringify({ code:syncCode, baseVersion:syncVersion, data:bundleLocal() })],{type:'application/json'})); }catch(e){} } });
   }
 
+  // ============================================================
+  // OWNER: share booking link  (publish free/busy, poll + import bookings)
+  // ============================================================
+  const BK_TOKEN_KEY='planner_book_token', BK_SECRET_KEY='planner_book_secret',
+        BK_CFG_KEY='planner_book_config', BK_IMPORTED_KEY='planner_book_imported',
+        BK_ENABLED_KEY='planner_book_enabled';
+  const shareOverlay=document.getElementById('shareOverlay'), shareBody=document.getElementById('shareBody'),
+        shareSaveBtn=document.getElementById('shareSave'), shareDisableBtn=document.getElementById('shareDisable'),
+        shareCloseBtn=document.getElementById('shareClose'), shareBtn=document.getElementById('shareBtn');
+  let bkPollTimer=null, bkPubTimer=null, bkLastBookings=[];
+
+  function bkRandId(len){ const a='abcdefghijkmnpqrstuvwxyz23456789'; let s=''; for(let i=0;i<len;i++) s+=a[Math.floor(Math.random()*a.length)]; return s; }
+  function mm2t(m){ return pad2(Math.floor(m/60))+':'+pad2(m%60); }
+  function t2mm(v){ const p=String(v||'').split(':'); return (parseInt(p[0],10)||0)*60+(parseInt(p[1],10)||0); }
+  function bkDefaults(){ return { owner:'', durationMin:30, days:[1,2,3,4,5], startMin:540, endMin:1020, slotMin:30, horizonDays:14 }; }
+  function bkCfg(){ try{ return Object.assign(bkDefaults(), JSON.parse(localStorage.getItem(BK_CFG_KEY)||'{}')); }catch(e){ return bkDefaults(); } }
+  function bkEnabled(){ return localStorage.getItem(BK_ENABLED_KEY)==='1'; }
+  function bkLink(){ const tok=localStorage.getItem(BK_TOKEN_KEY); if(!tok) return ''; return location.origin+location.pathname+'?book='+tok; }
+  function bkEnsureKeys(){ if(!localStorage.getItem(BK_TOKEN_KEY)) localStorage.setItem(BK_TOKEN_KEY, bkRandId(11)); if(!localStorage.getItem(BK_SECRET_KEY)) localStorage.setItem(BK_SECRET_KEY, bkRandId(24)); }
+
+  function computeBusy(cfg){
+    const busy={}; const horizon=(cfg.horizonDays||14);
+    const today=new Date(); today.setHours(0,0,0,0);
+    for(let i=0;i<=horizon;i++){
+      const d=new Date(today); d.setDate(today.getDate()+i);
+      const data=loadDay(d); const k=dateKey(d);
+      (data.tasks||[]).forEach(t=>{ const st=taskState(t); if(st==='cancelled'||st==='carried') return; const dur=(t.duration||0); if(dur<=0) return; const s=timeToMinutes(t.time); (busy[k]=busy[k]||[]).push([s, s+dur]); });
+    }
+    return busy;
+  }
+
+  async function bkPublish(){
+    bkEnsureKeys();
+    const tok=localStorage.getItem(BK_TOKEN_KEY), sec=localStorage.getItem(BK_SECRET_KEY);
+    const cfg=bkCfg(); const busy=computeBusy(cfg);
+    try{ await fetch(BOOK_API+'?book='+encodeURIComponent(tok)+'&publish=1', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ownerSecret:sec, config:cfg, busy }) }); }catch(e){}
+  }
+
+  function importBookings(bookings){
+    let imported=[]; try{ imported=JSON.parse(localStorage.getItem(BK_IMPORTED_KEY)||'[]'); }catch(e){}
+    const set=new Set(imported); let added=0, lastName='';
+    (bookings||[]).forEach(b=>{
+      if(set.has(b.id)) return;
+      const d=new Date(b.date+'T00:00:00'); const data=loadDay(d); data.tasks=data.tasks||[];
+      if(!data.tasks.some(t=>t.bookingId===b.id)){
+        data.tasks.push({ id:'booked_'+b.id, time:b.time, duration:b.duration||30, title:'Booking · '+(b.name||'Guest'), sub:(b.note||'')+(b.email?((b.note?' · ':'')+b.email):''), categories:['#meeting'], priority:'high', booked:true, bookingId:b.id, createdAt:Date.now() });
+        saveDay(d, data); added++;
+      }
+      set.add(b.id); lastName=b.name||lastName;
+    });
+    if(added>0){
+      localStorage.setItem(BK_IMPORTED_KEY, JSON.stringify([...set]));
+      renderStructure(); bkPublish();
+      flashToast(added===1?('New booking from '+lastName):(added+' new bookings received'));
+    }
+  }
+
+  async function bkPoll(silent){
+    const tok=localStorage.getItem(BK_TOKEN_KEY), sec=localStorage.getItem(BK_SECRET_KEY);
+    if(!tok||!sec) return [];
+    try{
+      const r=await fetch(BOOK_API+'?book='+encodeURIComponent(tok)+'&pull=1&secret='+encodeURIComponent(sec));
+      if(!r.ok) return bkLastBookings;
+      const res=await r.json(); const bookings=res.bookings||[];
+      bkLastBookings=bookings; importBookings(bookings);
+      if(!silent && shareOverlay.classList.contains('open')) renderBookingsList();
+      return bookings;
+    }catch(e){ return bkLastBookings; }
+  }
+
+  function renderBookingsList(){
+    const el=document.getElementById('bkList'); if(!el) return;
+    const list=(bkLastBookings||[]).slice().sort((a,b)=> (a.date+a.time) < (b.date+b.time) ? 1 : -1);
+    if(!list.length){ el.innerHTML='<div class="sb-empty">No bookings yet. Share your link to start receiving them.</div>'; return; }
+    el.innerHTML=list.map(b=>{
+      let when=b.date; try{ when=new Date(b.date+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }catch(e){}
+      const t=fmtTime(b.time);
+      return '<div class="sb-row"><div class="sb-ic">'+svgIco('calendar',16)+'</div><div class="sb-main"><div class="sb-name">'+escapeHtml(b.name||'Guest')+'</div><div class="sb-when">'+escapeHtml(when)+' · '+escapeHtml(t)+(b.email?' · '+escapeHtml(b.email):'')+'</div></div></div>';
+    }).join('');
+  }
+
+  let bkDraft=null;
+  function renderShareBody(){
+    const c=bkDraft; const enabled=bkEnabled(); const link=bkLink();
+    const dowL=['S','M','T','W','T','F','S']; const durOpts=[15,30,45,60], slotOpts=[15,30,60], horOpts=[7,14,30];
+    let h='';
+    h+='<p class="share-note">Guests see only open time slots — your tasks, titles and notes stay private. Bookings appear in your planner automatically.</p>';
+    if(enabled && link){
+      h+='<div class="share-field"><label>Your shareable link · live</label><div class="share-link-row"><input id="bkLinkInput" type="text" readonly value="'+escapeHtml(link)+'"><button type="button" class="copy-btn" id="bkCopy">Copy</button></div></div>';
+    }
+    h+='<div class="share-field"><label>Display name (shown to guests)</label><input id="bkOwner" type="text" placeholder="e.g. Kaushik" value="'+escapeHtml(c.owner||'')+'"></div>';
+    h+='<div class="share-field"><label>Meeting length</label><div class="bk-pillrow" data-pill="dur">'+durOpts.map(o=>'<button type="button" class="bk-pill'+(c.durationMin===o?' on':'')+'" data-v="'+o+'">'+o+' min</button>').join('')+'</div></div>';
+    h+='<div class="share-field"><label>Available days</label><div class="dow-toggle" id="bkDows">'+dowL.map((l,i)=>'<button type="button" class="'+(c.days.indexOf(i)>=0?'on':'')+'" data-d="'+i+'">'+l+'</button>').join('')+'</div></div>';
+    h+='<div class="share-grid2"><div class="share-field"><label>Day starts</label><input id="bkStart" type="time" value="'+mm2t(c.startMin)+'"></div><div class="share-field"><label>Day ends</label><input id="bkEnd" type="time" value="'+mm2t(c.endMin)+'"></div></div>';
+    h+='<div class="share-field"><label>Slot spacing</label><div class="bk-pillrow" data-pill="slot">'+slotOpts.map(o=>'<button type="button" class="bk-pill'+(c.slotMin===o?' on':'')+'" data-v="'+o+'">every '+o+'m</button>').join('')+'</div></div>';
+    h+='<div class="share-field"><label>Bookable window</label><div class="bk-pillrow" data-pill="hor">'+horOpts.map(o=>'<button type="button" class="bk-pill'+(c.horizonDays===o?' on':'')+'" data-v="'+o+'">next '+o+' days</button>').join('')+'</div></div>';
+    h+='<div class="share-field"><label>Bookings received</label><div class="share-bookings" id="bkList"><div class="sb-empty">Loading…</div></div></div>';
+    shareBody.innerHTML=h;
+
+    const owner=document.getElementById('bkOwner'); owner.addEventListener('input',()=>{ bkDraft.owner=owner.value; });
+    document.getElementById('bkStart').addEventListener('change', e=>{ bkDraft.startMin=t2mm(e.target.value); });
+    document.getElementById('bkEnd').addEventListener('change', e=>{ bkDraft.endMin=t2mm(e.target.value); });
+    shareBody.querySelectorAll('.bk-pillrow').forEach(row=>{
+      const kind=row.dataset.pill;
+      row.querySelectorAll('.bk-pill').forEach(b=>b.addEventListener('click',()=>{
+        row.querySelectorAll('.bk-pill').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+        const v=parseInt(b.dataset.v,10);
+        if(kind==='dur') bkDraft.durationMin=v; else if(kind==='slot') bkDraft.slotMin=v; else if(kind==='hor') bkDraft.horizonDays=v;
+      }));
+    });
+    document.querySelectorAll('#bkDows button').forEach(b=>b.addEventListener('click',()=>{
+      const d=parseInt(b.dataset.d,10); const i=bkDraft.days.indexOf(d);
+      if(i>=0) bkDraft.days.splice(i,1); else bkDraft.days.push(d);
+      b.classList.toggle('on');
+    }));
+    const copy=document.getElementById('bkCopy');
+    if(copy) copy.addEventListener('click',()=>{ const inp=document.getElementById('bkLinkInput'); inp.select(); navigator.clipboard&&navigator.clipboard.writeText(inp.value); copy.textContent='Copied'; copy.classList.add('copied'); setTimeout(()=>{ copy.textContent='Copy'; copy.classList.remove('copied'); },1600); });
+    renderBookingsList();
+  }
+
+  function openShareModal(){
+    bkEnsureKeys();
+    bkDraft=bkCfg();
+    renderShareBody();
+    shareDisableBtn.style.display = bkEnabled()?'':'none';
+    shareOverlay.classList.add('open');
+    bkPoll(false);
+  }
+  function closeShareModal(){ shareOverlay.classList.remove('open'); }
+
+  async function saveShareConfig(){
+    bkDraft.days = bkDraft.days.slice().sort((a,b)=>a-b);
+    if(!bkDraft.days.length){ flashToast('Pick at least one available day','err'); return; }
+    if(bkDraft.endMin<=bkDraft.startMin){ flashToast('End time must be after start time','err'); return; }
+    localStorage.setItem(BK_CFG_KEY, JSON.stringify(bkDraft));
+    localStorage.setItem(BK_ENABLED_KEY,'1');
+    shareSaveBtn.disabled=true; shareSaveBtn.textContent='Publishing…';
+    await bkPublish();
+    shareSaveBtn.disabled=false; shareSaveBtn.textContent='Save & publish';
+    flashToast('Booking link is live — share it anywhere');
+    startBookingLoops();
+    renderShareBody(); // re-render to show the live link row
+    shareDisableBtn.style.display='';
+  }
+
+  async function disableSharing(){
+    // publish an empty-availability config so any open links show no slots
+    localStorage.setItem(BK_ENABLED_KEY,'0');
+    const off=Object.assign(bkCfg(),{ days:[], horizonDays:0 });
+    localStorage.setItem(BK_CFG_KEY, JSON.stringify(off));
+    await bkPublish();
+    if(bkPollTimer){ clearInterval(bkPollTimer); bkPollTimer=null; }
+    if(bkPubTimer){ clearInterval(bkPubTimer); bkPubTimer=null; }
+    flashToast('Booking link turned off');
+    closeShareModal();
+  }
+
+  function startBookingLoops(){
+    if(!bkEnabled()) return;
+    bkPublish(); bkPoll(true);
+    if(!bkPollTimer) bkPollTimer=setInterval(()=>{ if(!document.hidden) bkPoll(true); }, 30000);
+    if(!bkPubTimer) bkPubTimer=setInterval(()=>{ if(bkEnabled()) bkPublish(); }, 120000);
+  }
+
+  if(shareBtn) shareBtn.addEventListener('click', openShareModal);
+  if(shareCloseBtn) shareCloseBtn.addEventListener('click', closeShareModal);
+  if(shareSaveBtn) shareSaveBtn.addEventListener('click', saveShareConfig);
+  if(shareDisableBtn) shareDisableBtn.addEventListener('click', disableSharing);
+  if(shareOverlay) shareOverlay.addEventListener('click', e=>{ if(e.target===shareOverlay) closeShareModal(); });
+
   // ---------- boot ----------
   heroDotEls = buildDotBar(heroDots, 14);
   renderStructure();
   refreshSwapBtn();
   syncInit();
+  startBookingLoops();
   setInterval(()=>{
     tick();
     if(auditView.style.display!=='none') renderAudit();
   }, 1000);
-})();
-</script>
+})();</script>
 
 </body>
 </html>
