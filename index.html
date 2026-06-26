@@ -5068,7 +5068,12 @@
   function bundleLocal(){
     const days={};
     for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k && k.indexOf(STORAGE_PREFIX)===0){ try{ days[k.slice(STORAGE_PREFIX.length)]=JSON.parse(localStorage.getItem(k)); }catch(e){} } }
-    return { days, recurring: loadRecurring(), imgCache: imgCache };
+    // booking setup travels with the account so the link is permanent + one-time across devices
+    const booking={};
+    ['planner_book_token','planner_book_secret','planner_book_config','planner_book_enabled','planner_book_imported','planner_book_dismissed'].forEach(k=>{ const v=localStorage.getItem(k); if(v!=null) booking[k]=v; });
+    const out={ days, recurring: loadRecurring(), imgCache: imgCache };
+    if(booking.planner_book_token) out.booking=booking;
+    return out;
   }
   function localHasData(){ const b=bundleLocal(); return Object.keys(b.days).some(k=>(b.days[k].tasks||[]).length) || (b.recurring||[]).length; }
   function applyRemote(data){
@@ -5080,8 +5085,13 @@
       Object.keys(days).forEach(dk=>{ try{ localStorage.setItem(STORAGE_PREFIX+dk, JSON.stringify(days[dk])); }catch(e){} });
       saveRecurring((data&&data.recurring)||[]);
       if(data&&data.imgCache){ imgCache=data.imgCache; saveImgCache(); }
+      // adopt the synced booking setup (same permanent link on every device)
+      if(data && data.booking && data.booking.planner_book_token){
+        Object.keys(data.booking).forEach(k=>{ try{ localStorage.setItem(k, data.booking[k]); }catch(e){} });
+      }
     } finally { applyingRemote=false; }
     renderStructure();
+    if(typeof startBookingLoops==='function' && localStorage.getItem('planner_book_enabled')==='1') startBookingLoops();
   }
 
   function renderSyncStatus(){
@@ -5251,7 +5261,7 @@
   function bkCfg(){ try{ return Object.assign(bkDefaults(), JSON.parse(localStorage.getItem(BK_CFG_KEY)||'{}')); }catch(e){ return bkDefaults(); } }
   function bkEnabled(){ return localStorage.getItem(BK_ENABLED_KEY)==='1'; }
   function bkLink(){ const tok=localStorage.getItem(BK_TOKEN_KEY); if(!tok) return ''; return location.origin+location.pathname+'?book='+tok; }
-  function bkEnsureKeys(){ if(!localStorage.getItem(BK_TOKEN_KEY)) localStorage.setItem(BK_TOKEN_KEY, bkRandId(11)); if(!localStorage.getItem(BK_SECRET_KEY)) localStorage.setItem(BK_SECRET_KEY, bkRandId(24)); }
+  function bkEnsureKeys(){ let made=false; if(!localStorage.getItem(BK_TOKEN_KEY)){ localStorage.setItem(BK_TOKEN_KEY, bkRandId(11)); made=true; } if(!localStorage.getItem(BK_SECRET_KEY)){ localStorage.setItem(BK_SECRET_KEY, bkRandId(24)); made=true; } if(made && typeof syncMarkDirty==='function') syncMarkDirty(); }
 
   function computeBusy(cfg){
     const busy={}; const horizon=(cfg.horizonDays||14);
@@ -5478,7 +5488,7 @@
     const durOpts=[15,30,45,60,90,120], slotOpts=[10,15,20,30,45,60], horOpts=[3,7,14,30,60,90];
     const pillRow=(kind,opts,val,fmt)=> '<div class="bk-pillrow" data-pill="'+kind+'">'+opts.map(o=>'<button type="button" class="bk-pill'+(val===o?' on':'')+'" data-v="'+o+'">'+fmt(o)+'</button>').join('')+'</div>';
     let h='';
-    h+='<p class="share-note">Guests see only open time slots — your tasks, titles and notes stay private. Edit anything here and hit Save to update your live link instantly.</p>';
+    h+='<p class="share-note">Set this up once — <b>your link never changes</b>. Edit any setting and hit Save to update availability; the same link keeps working everywhere. Guests only ever see open slots.</p>';
     if(enabled && link){
       h+='<div class="share-field"><label>Your shareable link · live</label><div class="share-link-row"><input id="bkLinkInput" type="text" readonly value="'+escapeHtml(link)+'"><button type="button" class="copy-btn" id="bkCopy">Copy</button></div></div>';
     }
@@ -5532,6 +5542,7 @@
     if(bkDraft.endMin<=bkDraft.startMin){ flashToast('End time must be after start time','err'); return; }
     localStorage.setItem(BK_CFG_KEY, JSON.stringify(bkDraft));
     localStorage.setItem(BK_ENABLED_KEY,'1');
+    if(typeof syncMarkDirty==='function') syncMarkDirty();
     shareSaveBtn.disabled=true; shareSaveBtn.textContent='Publishing…';
     await bkPublish();
     shareSaveBtn.disabled=false; shareSaveBtn.textContent='Save & publish';
@@ -5546,6 +5557,7 @@
     localStorage.setItem(BK_ENABLED_KEY,'0');
     const off=Object.assign(bkCfg(),{ days:[], horizonDays:0 });
     localStorage.setItem(BK_CFG_KEY, JSON.stringify(off));
+    if(typeof syncMarkDirty==='function') syncMarkDirty();
     await bkPublish();
     if(bkPollTimer){ clearInterval(bkPollTimer); bkPollTimer=null; }
     if(bkPubTimer){ clearInterval(bkPubTimer); bkPubTimer=null; }
