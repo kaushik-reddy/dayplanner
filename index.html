@@ -1083,6 +1083,24 @@
   .ld-meta svg{ transition:transform .2s ease; }
   .log-group.collapsed .ld-meta svg{ transform:rotate(-90deg); }
   .log-group.collapsed .log-rows{ display:none; }
+
+  /* ---- timeline log roll-up nodes (week / month / year) ---- */
+  .log-node{ margin-top:8px; }
+  .log-node:first-child{ margin-top:0; }
+  .log-node-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; text-align:left; background:var(--bg-card); border:1px solid var(--line); border-radius:12px; padding:12px 14px; cursor:pointer; font-family:inherit; transition:border-color .15s, background .15s; }
+  .log-node-head:hover{ border-color:#3a383d; }
+  .ln-label{ display:flex; flex-direction:column; gap:2px; min-width:0; font-size:12.5px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--ink); }
+  .ln-sub{ font-size:10px; font-weight:500; letter-spacing:0; text-transform:none; color:var(--ink-faint); font-family:var(--font-mono); }
+  .ln-meta{ display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:10px; color:var(--ink-faint); white-space:nowrap; flex-shrink:0; }
+  .ln-meta svg{ transition:transform .2s ease; }
+  .log-node.collapsed > .log-node-head .ln-meta svg{ transform:rotate(-90deg); }
+  .log-node.collapsed > .log-node-body{ display:none; }
+  .log-node-body{ margin:8px 0 0 9px; padding-left:13px; border-left:1px solid var(--line); }
+  .lvl-year > .log-node-head{ background:linear-gradient(150deg, rgba(201,151,74,0.10), transparent 70%); border-color:rgba(201,151,74,0.30); }
+  .lvl-year > .log-node-head .ln-label{ color:var(--brass); }
+  .lvl-month > .log-node-head .ln-label{ color:var(--ink); }
+  .lvl-week > .log-node-head{ background:var(--bg); }
+  .lvl-week > .log-node-head .ln-label{ color:var(--ink-dim); font-size:11.5px; }
   .log-main{ flex:1; min-width:0; }
   .log-title{ font-size:13.5px; font-weight:600; margin-bottom:4px; word-break:break-word; }
   .log-meta{ display:flex; flex-wrap:wrap; gap:3px 14px; font-family:var(--font-mono); font-size:11px; color:var(--ink-dim); }
@@ -2413,6 +2431,7 @@
   let reschedTargetId=null, reschedMode='reschedule', reschedSelDate=null, bulkSelDate=null;
   let expandedTaskIds=null, defaultExpandIds=new Set();
   let auditExpandedDays=null;
+  let auditExpandedNodes=null;
   const prioSelect=document.getElementById('prioSelect'), fRepeat=document.getElementById('fRepeat');
   const repeatDays=document.getElementById('repeatDays'), repeatStart=document.getElementById('repeatStart'), fRepeatStartBtn=document.getElementById('fRepeatStartBtn');
   let modalRepeatDays=new Set(), modalRepeatStart=null;
@@ -3591,29 +3610,79 @@
     renderAccuracy(onTime, underCount, overCount, tracked, driftSum, animate);
 
     if(!total){ auditLog.innerHTML='<div class="audit-empty">No tasks logged yet. Start planning and the audit fills itself.</div>'; renderCatDonut([],0); return; }
-    let logHtml='';
-    const groupKeys=[];
-    days.forEach(dy=>{
-      const tasks=(dy.data.tasks||[]).slice().sort((a,b)=>timeToMinutes(a.time)-timeToMinutes(b.time));
-      if(!tasks.length) return;
-      const dlabel=new Date(dy.key+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
-      const doneN=tasks.filter(t=>taskState(t)==='completed').length;
-      groupKeys.push(dy.key);
-      let rows=''; tasks.forEach(t=>{ rows+=auditRow(t); });
-      logHtml+='<div class="log-group" data-key="'+dy.key+'"><button type="button" class="log-date"><span class="ld-label">'+escapeHtml(dlabel)+'</span><span class="ld-meta">'+doneN+'/'+tasks.length+' done '+svgIco('chevDown',12)+'</span></button><div class="log-rows">'+rows+'</div></div>';
+    // ---- timeline log: progressive day → week → month → year roll-up ----
+    const _dayData={}; days.forEach(dy=>{ _dayData[dy.key]=dy.data; });
+    const _today0=new Date(); _today0.setHours(0,0,0,0);
+    const _curWeekStart=new Date(_today0); _curWeekStart.setDate(_today0.getDate()-_today0.getDay());
+    const _curMonth=_today0.getMonth(), _curYear=_today0.getFullYear();
+    const _wkStartOf=(d)=>{ const x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()-x.getDay()); return x; };
+    const _weekDesc=(ws)=>{ const we=new Date(ws); we.setDate(ws.getDate()+6); const wnum=Math.floor((ws.getDate()-1)/7)+1; const sub=ws.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' – '+we.toLocaleDateString(undefined,{month:'short',day:'numeric'}); return { id:'W'+dateKey(ws), level:'week', label:'Week '+wnum, sub, sortTs:ws.getTime() }; };
+    const _pathFor=(d)=>{
+      const y=d.getFullYear(), m=d.getMonth(), ws=_wkStartOf(d); const path=[];
+      if(y<_curYear){
+        path.push({ id:'Y'+y, level:'year', label:String(y), sub:'', sortTs:new Date(y,11,31).getTime() });
+        path.push({ id:'M'+y+'-'+pad2(m+1), level:'month', label:new Date(y,m,1).toLocaleDateString(undefined,{month:'long'}), sub:'', sortTs:new Date(y,m,28).getTime() });
+        path.push(_weekDesc(ws));
+      } else if(m<_curMonth){
+        path.push({ id:'M'+y+'-'+pad2(m+1), level:'month', label:new Date(y,m,1).toLocaleDateString(undefined,{month:'long',year:'numeric'}), sub:'', sortTs:new Date(y,m,28).getTime() });
+        path.push(_weekDesc(ws));
+      } else if(ws<_curWeekStart){
+        path.push(_weekDesc(ws));
+      }
+      return path;
+    };
+    const _nodes={}, _roots=[];
+    Object.keys(_dayData).forEach(k=>{
+      if(!(_dayData[k].tasks||[]).length) return;
+      const d=new Date(k+'T00:00:00'); const path=_pathFor(d);
+      if(!path.length){ _roots.push({ isDay:true, key:k, sortTs:d.getTime() }); return; }
+      let container=_roots, parent=null;
+      path.forEach(desc=>{ let node=_nodes[desc.id]; if(!node){ node=_nodes[desc.id]={ id:desc.id, level:desc.level, label:desc.label, sub:desc.sub, sortTs:desc.sortTs, children:[], dayKeys:[] }; container.push(node); } container=node.children; parent=node; });
+      parent.dayKeys.push(k);
     });
+    function _countNode(node){
+      let dd=0, tt=0, dn=0;
+      node.dayKeys.forEach(k=>{ const ts=(_dayData[k].tasks||[]); dd++; tt+=ts.length; dn+=ts.filter(t=>taskState(t)==='completed').length; });
+      node.children.forEach(c=>{ const r=_countNode(c); dd+=r.dd; tt+=r.tt; dn+=r.dn; });
+      node._days=dd; node._tasks=tt; node._done=dn; return { dd, tt, dn };
+    }
+    _roots.forEach(r=>{ if(!r.isDay) _countNode(r); });
+    function _dayGroupHtml(k){
+      const tasks=(_dayData[k].tasks||[]).slice().sort((a,b)=>timeToMinutes(a.time)-timeToMinutes(b.time));
+      const dlabel=new Date(k+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+      const doneN=tasks.filter(t=>taskState(t)==='completed').length;
+      let rows=''; tasks.forEach(t=>{ rows+=auditRow(t); });
+      return '<div class="log-group" data-key="'+k+'"><button type="button" class="log-date"><span class="ld-label">'+escapeHtml(dlabel)+'</span><span class="ld-meta">'+doneN+'/'+tasks.length+' done '+svgIco('chevDown',12)+'</span></button><div class="log-rows">'+rows+'</div></div>';
+    }
+    function _nodeHtml(node){
+      const childItems = node.children.slice().sort((a,b)=>b.sortTs-a.sortTs).map(_nodeHtml).join('')
+        + node.dayKeys.slice().sort((a,b)=> a<b?1:-1).map(_dayGroupHtml).join('');
+      const sub = node.sub ? '<span class="ln-sub">'+escapeHtml(node.sub)+'</span>' : (node.level!=='week' ? '<span class="ln-sub">'+node._days+' days</span>' : '');
+      const meta = node._done+'/'+node._tasks+' done';
+      return '<div class="log-node lvl-'+node.level+'" data-node="'+node.id+'"><button type="button" class="log-node-head"><span class="ln-label">'+escapeHtml(node.label)+sub+'</span><span class="ln-meta">'+meta+' '+svgIco('chevDown',12)+'</span></button><div class="log-node-body">'+childItems+'</div></div>';
+    }
+    const _ordered=_roots.slice().sort((a,b)=>b.sortTs-a.sortTs);
+    let logHtml=''; const _curWeekKeys=[];
+    _ordered.forEach(r=>{ if(r.isDay){ logHtml+=_dayGroupHtml(r.key); _curWeekKeys.push(r.key); } else logHtml+=_nodeHtml(r); });
     auditLog.innerHTML=logHtml;
     const _todayK=dateKey(new Date());
-    const _expandKey = groupKeys.includes(_todayK) ? _todayK : (groupKeys.slice().sort().pop()||null);
-    // open the present day by default: reset each time the Audit view is opened (animate),
-    // and persist the user's manual toggles during the session
-    if(animate || auditExpandedDays===null){ auditExpandedDays=new Set(); if(_expandKey) auditExpandedDays.add(_expandKey); }
+    // open the present day by default; consolidated week/month/year nodes start collapsed
+    if(animate || auditExpandedDays===null){ auditExpandedDays=new Set(); if(_curWeekKeys.includes(_todayK)) auditExpandedDays.add(_todayK); else if(_curWeekKeys.length) auditExpandedDays.add(_curWeekKeys[0]); }
+    if(animate || auditExpandedNodes===null){ auditExpandedNodes=new Set(); }
     auditLog.querySelectorAll('.log-group').forEach(g=>{
       const k=g.getAttribute('data-key');
       if(!auditExpandedDays.has(k)) g.classList.add('collapsed');
-      g.querySelector('.log-date').addEventListener('click',()=>{
+      g.querySelector('.log-date').addEventListener('click',(e)=>{ e.stopPropagation();
         if(auditExpandedDays.has(k)){ auditExpandedDays.delete(k); g.classList.add('collapsed'); }
         else { auditExpandedDays.add(k); g.classList.remove('collapsed'); }
+      });
+    });
+    auditLog.querySelectorAll('.log-node').forEach(nd=>{
+      const id=nd.getAttribute('data-node');
+      if(!auditExpandedNodes.has(id)) nd.classList.add('collapsed');
+      nd.querySelector('.log-node-head').addEventListener('click',(e)=>{ e.stopPropagation();
+        if(auditExpandedNodes.has(id)){ auditExpandedNodes.delete(id); nd.classList.add('collapsed'); }
+        else { auditExpandedNodes.add(id); nd.classList.remove('collapsed'); }
       });
     });
 
