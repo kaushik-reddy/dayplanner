@@ -1979,6 +1979,9 @@
   .tk-confirm-q{ font-size:14px; font-weight:600; color:var(--ink); margin-bottom:14px; }
   .tk-confirm-row{ display:flex; gap:10px; }
   .tk-confirm-row .btn{ flex:1; margin-top:0; }
+  .tk-booklink{ display:flex; align-items:center; gap:8px; margin-top:18px; padding:11px 14px; border:1px solid var(--line); border-radius:11px; background:var(--bg); font-family:var(--font-mono); font-size:12px; color:var(--ink-dim); }
+  .tk-booklink .ico{ color:var(--brass); flex-shrink:0; }
+  .tk-booklink span{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   /* proposal (new time) card on tracking page */
   .bk-propose{ border:1px solid var(--line); border-radius:14px; overflow:hidden; text-align:left; }
   .bk-prop-row{ display:flex; align-items:center; gap:12px; padding:12px 15px; font-size:13.5px; }
@@ -2865,7 +2868,7 @@
 
     function header(pillTxt,pillCls){ return '<div class="tk-top"><div class="bk-brand">'+brandIco()+'Your booking</div>'+(pillTxt?'<span class="tk-pill '+pillCls+'">'+pillTxt+'</span>':'')+'</div>'; }
     function hero(kind,title,sub){ return '<div class="tk-heroblock">'+ic(kind)+'<div class="tk-title">'+title+'</div>'+(sub?'<div class="tk-sub">'+sub+'</div>':'')+'</div>'; }
-    function meetCard(date,time,dur,o){ o=o||{}; let cls='tk-meet'; if(o.muted)cls+=' muted'; if(o.accent)cls+=' accent';
+    function meetCard(date,time,dur,o){ o=o||{}; if(!date||time==null) return ''; let cls='tk-meet'; if(o.muted)cls+=' muted'; if(o.accent)cls+=' accent';
       return '<div class="'+cls+'">'+(o.label?'<div class="tk-meet-tag">'+esc(o.label)+'</div>':'')
         +'<div class="tk-meet-date">'+dlabel(date)+'</div>'
         +'<div class="tk-meet-time'+(o.strike?' strike':'')+'">'+fmt12(t2m(time))+' – '+fmt12(t2m(time)+(dur||30))+'<span class="tk-meet-dur">'+(dur||30)+' min</span></div></div>'; }
@@ -2899,10 +2902,12 @@
           +hero('accepted','You\u2019re confirmed','<b>'+owner+'</b> accepted your booking. See you then!')
           +meetCard(r.date,r.time,r.duration,{accent:true,label:'Meeting with '+owner});
       } else if(state==='declined' || state==='cancelled'){
-        h=header(state==='cancelled'?'Cancelled':'Declined','bad')+steps(0,true)
-          +hero('declined',state==='cancelled'?'Booking cancelled':'Time not available',state==='cancelled'?('This booking was cancelled and the slot is now free. This tracking link is no longer active.'+(bookUrl?' Want to book again?':'')):('Sorry \u2014 <b>'+owner+'</b> couldn\u2019t take this slot.'+(bookUrl?' Pick another that works for you.':'')))
+        const isCan=state==='cancelled';
+        const prettyLink=bookUrl?esc(bookUrl.replace(/^https?:\/\//,'').replace(/^file:\/\/\//,'').split('&')[0]):'';
+        h=header(isCan?'Cancelled':'Declined','bad')+steps(0,true)
+          +hero('declined',isCan?'Booking cancelled':'Time not available',isCan?('We regret to inform you that this booking has been cancelled. Please pick another slot below to continue.'):('Sorry \u2014 <b>'+owner+'</b> couldn\u2019t take this slot.'+(bookUrl?' Pick another that works for you.':'')))
           +meetCard(r.date,r.time,r.duration,{muted:true,strike:true})
-          +(bookUrl?btnLink(bookUrl,state==='cancelled'?'Book a new time':'Pick another time','primary'):'');
+          +(bookUrl?('<div class="tk-booklink" title="'+esc(bookUrl)+'">'+brandIco()+'<span>'+prettyLink+'</span></div>'+btnLink(bookUrl,isCan?'Book a slot':'Pick another time','primary','12px')):'');
       } else if(state==='reschedule_proposed' && r.proposed){
         h=header('Action needed','warn')+steps(2,false)
           +hero('reschedule_proposed','New time proposed','<b>'+owner+'</b> suggested a different time. Accept it, or pick another that suits you.')
@@ -5659,7 +5664,8 @@
   }
   function fillBookingLists(){
     const today=dateKey(new Date());
-    const all=(bkLastBookings||[]);
+    const dismissed=new Set(bkDismissed());
+    const all=(bkLastBookings||[]).filter(b=>!dismissed.has(b.id));
     const isActive=b=>{ const s=b.status||'pending'; return s!=='declined' && s!=='cancelled' && b.date>=today; };
     const active=all.filter(isActive).sort((a,b)=> (a.date+a.time) < (b.date+b.time) ? -1 : 1);
     const history=all.filter(b=>!isActive(b)).sort((a,b)=> (a.date+a.time) < (b.date+b.time) ? 1 : -1);
