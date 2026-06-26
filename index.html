@@ -3104,6 +3104,15 @@
   // ---------- modal ----------
   const PRESET_CATS=['work','watch','read','sleep','errand','general'];
   let modalCats=[];
+  let modalSuggestCats=null;
+  // most-used categories across all history (dynamic), padded with presets as fallback
+  function mostUsedCats(limit){
+    const counts={};
+    try{ allPlannerDays().forEach(dy=>(dy.data.tasks||[]).forEach(t=>getCategories(t).forEach(c=>{ const k=String(c).replace(/^#+/,'').toLowerCase().trim(); if(k) counts[k]=(counts[k]||0)+1; }))); }catch(e){}
+    const sorted=Object.keys(counts).sort((a,b)=> counts[b]-counts[a] || (a<b?-1:1));
+    PRESET_CATS.forEach(p=>{ if(!sorted.includes(p)) sorted.push(p); });
+    return sorted.slice(0, limit||8);
+  }
   function renderTagChips(){
     tagInput.querySelectorAll('.tag-chip').forEach(c=>c.remove());
     modalCats.forEach(cat=>{
@@ -3119,7 +3128,8 @@
   }
   function renderSuggest(){
     tagSuggest.innerHTML='';
-    PRESET_CATS.filter(c=>!modalCats.includes(c)).forEach(c=>{
+    const list = (modalSuggestCats && modalSuggestCats.length) ? modalSuggestCats : mostUsedCats(8);
+    list.filter(c=>!modalCats.includes(c)).forEach(c=>{
       const b=document.createElement('button'); b.type='button'; b.className='sug-chip'; b.textContent='#'+c;
       b.addEventListener('click',()=>addCat(c));
       tagSuggest.appendChild(b);
@@ -3153,6 +3163,7 @@
     fTitle.value=task?task.title:'';
     fSub.value=task?task.sub:'';
     modalCats = task ? getCategories(task).slice() : [];
+    modalSuggestCats = mostUsedCats(8);
     fTagText.value='';
     renderTagChips();
     modalPriority = task ? (task.priority||'medium') : 'medium';
