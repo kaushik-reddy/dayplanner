@@ -137,9 +137,11 @@
   .sync-status{ font-size:12.5px; color:var(--ink-dim); background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:11px 13px; line-height:1.5; }
   .sync-status b{ color:var(--ink); }
   .sync-status .ok{ color:var(--green); }
-  .sync-toast{ position:fixed; left:50%; top:calc(14px + env(safe-area-inset-top)); bottom:auto; transform:translate(-50%,-14px); z-index:80; display:flex; align-items:center; gap:9px; background:var(--bg-soft); border:1px solid var(--line); color:var(--ink); font-size:13.5px; font-weight:600; padding:11px 16px; border-radius:999px; box-shadow:0 10px 30px rgba(0,0,0,0.5); opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s cubic-bezier(.16,1,.3,1); max-width:calc(100vw - 28px); }
+  .sync-toast{ position:fixed; left:50%; top:calc(14px + env(safe-area-inset-top)); bottom:auto; transform:translate(-50%,-14px); z-index:80; display:flex; align-items:center; gap:8px; background:var(--bg-soft); border:1px solid var(--line); color:var(--ink); font-size:12.5px; font-weight:600; padding:10px 15px; border-radius:999px; box-shadow:0 10px 30px rgba(0,0,0,0.5); opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s cubic-bezier(.16,1,.3,1); max-width:min(92vw, 460px); white-space:nowrap; }
   .sync-toast.show{ opacity:1; transform:translate(-50%,0); }
-  .sync-toast .ico{ color:var(--green); }
+  .sync-toast .ico{ color:var(--green); flex-shrink:0; }
+  .sync-toast svg{ flex-shrink:0; }
+  .sync-toast span{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .sync-toast.err{ border-color:var(--red-soft); }
   .sync-toast.err .ico{ color:var(--red-soft); }
   .sync-conflict-rows{ display:flex; flex-direction:column; gap:10px; margin-bottom:4px; }
@@ -1826,8 +1828,6 @@
   @media (min-width:900px){
     .bk-grid{ grid-template-columns: minmax(0,0.9fr) minmax(0,1.1fr); gap:30px; align-items:start; }
   }
-  .bk-col-right{ order:-1; }
-  @media (min-width:900px){ .bk-col-right{ order:0; } }
   .bk-col{ min-width:0; }
   .bk-col .section-title:first-child{ margin-top:0; }
   .bk-linkcard{ background:var(--bg-card); border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:24px; }
