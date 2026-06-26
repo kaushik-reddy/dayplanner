@@ -3140,6 +3140,7 @@
 
       const head=document.createElement('div'); head.className='task-head';
       head.innerHTML=`<div class="task-title">${highlightTitle(task.title)}</div>`+prioHtml(task.priority);
+      if(task.booked){ const _bs=task.bookingStatus||'pending'; const _bm=({pending:['Pending','amber'],accepted:['Accepted','green'],reschedule_proposed:['Awaiting guest','blue']})[_bs]||['Pending','amber']; const _bdg=document.createElement('span'); _bdg.className='sb-badge sb-'+_bm[1]; _bdg.textContent=_bm[0]; head.appendChild(_bdg); }
       body.appendChild(head);
       if(task.sub){ const sub=document.createElement('div'); sub.className='task-sub'; sub.textContent=task.sub; body.appendChild(sub); }
       if(task.carryCount){
@@ -3269,10 +3270,28 @@
         actions.insertBefore(start, actions.firstChild);
       }
 
-      if(!selectMode && (st==='running'||st==='pending')){
+      if(!selectMode && !task.booked && (st==='running'||st==='pending')){
         const can=document.createElement('button'); can.className='mini-btn cancel-task'; can.innerHTML=svgIco('x',12)+' Cancel';
         can.addEventListener('click',e=>{ e.stopPropagation(); askConfirm('Cancel this task?', '“'+String(task.title)+'” will move to Resolved as cancelled. You can restore it anytime.', 'Cancel task', ()=>{ animateResolve(row, 'cancel', ()=>{ task.cancelled=true; delete task.runningSince; delete task.pausedSince; saveDay(d,data); renderStructure(); flashToast('Task cancelled'); }); }); });
         actions.appendChild(can);
+      }
+
+      // booking requests are managed right on the card (no need to open the share panel)
+      if(!selectMode && task.booked && task.bookingId && taskState(task)!=='cancelled'){
+        const bs=task.bookingStatus||'pending';
+        if(task.sub){ /* guest note/email already shown in .task-sub */ }
+        if(bs==='pending'){
+          const acc=document.createElement('button'); acc.className='mini-btn complete'; acc.innerHTML=svgIco('check',12)+' Accept';
+          acc.addEventListener('click',e=>{ e.stopPropagation(); if(typeof acceptBooking==='function') acceptBooking(task.bookingId); });
+          actions.appendChild(acc);
+        }
+        const sug=document.createElement('button'); sug.className='mini-btn resched'; sug.innerHTML=svgIco('clock',12)+' Suggest time';
+        sug.addEventListener('click',e=>{ e.stopPropagation(); if(typeof bookingReschedule==='function') bookingReschedule(task.bookingId); });
+        actions.appendChild(sug);
+        const isAcc=bs==='accepted';
+        const dec=document.createElement('button'); dec.className='mini-btn cancel-task'; dec.innerHTML=svgIco('x',12)+(isAcc?' Cancel':' Decline');
+        dec.addEventListener('click',e=>{ e.stopPropagation(); askConfirm((isAcc?'Cancel':'Decline')+' this booking?', '“'+String(task.title)+'” — the guest is notified and the slot frees up.', (isAcc?'Cancel':'Decline'), ()=>{ if(isAcc){ if(typeof cancelBooking==='function') cancelBooking(task.bookingId); } else { if(typeof declineBooking==='function') declineBooking(task.bookingId); } }); });
+        actions.appendChild(dec);
       }
 
       card.appendChild(checkbox);
@@ -5312,6 +5331,13 @@
     if(res.error){ flashToast('Could not decline — try again','err'); return; }
     reconcileBookings(bkLastBookings); await bkPublish(); renderBookingsList();
     flashToast('Declined — '+((b&&b.name)||'guest')+' will see it on their link');
+  }
+  // open the share panel focused on one booking's reschedule editor (called from the task card)
+  function bookingReschedule(id){
+    if(typeof openShareModal!=='function') return;
+    openShareModal();
+    bkEditId=id; renderBookingsList();
+    setTimeout(()=>{ const el=document.querySelector('#bkList .sb-item[data-id="'+id+'"]'); if(el) el.scrollIntoView({block:'center', behavior:'smooth'}); }, 120);
   }
 
   async function bkPoll(silent){
