@@ -2638,7 +2638,7 @@
         h+=ic('expired')+'<div class="bk-confirm-title">Link expired</div>'
           +'<div class="bk-confirm-when">'+brandIco()+slotLine(r.date,r.time,r.duration)+'</div>'
           +'<div class="bk-confirm-detail">This time has passed, so the tracking link is no longer active.'+(bookUrl?' You can always request a new time.':'')+'</div>'
-          +(bookUrl?'<a class="btn btn-secondary" style="margin-top:18px;display:block;text-decoration:none" href="'+esc(bookUrl)+'">Request a new time</a>':'');
+          +(bookUrl?'<a class="btn btn-secondary bk-track-btn" style="margin-top:18px" href="'+esc(bookUrl)+'">Request a new time</a>':'');
       } else if(r.status==='accepted'){
         h+=ic('accepted')+'<div class="bk-confirm-title">Confirmed</div>'
           +'<div class="bk-confirm-when">'+brandIco()+slotLine(r.date,r.time,r.duration)+'</div>'
@@ -2648,14 +2648,14 @@
         h+=ic('declined')+'<div class="bk-confirm-title">'+(r.status==='cancelled'?'Cancelled':'Not available')+'</div>'
           +'<div class="bk-confirm-when" style="text-decoration:line-through;opacity:0.7">'+brandIco()+slotLine(r.date,r.time,r.duration)+'</div>'
           +'<div class="bk-confirm-detail">Sorry — <b>'+owner+'</b> couldn\'t take this slot.'+(bookUrl?' Please pick another time that works for you.':'')+'</div>'
-          +(bookUrl?'<a class="btn btn-primary" style="margin-top:18px;display:block;text-decoration:none" href="'+esc(bookUrl)+'">Pick another time</a>':'');
+          +(bookUrl?'<a class="btn btn-primary bk-track-btn" style="margin-top:18px" href="'+esc(bookUrl)+'">Pick another time</a>':'');
       } else if(r.status==='reschedule_proposed' && r.proposed){
         h+=ic('reschedule_proposed')+'<div class="bk-confirm-title">New time proposed</div>'
           +'<div class="bk-confirm-detail" style="margin-bottom:14px"><b>'+owner+'</b> suggested a different time. Accept it, or pick another that suits you.</div>'
           +'<div class="bk-propose"><div class="bk-prop-row old"><span>Was</span><b>'+slotLine(r.date,r.time,r.duration)+'</b></div>'
           +'<div class="bk-prop-row new"><span>New</span><b>'+slotLine(r.proposed.date,r.proposed.time,r.proposed.duration)+'</b></div></div>'
           +'<button class="btn btn-primary" id="tkAccept" style="width:100%;margin-top:16px">Accept new time</button>'
-          +(bookUrl?'<a class="btn btn-secondary" style="margin-top:10px;display:block;text-decoration:none" href="'+esc(bookUrl)+'">Pick another time instead</a>':'')
+          +(bookUrl?'<a class="btn btn-secondary bk-track-btn" style="margin-top:10px" href="'+esc(bookUrl)+'">Pick another time instead</a>':'')
           +'<div id="tkMsg" class="bk-custom-msg" style="text-align:center"></div>';
       } else {
         h+=ic('pending')+'<div class="bk-confirm-title">Awaiting confirmation</div>'
