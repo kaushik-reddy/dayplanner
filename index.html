@@ -953,6 +953,24 @@
   .acard.good .val{ color:var(--green); }
   .acard.warn .val{ color:var(--red-soft); }
 
+  /* ---- audit insights (lively highlight cards) ---- */
+  .audit-insights{ margin-bottom:22px; }
+  .audit-insights:empty{ display:none; }
+  .ai-head{ font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-dim); font-weight:600; margin:0 2px 13px; }
+  .ai-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(228px, 1fr)); gap:12px; }
+  .insight{ position:relative; overflow:hidden; display:flex; align-items:flex-start; gap:13px; background:var(--bg-card); border:1px solid var(--line); border-radius:16px; padding:15px 16px; transition:border-color .15s, transform .15s; }
+  .insight:hover{ transform:translateY(-2px); }
+  .insight::before{ content:''; position:absolute; inset:0; opacity:0.9; background:radial-gradient(130% 120% at 0% 0%, var(--tone, rgba(201,151,74,0.10)), transparent 62%); pointer-events:none; }
+  .ins-ic{ position:relative; z-index:1; width:38px; height:38px; border-radius:11px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .ins-body{ position:relative; z-index:1; min-width:0; }
+  .ins-head{ font-size:13.5px; font-weight:700; color:var(--ink); margin-bottom:4px; line-height:1.25; }
+  .ins-text{ font-size:11.5px; color:var(--ink-dim); line-height:1.45; }
+  .insight.i-brass{ --tone:rgba(201,151,74,0.13); } .insight.i-brass .ins-ic{ background:rgba(201,151,74,0.16); color:var(--brass); } .insight.i-brass:hover{ border-color:rgba(201,151,74,0.4); }
+  .insight.i-green{ --tone:rgba(111,168,138,0.13); } .insight.i-green .ins-ic{ background:rgba(111,168,138,0.16); color:var(--green); } .insight.i-green:hover{ border-color:rgba(111,168,138,0.4); }
+  .insight.i-blue{ --tone:rgba(127,168,201,0.13); } .insight.i-blue .ins-ic{ background:rgba(127,168,201,0.16); color:#7FA8C9; } .insight.i-blue:hover{ border-color:rgba(127,168,201,0.4); }
+  .insight.i-red{ --tone:rgba(201,122,106,0.13); } .insight.i-red .ins-ic{ background:rgba(201,122,106,0.16); color:var(--red-soft); } .insight.i-red:hover{ border-color:rgba(201,122,106,0.4); }
+  .insight.i-amber{ --tone:rgba(224,179,106,0.14); } .insight.i-amber .ins-ic{ background:rgba(224,179,106,0.16); color:#E0B36A; } .insight.i-amber:hover{ border-color:rgba(224,179,106,0.4); }
+
   /* chart cards */
   .chart-card{ background:var(--bg-card); border:1px solid var(--line); border-radius:18px; padding:18px clamp(14px,4vw,20px); margin-bottom:14px; }
   .chart-head{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:18px; }
@@ -1722,6 +1740,8 @@
 
     <div class="audit-cards" id="auditCards"></div>
 
+    <div class="audit-insights" id="auditInsights"></div>
+
     <div class="audit-charts">
     <div class="chart-card" id="auditHeatCard">
       <div class="chart-head"><span class="ch-title">Consistency</span><span class="ch-note" id="auditHeatNote"></span></div>
@@ -2377,7 +2397,8 @@
         auditHours=document.getElementById('auditHours'), auditHoursNote=document.getElementById('auditHoursNote'),
         auditDow=document.getElementById('auditDow'), auditDowNote=document.getElementById('auditDowNote'),
         auditPrio=document.getElementById('auditPrio'), auditPrioNote=document.getElementById('auditPrioNote'),
-        auditAcc=document.getElementById('auditAcc'), auditAccNote=document.getElementById('auditAccNote');
+        auditAcc=document.getElementById('auditAcc'), auditAccNote=document.getElementById('auditAccNote'),
+        auditInsights=document.getElementById('auditInsights');
   const closeOverlay=document.getElementById('closeOverlay'), closeList=document.getElementById('closeList'),
         closeBackBtn=document.getElementById('closeBackBtn'), closeConfirmBtn=document.getElementById('closeConfirmBtn');
   const resolvedOverlay=document.getElementById('resolvedOverlay'), resolvedList=document.getElementById('resolvedList'),
@@ -3541,6 +3562,26 @@
       {lbl:'Streak', val: streak, sub: streak?'days in a row':'start today', cls: streak?'good':''}
     ];
     auditCards.innerHTML=cards.map(c=>`<div class="acard ${c.cls||''}"><div class="lbl">${c.lbl}</div><div class="val">${c.val}</div><div class="sub">${c.sub}</div></div>`).join('');
+
+    // ---- lively auto-generated insights ----
+    (function(){
+      if(!auditInsights) return;
+      if(!total){ auditInsights.innerHTML=''; return; }
+      const ins=[];
+      ins.push({tone:'brass', ic:'check', head:compPct+'% completion rate', text: done+' of '+total+' tasks finished across your history.'});
+      const startsTotal=hourBuckets.reduce((a,b)=>a+b,0);
+      const hlbl=h=> h===0?'12am':(h<12?h+'am':(h===12?'12pm':(h-12)+'pm'));
+      if(startsTotal){ let ph=0; hourBuckets.forEach((v,i)=>{ if(v>hourBuckets[ph]) ph=i; }); ins.push({tone:'amber', ic:'clock', head:'Sharpest around '+hlbl(ph), text:'Most of your tasks get started near '+hlbl(ph)+'.'}); }
+      const dmins=new Array(7).fill(0); days.forEach(dy=>{ const wd=new Date(dy.key+'T00:00:00').getDay(); (dy.data.tasks||[]).forEach(t=>{ dmins[wd]+=spentMsOf(t); }); });
+      if(dmins.reduce((a,b)=>a+b,0)){ let bd=0; dmins.forEach((v,i)=>{ if(v>dmins[bd]) bd=i; }); const nm=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']; ins.push({tone:'blue', ic:'flag', head:nm[bd]+' is your power day', text:fmtPlanned(Math.round(dmins[bd]/60000))+' tracked on a typical '+nm[bd]+'.'}); }
+      let champ=null; ['must','high','medium','low'].forEach(p=>{ const s=prioStats[p]; if(s.t>0){ const r=s.d/s.t; if(!champ || r>champ.r) champ={p,r}; } });
+      if(champ){ const pn={must:'Must',high:'High',medium:'Medium',low:'Low'}[champ.p]; ins.push({tone:'green', ic:'target', head:pn+'-priority: '+Math.round(champ.r*100)+'% done', text:'You rarely let '+pn.toLowerCase()+'-priority work slip.'}); }
+      if(tracked){ const avg=Math.round(driftSum/tracked/60000); if(avg>0) ins.push({tone:'red', ic:'clock', head:'Runs ~'+fmtPlanned(avg)+' over plan', text:'Tasks tend to take longer than estimated — add a buffer.'}); else if(avg<0) ins.push({tone:'green', ic:'check', head:'Beats plan by ~'+fmtPlanned(-avg), text:'You usually finish ahead of your estimate.'}); else ins.push({tone:'green', ic:'target', head:'Spot-on estimates', text:'On average you finish right on time.'}); }
+      if(streak>=2) ins.push({tone:'brass', ic:'flag', head:streak+'-day streak', text:'Finish a task each day to keep the run alive.'});
+      else if(planChanges>0) ins.push({tone:'blue', ic:'repeat', head:planChanges+' plan changes', text:'You adapt often — '+resch+' reschedules and '+moves+' moves.'});
+      if(pausedEvents>0 && ins.length<6) ins.push({tone:'amber', ic:'clock', head:fmtPlanned(pausedMin)+' paused', text:'Paused '+pausedEvents+' time'+(pausedEvents>1?'s':'')+' — watch for interruptions.'});
+      auditInsights.innerHTML='<div class="ai-head">Insights</div><div class="ai-grid">'+ins.slice(0,6).map(x=>'<div class="insight i-'+x.tone+'"><div class="ins-ic">'+svgIco(x.ic,16)+'</div><div class="ins-body"><div class="ins-head">'+escapeHtml(x.head)+'</div><div class="ins-text">'+escapeHtml(x.text)+'</div></div></div>').join('')+'</div>';
+    })();
 
     renderHeatmap(completedDays, days);
     renderActivityBars(days, animate);
