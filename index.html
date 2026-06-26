@@ -972,13 +972,13 @@
   .insight.i-amber{ --tone:rgba(224,179,106,0.14); } .insight.i-amber .ins-ic{ background:rgba(224,179,106,0.16); color:#E0B36A; } .insight.i-amber:hover{ border-color:rgba(224,179,106,0.4); }
 
   /* chart cards */
-  .chart-card{ background:var(--bg-card); border:1px solid var(--line); border-radius:18px; padding:18px clamp(14px,4vw,20px); margin-bottom:14px; }
+  .chart-card{ background:var(--bg-card); border:1px solid var(--line); border-radius:18px; padding:18px clamp(14px,4vw,20px); margin-bottom:14px; display:flex; flex-direction:column; }
   .chart-head{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:18px; }
   .chart-head .ch-title{ font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-dim); font-weight:600; }
   .chart-head .ch-note{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); white-space:nowrap; }
 
   /* weekly activity bars */
-  .bars{ display:flex; align-items:flex-end; gap:clamp(4px,1.6vw,9px); height:118px; }
+  .bars{ display:flex; align-items:flex-end; gap:clamp(4px,1.6vw,9px); height:120px; }
   .bcol{ flex:1; display:flex; flex-direction:column; align-items:center; gap:7px; min-width:0; height:100%; justify-content:flex-end; }
   .bcol .b-track{ width:100%; flex:1; display:flex; align-items:flex-end; }
   .bcol .b-fill{
@@ -1024,7 +1024,7 @@
   .hl-cell.h2{ background:rgba(201,151,74,0.52); } .hl-cell.h3{ background:rgba(201,151,74,0.76); } .hl-cell.h4{ background:var(--brass); }
 
   /* ---- peak hours histogram ---- */
-  .hours{ display:flex; align-items:flex-end; gap:2px; height:96px; }
+  .hours{ display:flex; align-items:flex-end; gap:2px; height:120px; }
   .hcol{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:5px; height:100%; min-width:0; }
   .hcol .h-track{ width:100%; flex:1; display:flex; align-items:flex-end; }
   .hcol .h-fill{ width:100%; border-radius:3px 3px 1px 1px; min-height:2px; background:linear-gradient(180deg, var(--brass), rgba(201,151,74,0.30)); transition:height .7s cubic-bezier(.4,0,.2,1); }
@@ -1032,7 +1032,7 @@
   .hcol .h-lbl{ font-family:var(--font-mono); font-size:8px; color:var(--ink-faint); white-space:nowrap; height:10px; }
 
   /* ---- weekday bars ---- */
-  .dow-bars{ display:flex; align-items:flex-end; gap:clamp(5px,2vw,10px); height:108px; }
+  .dow-bars{ display:flex; align-items:flex-end; gap:clamp(5px,2vw,10px); height:120px; }
   .dcol{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:6px; height:100%; min-width:0; }
   .dcol .d-track{ width:100%; flex:1; display:flex; align-items:flex-end; }
   .dcol .d-fill{ width:100%; border-radius:6px 6px 3px 3px; min-height:3px; background:linear-gradient(180deg,#7FA8C9,rgba(127,168,201,0.30)); transition:height .7s cubic-bezier(.4,0,.2,1); }
@@ -1511,7 +1511,7 @@
     .planner-main .timeline{ margin-top: 0; }
 
     /* Audit: charts flow into a responsive multi-column grid */
-    .audit-charts{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+    .audit-charts{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
     #auditHeatCard, #auditBarsCard{ grid-column: 1 / -1; }  /* wide charts span full width */
     .audit-cards{ grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
   }
