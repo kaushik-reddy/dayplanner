@@ -1782,7 +1782,14 @@
   .bk-addwin{ display:inline-flex; align-items:center; gap:7px; width:100%; justify-content:center; margin-top:9px; background:transparent; border:1px dashed var(--line); color:var(--ink-dim); border-radius:11px; padding:10px 14px; font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer; transition:border-color .15s, color .15s; }
   .bk-addwin:hover{ border-color:var(--brass); color:var(--brass); }
   /* ===== Bookings page (main nav) ===== */
-  #bookingsView{ max-width:720px; margin:0 auto; }
+  #bookingsView{ max-width:1060px; margin:0 auto; }
+  .bk-grid{ display:grid; gap:22px; }
+  @media (min-width:900px){
+    .bk-grid{ grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:28px; align-items:start; }
+    .bk-col-left{ position:sticky; top:24px; }
+  }
+  .bk-col{ min-width:0; }
+  .bk-col .section-title:first-child{ margin-top:0; }
   .bk-linkcard{ background:var(--bg-card); border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:24px; }
   .bk-linkcard-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
   .bk-linkcard-label{ display:flex; align-items:center; gap:8px; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-dim); font-weight:700; margin-bottom:12px; }
@@ -1960,8 +1967,8 @@
 <div class="wrap">
   <div class="viewtabs">
     <button class="viewtab active" id="tabPlanner">Planner</button>
-    <button class="viewtab" id="tabAudit">Audit &amp; Analysis</button>
     <button class="viewtab" id="tabBookings">Bookings</button>
+    <button class="viewtab" id="tabAudit">Audit &amp; Analysis</button>
   </div>
 
   <div id="plannerView">
@@ -5607,15 +5614,21 @@
     const link=bkLink();
     const pretty=link.replace(/^https?:\/\//,'').replace(/^file:\/\/\//,'');
     body.innerHTML=
-      '<div class="bk-linkcard">'
-        +'<div class="bk-linkcard-label"><span class="bk-live-dot"></span>Your booking link · live</div>'
-        +'<div class="bk-linkbox"><span class="bk-linkurl" title="'+escapeHtml(link)+'">'+escapeHtml(pretty)+'</span></div>'
-        +'<div class="bk-linkactions"><button type="button" class="btn btn-primary bk-linkbtn" id="bkPageCopy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15"/></svg>Copy link</button>'
-          +'<button type="button" class="btn btn-secondary bk-linkbtn" id="bkPageShare"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button></div>'
+      '<div class="bk-grid">'
+      +'<div class="bk-col bk-col-left">'
+        +'<div class="bk-linkcard">'
+          +'<div class="bk-linkcard-label"><span class="bk-live-dot"></span>Your booking link · live</div>'
+          +'<div class="bk-linkbox"><span class="bk-linkurl" title="'+escapeHtml(link)+'">'+escapeHtml(pretty)+'</span></div>'
+          +'<div class="bk-linkactions"><button type="button" class="btn btn-primary bk-linkbtn" id="bkPageCopy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15"/></svg>Copy link</button>'
+            +'<button type="button" class="btn btn-secondary bk-linkbtn" id="bkPageShare"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button></div>'
+        +'</div>'
+        +'<div class="section-title bk-sec">Requests &amp; upcoming <span class="bk-count" id="bkActiveCount"></span></div><div id="bkPageActive"></div>'
       +'</div>'
-      +'<div class="section-title bk-sec">Requests &amp; upcoming <span class="bk-count" id="bkActiveCount"></span></div><div id="bkPageActive"></div>'
-      +'<div class="section-title bk-sec">History <span class="bk-count" id="bkHistoryCount"></span></div><div id="bkPageHistory"></div>';
-    const copy=document.getElementById('bkPageCopy'); if(copy) copy.addEventListener('click',()=>{ if(navigator.clipboard) navigator.clipboard.writeText(link); const t=copy.querySelector('svg'); copy.innerHTML='Copied'; copy.classList.add('copied'); setTimeout(()=>{ renderBookingsPage(); },1400); });
+      +'<div class="bk-col bk-col-right">'
+        +'<div class="section-title bk-sec">History <span class="bk-count" id="bkHistoryCount"></span></div><div id="bkPageHistory"></div>'
+      +'</div>'
+      +'</div>';
+    const copy=document.getElementById('bkPageCopy'); if(copy) copy.addEventListener('click',()=>{ if(navigator.clipboard) navigator.clipboard.writeText(link); copy.innerHTML='Copied'; copy.classList.add('copied'); setTimeout(()=>{ renderBookingsPage(); },1400); });
     const share=document.getElementById('bkPageShare'); if(share) share.addEventListener('click',()=>{ if(navigator.share){ navigator.share({ title:'Book time with me', url:link }).catch(()=>{}); } else { if(navigator.clipboard) navigator.clipboard.writeText(link); flashToast('Link copied — paste it anywhere'); } });
     fillBookingLists();
     bkPoll(true);
