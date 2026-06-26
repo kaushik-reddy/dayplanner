@@ -2929,11 +2929,10 @@
           +meetCard(r.date,r.time,r.duration,{accent:true,label:'Meeting with '+owner});
       } else if(state==='declined' || state==='cancelled'){
         const isCan=state==='cancelled';
-        const prettyLink=bookUrl?esc(bookUrl.replace(/^https?:\/\//,'').replace(/^file:\/\/\//,'').split('&')[0]):'';
         h=header(isCan?'Cancelled':'Declined','bad')+steps(0,true)
           +hero('declined',isCan?'Booking cancelled':'Time not available',isCan?('We regret to inform you that this booking has been cancelled. Please pick another slot below to continue.'):('Sorry \u2014 <b>'+owner+'</b> couldn\u2019t take this slot.'+(bookUrl?' Pick another that works for you.':'')))
           +meetCard(r.date,r.time,r.duration,{muted:true,strike:true})
-          +(bookUrl?('<div class="tk-booklink" title="'+esc(bookUrl)+'">'+brandIco()+'<span>'+prettyLink+'</span></div>'+btnLink(bookUrl,isCan?'Book a slot':'Pick another time','primary','12px')):'');
+          +(bookUrl?btnLink(bookUrl,isCan?'Book a slot':'Pick another time','primary','12px'):'');
       } else if(state==='reschedule_proposed' && r.proposed){
         h=header('Action needed','warn')+steps(2,false)
           +hero('reschedule_proposed','New time proposed','<b>'+owner+'</b> suggested a different time. Accept it, or pick another that suits you.')
