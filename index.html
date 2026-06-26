@@ -1782,10 +1782,10 @@
   .bk-addwin{ display:inline-flex; align-items:center; gap:7px; width:100%; justify-content:center; margin-top:9px; background:transparent; border:1px dashed var(--line); color:var(--ink-dim); border-radius:11px; padding:10px 14px; font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer; transition:border-color .15s, color .15s; }
   .bk-addwin:hover{ border-color:var(--brass); color:var(--brass); }
   /* ===== Bookings page (main nav) ===== */
-  #bookingsView{ max-width:1060px; margin:0 auto; }
+  #bookingsView{ width:100%; }
   .bk-grid{ display:grid; gap:22px; }
   @media (min-width:900px){
-    .bk-grid{ grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap:28px; align-items:start; }
+    .bk-grid{ grid-template-columns: minmax(0,1.05fr) minmax(0,1fr); gap:32px; align-items:start; }
     .bk-col-left{ position:sticky; top:24px; }
   }
   .bk-col{ min-width:0; }
