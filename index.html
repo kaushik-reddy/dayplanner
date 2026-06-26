@@ -1737,11 +1737,16 @@
   .sb-act:hover{ border-color:var(--brass); color:var(--brass); }
   .sb-act.danger:hover{ border-color:var(--red-soft); color:var(--red-soft); }
   .sb-edit{ border-top:1px solid var(--line); padding:12px; background:var(--bg-card); }
-  .sb-edit-grid{ display:grid; grid-template-columns:1.4fr 1fr 0.8fr; gap:8px; }
+  .sb-edit-grid{ display:grid; grid-template-columns:1.5fr 1.1fr 0.7fr; gap:8px; align-items:end; }
   .sb-edit-grid label{ display:flex; flex-direction:column; gap:5px; font-size:9.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-faint); font-weight:600; }
-  .sb-edit-grid input{ width:100%; box-sizing:border-box; background:var(--bg); border:1px solid var(--line); color:var(--ink); font-size:13px; font-family:var(--font-mono); padding:8px 9px; border-radius:9px; outline:none; }
+  /* one consistent look for all three reschedule inputs (override the larger owner-config input rule) */
+  .modal-share .modal-body .sb-edit-grid input,
+  .sb-edit-grid input{ width:100%; box-sizing:border-box; height:42px; background:var(--bg); border:1px solid var(--line); color:var(--ink); font-size:13px; font-weight:500; font-family:var(--font-mono); padding:0 10px; border-radius:10px; outline:none; transition:border-color .15s, box-shadow .15s; }
+  .modal-share .modal-body .sb-edit-grid input:focus,
   .sb-edit-grid input:focus{ border-color:var(--brass); box-shadow:0 0 0 2px var(--brass-soft); }
-  .sb-edit-grid input::-webkit-calendar-picker-indicator{ filter:invert(0.7) sepia(1) saturate(2) hue-rotate(5deg); opacity:0.6; cursor:pointer; }
+  .sb-edit-grid input::-webkit-calendar-picker-indicator{ filter:invert(0.7) sepia(1) saturate(2) hue-rotate(5deg); opacity:0.55; cursor:pointer; }
+  .sb-edit-grid input[type=number]::-webkit-inner-spin-button,
+  .sb-edit-grid input[type=number]::-webkit-outer-spin-button{ opacity:0.45; height:24px; }
   .sb-edit-btns{ display:flex; gap:8px; justify-content:flex-end; margin-top:11px; }
   .btn-mini{ border:none; border-radius:9px; padding:8px 16px; font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; background:var(--brass); color:#15110A; }
   .btn-mini.ghost{ background:transparent; border:1px solid var(--line); color:var(--ink-dim); }
