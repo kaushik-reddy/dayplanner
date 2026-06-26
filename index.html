@@ -1775,6 +1775,21 @@
   .bk-win-rm:disabled{ opacity:0.3; cursor:not-allowed; }
   .bk-addwin{ display:inline-flex; align-items:center; gap:7px; width:100%; justify-content:center; margin-top:9px; background:transparent; border:1px dashed var(--line); color:var(--ink-dim); border-radius:11px; padding:10px 14px; font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer; transition:border-color .15s, color .15s; }
   .bk-addwin:hover{ border-color:var(--brass); color:var(--brass); }
+  /* ===== Bookings page (main nav) ===== */
+  #bookingsView{ max-width:720px; margin:0 auto; }
+  .bk-linkcard{ background:var(--bg-card); border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:24px; }
+  .bk-linkcard-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+  .bk-linkcard-label{ display:flex; align-items:center; gap:8px; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-dim); font-weight:700; }
+  .bk-live-dot{ width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 0 3px rgba(111,168,138,0.18); }
+  .bk-sec{ display:flex; align-items:center; gap:9px; }
+  .bk-count{ font-family:var(--font-mono); font-size:11px; font-weight:700; color:#15110A; background:var(--brass); min-width:18px; height:18px; padding:0 5px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; }
+  .bk-count:empty{ display:none; }
+  #bkPageActive, #bkPageHistory{ display:flex; flex-direction:column; gap:8px; margin-bottom:8px; }
+  #bkPageHistory .sb-item{ opacity:0.82; }
+  .bk-setup-card{ text-align:center; max-width:420px; margin:40px auto; padding:30px 22px; border:1px solid var(--line); border-radius:20px; background:var(--bg-card); }
+  .bk-setup-ic{ width:60px; height:60px; border-radius:50%; margin:0 auto 18px; display:flex; align-items:center; justify-content:center; background:var(--brass-soft); color:var(--brass); }
+  .bk-setup-title{ font-family:var(--font-display); font-size:22px; font-weight:600; margin-bottom:10px; }
+  .bk-setup-text{ font-size:13.5px; color:var(--ink-dim); line-height:1.55; }
 
   /* public booking page */
   .booking-view{ max-width:560px; margin:0 auto; padding:calc(28px + env(safe-area-inset-top)) clamp(16px,5vw,28px) 60px; }
@@ -1924,6 +1939,7 @@
   <div class="viewtabs">
     <button class="viewtab active" id="tabPlanner">Planner</button>
     <button class="viewtab" id="tabAudit">Audit &amp; Analysis</button>
+    <button class="viewtab" id="tabBookings">Bookings</button>
   </div>
 
   <div id="plannerView">
@@ -1985,7 +2001,7 @@
       <button class="slot-btn" id="slotsBtn"><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>See free time slots</button>
       <button class="swap-btn" id="swapBtn"><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v15M7 4 3.5 7.5M7 4l3.5 3.5"/><path d="M17 20V5M17 20l3.5-3.5M17 20l-3.5-3.5"/></svg>Swap two tasks</button>
       <button class="select-btn" id="selectBtn"><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 12l2.8 2.8L16.5 9"/></svg>Select &amp; move tasks</button>
-      <button class="slot-btn" id="shareBtn"><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share booking link</button>
+      <button class="slot-btn" id="shareBtn"><svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Bookings &amp; link</button>
       <button class="close-day" id="closeDayBtn">Close checklist for the day</button>
     </div>
     <button class="fab" id="fabToggle" aria-label="Quick actions" title="Quick actions">
@@ -2077,6 +2093,19 @@
     <div class="section-title">Timeline log · every action recorded</div>
     <div id="auditLog"></div>
   </div>
+
+  <div id="bookingsView" style="display:none;">
+    <div class="audit-head">
+      <div>
+        <div class="day-name" style="color:var(--brass);margin-bottom:6px;">Bookings</div>
+        <div class="a-date">Requests &amp; history from your scheduling link</div>
+      </div>
+      <div class="audit-tools">
+        <button type="button" class="atool" id="bkPageSettings"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.7-1.3-1.8-3.1-2 .8a7.6 7.6 0 0 0-2.6-1.5L14.4 2h-3.6L10.4 4a7.6 7.6 0 0 0-2.6 1.5l-2-.8L4 7.8l1.7 1.3a7.8 7.8 0 0 0 0 3L4 13.4l1.8 3.1 2-.8a7.6 7.6 0 0 0 2.6 1.5l.4 2.1h3.6l.4-2.1a7.6 7.6 0 0 0 2.6-1.5l2 .8 1.8-3.1z"/></svg>Settings</button>
+      </div>
+    </div>
+    <div id="bkPageBody"></div>
+  </div>
 </div>
 
 <!-- Public booking page (rendered when ?book=TOKEN is present) -->
@@ -2087,8 +2116,8 @@
   <div class="modal modal-form modal-share">
     <div class="modal-head">
       <div class="ta-titles">
-        <h2>Your booking link</h2>
-        <div class="ta-when">Share it — people see only free slots, never your tasks.</div>
+        <h2>Booking settings</h2>
+        <div class="ta-when">Set your availability — guests only ever see open slots.</div>
       </div>
       <button type="button" class="modal-close" id="shareClose" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
     </div>
@@ -3017,6 +3046,7 @@
         fetchPosterBtn=document.getElementById('fetchPosterBtn'), posterPreview=document.getElementById('posterPreview'),
         saveBtn=document.getElementById('saveBtn'), cancelBtn=document.getElementById('cancelBtn'), deleteBtn=document.getElementById('deleteBtn');
   const tabPlanner=document.getElementById('tabPlanner'), tabAudit=document.getElementById('tabAudit'),
+        tabBookings=document.getElementById('tabBookings'), bookingsView=document.getElementById('bookingsView'),
         plannerView=document.getElementById('plannerView'), auditView=document.getElementById('auditView'),
         swapBtn=document.getElementById('swapBtn'), swapOverlay=document.getElementById('swapOverlay'),
         swapA=document.getElementById('swapA'), swapB=document.getElementById('swapB'),
@@ -3901,17 +3931,22 @@
 
   // ---------- view switching ----------
   function showView(v){
-    const planner = v!=='audit';
+    const isAudit=v==='audit', isBookings=v==='bookings';
+    const planner=!isAudit && !isBookings;
     // use '' (not 'block') so the responsive CSS layout (desktop grid / mobile block) stays in control
     plannerView.style.display = planner ? '' : 'none';
-    auditView.style.display = planner ? 'none' : '';
+    auditView.style.display = isAudit ? '' : 'none';
+    bookingsView.style.display = isBookings ? '' : 'none';
     tabPlanner.classList.toggle('active', planner);
-    tabAudit.classList.toggle('active', !planner);
-    if(!planner) renderAudit(true);
+    tabAudit.classList.toggle('active', isAudit);
+    tabBookings.classList.toggle('active', isBookings);
+    if(isAudit) renderAudit(true);
+    if(isBookings && typeof renderBookingsPage==='function') renderBookingsPage();
     window.scrollTo(0,0);
   }
   tabPlanner.addEventListener('click',()=>showView('planner'));
   tabAudit.addEventListener('click',()=>showView('audit'));
+  tabBookings.addEventListener('click',()=>showView('bookings'));
 
   // ---------- swap with FLIP animation ----------
   function swappableTasks(data){ return data.tasks.filter(t=>{ const s=taskState(t); return s!=='completed'&&s!=='cancelled'&&s!=='carried'; }); }
@@ -5392,7 +5427,7 @@
   async function cancelBooking(id){
     const b=(bkLastBookings||[]).find(x=>x.id===id);
     await removeBookingLocally(id);
-    renderBookingsList();
+    refreshBookings();
     flashToast('Booking with '+((b&&b.name)||'guest')+' cancelled');
   }
 
@@ -5401,7 +5436,7 @@
     if(res.error==='clash'){ flashToast('That time clashes with another booking','err'); return false; }
     if(res.error){ flashToast('Could not reschedule — try again','err'); return false; }
     bkEditId=null;
-    reconcileBookings(bkLastBookings); await bkPublish(); renderBookingsList();
+    reconcileBookings(bkLastBookings); await bkPublish(); refreshBookings();
     flashToast('New time proposed — awaiting the guest');
     return true;
   }
@@ -5410,22 +5445,21 @@
     const b=(bkLastBookings||[]).find(x=>x.id===id);
     const res=await manageBooking('accept', id);
     if(res.error){ flashToast('Could not accept — try again','err'); return; }
-    reconcileBookings(bkLastBookings); await bkPublish(); renderBookingsList();
+    reconcileBookings(bkLastBookings); await bkPublish(); refreshBookings();
     flashToast('Accepted — '+((b&&b.name)||'guest')+' will see it on their link');
   }
   async function declineBooking(id){
     const b=(bkLastBookings||[]).find(x=>x.id===id);
     const res=await manageBooking('decline', id);
     if(res.error){ flashToast('Could not decline — try again','err'); return; }
-    reconcileBookings(bkLastBookings); await bkPublish(); renderBookingsList();
+    reconcileBookings(bkLastBookings); await bkPublish(); refreshBookings();
     flashToast('Declined — '+((b&&b.name)||'guest')+' will see it on their link');
   }
-  // open the share panel focused on one booking's reschedule editor (called from the task card)
+  // jump to the Bookings page and open one booking's reschedule editor (called from the task card)
   function bookingReschedule(id){
-    if(typeof openShareModal!=='function') return;
-    openShareModal();
-    bkEditId=id; renderBookingsList();
-    setTimeout(()=>{ const el=document.querySelector('#bkList .sb-item[data-id="'+id+'"]'); if(el) el.scrollIntoView({block:'center', behavior:'smooth'}); }, 120);
+    showView('bookings');
+    bkEditId=id; refreshBookings();
+    setTimeout(()=>{ const el=document.querySelector('#bkPageActive .sb-item[data-id="'+id+'"]'); if(el) el.scrollIntoView({block:'center', behavior:'smooth'}); }, 150);
   }
 
   async function bkPoll(silent){
@@ -5436,61 +5470,58 @@
       if(!r.ok) return bkLastBookings;
       const res=await r.json(); const bookings=res.bookings||[];
       bkLastBookings=bookings; reconcileBookings(bookings);
-      if(shareOverlay.classList.contains('open') && !bkEditId) renderBookingsList();
+      if(bookingsView && bookingsView.style.display!=='none' && !bkEditId) fillBookingLists();
       return bookings;
     }catch(e){ return bkLastBookings; }
   }
 
   let bkEditId=null;
   const BK_STATUS={ pending:{t:'Pending',c:'amber'}, accepted:{t:'Accepted',c:'green'}, reschedule_proposed:{t:'Awaiting guest',c:'blue'}, declined:{t:'Declined',c:'red'}, cancelled:{t:'Cancelled',c:'red'} };
-  function renderBookingsList(){
-    const el=document.getElementById('bkList'); if(!el) return;
-    const order={ pending:0, reschedule_proposed:1, accepted:2, declined:3, cancelled:3 };
-    const list=(bkLastBookings||[]).slice().sort((a,b)=>{ const oa=order[a.status]??2, ob=order[b.status]??2; if(oa!==ob) return oa-ob; return (a.date+a.time) < (b.date+b.time) ? 1 : -1; });
-    if(!list.length){ el.innerHTML='<div class="sb-empty">No requests yet. Share your link to start receiving them.</div>'; return; }
-    const today=dateKey(new Date());
-    function dShort(dk){ try{ return new Date(dk+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }catch(e){ return dk; } }
-    el.innerHTML=list.map(b=>{
-      const st=b.status||'pending'; const meta=BK_STATUS[st]||BK_STATUS.pending;
-      const when=dShort(b.date); const past=b.date<today; const dur=b.duration||30; const editing=b.id===bkEditId;
-      const dead=(st==='declined'||st==='cancelled');
-      let actions='';
+  function bkDShort(dk){ try{ return new Date(dk+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }catch(e){ return dk; } }
+  function bookingRowHtml(b, today, readonly){
+    const st=b.status||'pending'; const meta=BK_STATUS[st]||BK_STATUS.pending;
+    const when=bkDShort(b.date); const past=b.date<today; const dur=b.duration||30; const editing=!readonly && b.id===bkEditId;
+    const dead=(st==='declined'||st==='cancelled');
+    let actions='';
+    if(!readonly){
       if(st==='pending'){ actions='<button type="button" class="sb-act ok" data-act="accept" title="Accept">'+svgIco('check',15)+'</button><button type="button" class="sb-act" data-act="resch" title="Suggest another time">'+svgIco('clock',15)+'</button><button type="button" class="sb-act danger" data-act="decline" title="Decline">'+svgIco('x',15)+'</button>'; }
       else if(st==='accepted'){ actions='<button type="button" class="sb-act" data-act="resch" title="Reschedule">'+svgIco('clock',15)+'</button><button type="button" class="sb-act danger" data-act="cancel" title="Cancel">'+svgIco('x',15)+'</button>'; }
       else if(st==='reschedule_proposed'){ actions='<button type="button" class="sb-act" data-act="resch" title="Change proposed time">'+svgIco('clock',15)+'</button><button type="button" class="sb-act danger" data-act="cancel" title="Cancel">'+svgIco('x',15)+'</button>'; }
       else { actions='<button type="button" class="sb-act danger" data-act="cancel" title="Remove">'+svgIco('x',15)+'</button>'; }
-      let row='<div class="sb-item'+(past||dead?' past':'')+'" data-id="'+escapeHtml(b.id)+'"><div class="sb-row">'
-        +'<div class="sb-ic">'+svgIco('calendar',16)+'</div>'
-        +'<div class="sb-main"><div class="sb-name"><span class="sb-nm">'+escapeHtml(b.name||'Guest')+'</span><span class="sb-badge sb-'+meta.c+'">'+meta.t+'</span></div>'
-        +'<div class="sb-when">'+escapeHtml(when)+' · '+escapeHtml(fmtTime(b.time))+' · '+dur+'m'+(b.email?' · '+escapeHtml(b.email):'')+'</div>'
-        +(st==='reschedule_proposed'&&b.proposed?'<div class="sb-prop">You proposed → '+escapeHtml(dShort(b.proposed.date))+' · '+escapeHtml(fmtTime(b.proposed.time))+'</div>':'')
-        +(b.note?'<div class="sb-note">'+escapeHtml(b.note)+'</div>':'')
+    }
+    let row='<div class="sb-item'+(past||dead?' past':'')+'" data-id="'+escapeHtml(b.id)+'"><div class="sb-row">'
+      +'<div class="sb-ic">'+svgIco('calendar',16)+'</div>'
+      +'<div class="sb-main"><div class="sb-name"><span class="sb-nm">'+escapeHtml(b.name||'Guest')+'</span><span class="sb-badge sb-'+meta.c+'">'+meta.t+'</span></div>'
+      +'<div class="sb-when">'+escapeHtml(when)+' · '+escapeHtml(fmtTime(b.time))+' · '+dur+'m'+(b.email?' · '+escapeHtml(b.email):'')+'</div>'
+      +(st==='reschedule_proposed'&&b.proposed?'<div class="sb-prop">You proposed → '+escapeHtml(bkDShort(b.proposed.date))+' · '+escapeHtml(fmtTime(b.proposed.time))+'</div>':'')
+      +(b.note?'<div class="sb-note">'+escapeHtml(b.note)+'</div>':'')
+      +'</div>'
+      +(actions?'<div class="sb-actions">'+actions+'</div>':'')+'</div>';
+    if(editing){
+      row+='<div class="sb-edit">'
+        +'<div class="sb-edit-grid">'
+          +'<label>Date<input type="date" class="sbE-date" value="'+escapeHtml(b.date)+'"></label>'
+          +'<label>Time<input type="time" class="sbE-time" value="'+escapeHtml(b.time)+'"></label>'
+          +'<label>Mins<input type="number" class="sbE-dur" min="5" max="480" step="5" value="'+dur+'"></label>'
         +'</div>'
-        +'<div class="sb-actions">'+actions+'</div></div>';
-      if(editing){
-        row+='<div class="sb-edit">'
-          +'<div class="sb-edit-grid">'
-            +'<label>Date<input type="date" class="sbE-date" value="'+escapeHtml(b.date)+'"></label>'
-            +'<label>Time<input type="time" class="sbE-time" value="'+escapeHtml(b.time)+'"></label>'
-            +'<label>Mins<input type="number" class="sbE-dur" min="5" max="480" step="5" value="'+dur+'"></label>'
-          +'</div>'
-          +'<div class="sb-edit-hint">The guest will be asked to accept this new time.</div>'
-          +'<div class="sb-edit-btns"><button type="button" class="btn-mini ghost" data-act="recancel">Discard</button><button type="button" class="btn-mini" data-act="resave">Propose time</button></div>'
-        +'</div>';
-      }
-      return row+'</div>';
-    }).join('');
+        +'<div class="sb-edit-hint">The guest will be asked to accept this new time.</div>'
+        +'<div class="sb-edit-btns"><button type="button" class="btn-mini ghost" data-act="recancel">Discard</button><button type="button" class="btn-mini" data-act="resave">Propose time</button></div>'
+      +'</div>';
+    }
+    return row+'</div>';
+  }
+  function wireBookingContainer(el){
     el.querySelectorAll('.sb-act').forEach(btn=>btn.addEventListener('click',()=>{
       const item=btn.closest('.sb-item'); const id=item.dataset.id; const act=btn.dataset.act;
       const b=(bkLastBookings||[]).find(x=>x.id===id);
       if(act==='cancel'){ if(confirm('Cancel the booking with '+((b&&b.name)||'this guest')+'? Their slot will be freed up.')) cancelBooking(id); }
       else if(act==='accept'){ acceptBooking(id); }
       else if(act==='decline'){ if(confirm('Decline '+((b&&b.name)||'this guest')+'\u2019s request?')) declineBooking(id); }
-      else if(act==='resch'){ bkEditId=(bkEditId===id?null:id); renderBookingsList(); }
+      else if(act==='resch'){ bkEditId=(bkEditId===id?null:id); refreshBookings(); }
     }));
     el.querySelectorAll('.sb-edit').forEach(ed=>{
       const item=ed.closest('.sb-item'); const id=item.dataset.id;
-      ed.querySelector('[data-act="recancel"]').addEventListener('click',()=>{ bkEditId=null; renderBookingsList(); });
+      ed.querySelector('[data-act="recancel"]').addEventListener('click',()=>{ bkEditId=null; refreshBookings(); });
       ed.querySelector('[data-act="resave"]').addEventListener('click',()=>{
         const date=ed.querySelector('.sbE-date').value, time=ed.querySelector('.sbE-time').value;
         let dur=parseInt(ed.querySelector('.sbE-dur').value,10); if(isNaN(dur)||dur<5) dur=30;
@@ -5498,6 +5529,48 @@
         rescheduleBooking(id, date, time, dur);
       });
     });
+  }
+  function renderBookingsInto(el, list, readonly){
+    if(!el) return;
+    if(!list.length){ el.innerHTML='<div class="sb-empty">'+(readonly?'No past bookings yet.':'No active requests right now.')+'</div>'; return; }
+    const today=dateKey(new Date());
+    el.innerHTML=list.map(b=>bookingRowHtml(b, today, readonly)).join('');
+    wireBookingContainer(el);
+  }
+  function fillBookingLists(){
+    const today=dateKey(new Date());
+    const all=(bkLastBookings||[]);
+    const isActive=b=>{ const s=b.status||'pending'; return s!=='declined' && s!=='cancelled' && b.date>=today; };
+    const active=all.filter(isActive).sort((a,b)=> (a.date+a.time) < (b.date+b.time) ? -1 : 1);
+    const history=all.filter(b=>!isActive(b)).sort((a,b)=> (a.date+a.time) < (b.date+b.time) ? 1 : -1);
+    renderBookingsInto(document.getElementById('bkPageActive'), active, false);
+    renderBookingsInto(document.getElementById('bkPageHistory'), history, true);
+    const ac=document.getElementById('bkActiveCount'); if(ac) ac.textContent=active.length?active.length:'';
+    const hc=document.getElementById('bkHistoryCount'); if(hc) hc.textContent=history.length?history.length:'';
+  }
+  function refreshBookings(){ if(document.getElementById('bkPageActive')) fillBookingLists(); }
+
+  function renderBookingsPage(){
+    const body=document.getElementById('bkPageBody'); if(!body) return;
+    const token=localStorage.getItem(BK_TOKEN_KEY);
+    if(!token || !bkEnabled()){
+      body.innerHTML='<div class="bk-setup-card"><div class="bk-setup-ic">'+svgIco('calendar',26)+'</div>'
+        +'<div class="bk-setup-title">Share your availability</div>'
+        +'<div class="bk-setup-text">Create a private link people can use to book time with you. Your tasks stay hidden — guests only ever see open slots.</div>'
+        +'<button type="button" class="btn btn-primary" id="bkSetupBtn" style="margin-top:20px">Set up booking link</button></div>';
+      const sb=document.getElementById('bkSetupBtn'); if(sb) sb.addEventListener('click', openShareModal);
+      return;
+    }
+    const link=bkLink();
+    body.innerHTML=
+      '<div class="bk-linkcard"><div class="bk-linkcard-top"><div class="bk-linkcard-label"><span class="bk-live-dot"></span>Your booking link · live</div><button type="button" class="atool" id="bkPageSettings2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.7-1.3-1.8-3.1-2 .8a7.6 7.6 0 0 0-2.6-1.5L14.4 2h-3.6L10.4 4a7.6 7.6 0 0 0-2.6 1.5l-2-.8L4 7.8l1.7 1.3a7.8 7.8 0 0 0 0 3L4 13.4l1.8 3.1 2-.8a7.6 7.6 0 0 0 2.6 1.5l.4 2.1h3.6l.4-2.1a7.6 7.6 0 0 0 2.6-1.5l2 .8 1.8-3.1z"/></svg>Settings</button></div>'
+        +'<div class="share-link-row"><input id="bkPageLinkInput" type="text" readonly value="'+escapeHtml(link)+'"><button type="button" class="copy-btn" id="bkPageCopy">Copy</button></div></div>'
+      +'<div class="section-title bk-sec">Requests &amp; upcoming <span class="bk-count" id="bkActiveCount"></span></div><div id="bkPageActive"></div>'
+      +'<div class="section-title bk-sec">History <span class="bk-count" id="bkHistoryCount"></span></div><div id="bkPageHistory"></div>';
+    const copy=document.getElementById('bkPageCopy'); if(copy) copy.addEventListener('click',()=>{ const inp=document.getElementById('bkPageLinkInput'); inp.select(); navigator.clipboard&&navigator.clipboard.writeText(inp.value); copy.textContent='Copied'; copy.classList.add('copied'); setTimeout(()=>{ copy.textContent='Copy'; copy.classList.remove('copied'); },1600); });
+    const s2=document.getElementById('bkPageSettings2'); if(s2) s2.addEventListener('click', openShareModal);
+    fillBookingLists();
+    bkPoll(true);
   }
 
   let bkDraft=null;
@@ -5522,7 +5595,6 @@
       +'<div class="bk-customnum"><span>or custom</span><input type="number" id="bkSlotNum" min="5" max="240" step="5" value="'+(c.slotMin||30)+'"><em>minutes</em></div></div>';
     h+='<div class="share-field"><label>Bookable window</label>'+pillRow('hor',horOpts,c.horizonDays,o=>o+' days')
       +'<div class="bk-customnum"><span>or custom</span><input type="number" id="bkHorNum" min="1" max="365" step="1" value="'+(c.horizonDays||14)+'"><em>days ahead</em></div></div>';
-    h+='<div class="share-field"><label>Bookings received</label><div class="share-bookings" id="bkList"><div class="sb-empty">Loading…</div></div></div>';
     shareBody.innerHTML=h;
 
     const owner=document.getElementById('bkOwner'); owner.addEventListener('input',()=>{ bkDraft.owner=owner.value; });
@@ -5551,7 +5623,6 @@
     }));
     const copy=document.getElementById('bkCopy');
     if(copy) copy.addEventListener('click',()=>{ const inp=document.getElementById('bkLinkInput'); inp.select(); navigator.clipboard&&navigator.clipboard.writeText(inp.value); copy.textContent='Copied'; copy.classList.add('copied'); setTimeout(()=>{ copy.textContent='Copy'; copy.classList.remove('copied'); },1600); });
-    renderBookingsList();
   }
 
   function openShareModal(){
@@ -5563,7 +5634,7 @@
     shareOverlay.classList.add('open');
     bkPoll(false);
   }
-  function closeShareModal(){ shareOverlay.classList.remove('open'); }
+  function closeShareModal(){ shareOverlay.classList.remove('open'); if(typeof renderBookingsPage==='function' && bookingsView && bookingsView.style.display!=='none') renderBookingsPage(); }
 
   async function saveShareConfig(){
     bkDraft.days = bkDraft.days.slice().sort((a,b)=>a-b);
@@ -5583,6 +5654,7 @@
     startBookingLoops();
     renderShareBody(); // re-render to show the live link row
     shareDisableBtn.style.display='';
+    if(bookingsView && bookingsView.style.display!=='none') renderBookingsPage();
   }
 
   async function disableSharing(){
@@ -5611,7 +5683,8 @@
     }
   }
 
-  if(shareBtn) shareBtn.addEventListener('click', openShareModal);
+  if(shareBtn) shareBtn.addEventListener('click', ()=>showView('bookings'));
+  { const _bps=document.getElementById('bkPageSettings'); if(_bps) _bps.addEventListener('click', openShareModal); }
   if(shareCloseBtn) shareCloseBtn.addEventListener('click', closeShareModal);
   if(shareSaveBtn) shareSaveBtn.addEventListener('click', saveShareConfig);
   if(shareDisableBtn) shareDisableBtn.addEventListener('click', disableSharing);
