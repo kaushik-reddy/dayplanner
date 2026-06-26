@@ -1461,6 +1461,38 @@
   /* lock background scroll so popups don't show a double scrollbar */
   html:has(.overlay.open), body:has(.overlay.open){ overflow:hidden; }
 
+  /* ============ DESKTOP / WIDE LAYOUT (>=1000px) ============ */
+  /* Two-column dashboard: sticky overview sidebar + scrolling timeline. Mobile untouched. */
+  @media (min-width: 1000px){
+    .wrap{ max-width: 1200px; }
+    #plannerView{
+      display:grid;
+      grid-template-columns: 372px minmax(0, 1fr);
+      grid-template-areas: "head head" "aside main";
+      column-gap: 30px;
+      align-items: start;
+    }
+    #plannerView > .header{ grid-area: head; }
+    #plannerView > .closed-banner{ grid-column: 1 / -1; }
+    .planner-aside{ grid-area: aside; position: sticky; top: 24px; align-self: start; display:flex; flex-direction:column; gap:16px; }
+    .planner-aside .hero{ margin:0; }
+    .planner-aside .day-progress{ margin:0; }
+    .planner-main{ grid-area: main; min-width: 0; }
+    .planner-main .timeline{ margin-top: 0; }
+    /* keep individual task cards from getting uncomfortably wide */
+    .planner-main .task{ max-width: 760px; }
+
+    /* Audit: charts flow into a responsive multi-column grid */
+    .audit-charts{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+    #auditHeatCard, #auditBarsCard{ grid-column: 1 / -1; }  /* wide charts span full width */
+    .audit-cards{ grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+  }
+
+  @media (min-width: 1320px){
+    .wrap{ max-width: 1320px; }
+    #plannerView{ grid-template-columns: 400px minmax(0, 1fr); }
+  }
+
   @media (max-width: 480px){
     body{ padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
 
@@ -1578,6 +1610,7 @@
     </div>
   </div>
 
+  <div class="planner-aside">
   <!-- HERO: next or active task -->
   <div class="hero" id="hero">
     <div class="hero-bg empty" id="heroBg"></div>
@@ -1605,10 +1638,13 @@
     <div class="day-stats" id="dayStats"></div>
     <div class="day-hint" id="dayHint" style="display:none;"></div>
   </div>
+  </div><!-- /planner-aside -->
 
+  <div class="planner-main">
   <div class="timeline" id="timeline"></div>
   <div class="day-summary" id="daySummary" style="display:none;"></div>
   <div class="empty-state" id="emptyState" style="display:none;">No tasks yet. Add your first one for the day.</div>
+  </div><!-- /planner-main -->
 
   <div class="fab-dock" id="fabDock">
     <div class="fab-scrim" id="fabScrim"></div>
@@ -1638,6 +1674,7 @@
 
     <div class="audit-cards" id="auditCards"></div>
 
+    <div class="audit-charts">
     <div class="chart-card" id="auditHeatCard">
       <div class="chart-head"><span class="ch-title">Consistency</span><span class="ch-note" id="auditHeatNote"></span></div>
       <div class="heatmap" id="auditHeat"></div>
@@ -1676,6 +1713,7 @@
         <div class="donut-legend" id="auditLegend"></div>
       </div>
     </div>
+    </div><!-- /audit-charts -->
 
     <div class="section-title">Timeline log · every action recorded</div>
     <div id="auditLog"></div>
