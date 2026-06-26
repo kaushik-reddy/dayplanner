@@ -1774,7 +1774,61 @@
   .bk-confirm-detail{ font-size:14px; color:var(--ink-dim); line-height:1.6; }
   .bk-confirm-detail b{ color:var(--ink); }
   .bk-confirm-when{ display:inline-flex; align-items:center; gap:8px; margin:18px 0; padding:12px 18px; border:1px solid var(--brass-soft); background:var(--brass-soft); border-radius:14px; font-family:var(--font-mono); font-size:14px; color:var(--ink); }
-  .bk-footer{ text-align:center; margin-top:26px; font-size:11px; color:var(--ink-faint); }
+  .bk-footer{ text-align:center; margin-top:26px; font-size:11px; color:var(--ink-faint); line-height:1.5; }
+  /* custom from→to range */
+  .bk-range{ display:flex; align-items:flex-end; gap:10px; }
+  .bk-range-field{ flex:1; display:flex; flex-direction:column; gap:6px; }
+  .bk-range-field span{ font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; }
+  .bk-range-field input[type=time]{ width:100%; box-sizing:border-box; background:var(--bg-card); border:1px solid var(--line); color:var(--ink); font-size:16px; font-family:var(--font-mono); padding:12px 12px; border-radius:11px; outline:none; }
+  .bk-range-field input[type=time]:focus{ border-color:var(--brass); box-shadow:0 0 0 3px var(--brass-soft); }
+  .bk-range-field input[type=time]::-webkit-calendar-picker-indicator{ filter:invert(0.7) sepia(1) saturate(2) hue-rotate(5deg); opacity:0.6; cursor:pointer; }
+  .bk-range-sep{ flex-shrink:0; color:var(--brass); padding-bottom:13px; }
+  /* confirm / status icon variants */
+  .bk-confirm-ic.pending{ background:rgba(201,151,74,0.16); color:var(--brass); }
+  .bk-confirm-ic.ok{ background:rgba(111,168,138,0.16); color:var(--green); }
+  .bk-confirm-ic.bad{ background:rgba(201,122,106,0.16); color:var(--red-soft); }
+  .bk-confirm-ic.warn{ background:rgba(127,168,201,0.16); color:#7FA8C9; }
+  .bk-status-chip{ display:inline-block; margin:4px auto 0; padding:6px 14px; border-radius:999px; font-size:11px; font-weight:700; letter-spacing:0.04em; }
+  .bk-status-chip.ok{ background:rgba(111,168,138,0.16); color:var(--green); }
+  .bk-status-chip.pending{ background:rgba(201,151,74,0.16); color:var(--brass); }
+  /* guest tracking link box */
+  .bk-track-box{ margin-top:20px; border:1px solid var(--line); border-radius:14px; padding:15px; background:var(--bg); text-align:left; }
+  .bk-track-label{ font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; margin-bottom:9px; }
+  .bk-track-row{ display:flex; gap:8px; }
+  .bk-track-row input{ flex:1; min-width:0; box-sizing:border-box; background:var(--bg-card); border:1px solid var(--line); color:var(--ink-dim); font-size:12px; font-family:var(--font-mono); padding:10px 12px; border-radius:10px; }
+  .bk-track-open{ display:inline-flex; align-items:center; gap:6px; margin-top:11px; color:var(--brass); font-size:12.5px; font-weight:600; text-decoration:none; }
+  /* proposal (new time) card on tracking page */
+  .bk-propose{ border:1px solid var(--line); border-radius:14px; overflow:hidden; text-align:left; }
+  .bk-prop-row{ display:flex; align-items:center; gap:12px; padding:12px 15px; font-size:13.5px; }
+  .bk-prop-row span{ font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; width:34px; flex-shrink:0; }
+  .bk-prop-row b{ font-family:var(--font-mono); font-weight:600; color:var(--ink); }
+  .bk-prop-row.old{ background:var(--bg); }
+  .bk-prop-row.old b{ text-decoration:line-through; color:var(--ink-faint); }
+  .bk-prop-row.new{ background:var(--brass-soft); border-top:1px solid var(--line); }
+  .bk-prop-row.new b{ color:var(--ink); }
+  /* owner booking-row status badges + proposal note */
+  .sb-badge{ display:inline-block; font-size:9.5px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; padding:2px 7px; border-radius:6px; vertical-align:middle; margin-left:4px; }
+  .sb-amber{ background:rgba(201,151,74,0.18); color:var(--brass); }
+  .sb-green{ background:rgba(111,168,138,0.18); color:var(--green); }
+  .sb-blue{ background:rgba(127,168,201,0.18); color:#7FA8C9; }
+  .sb-red{ background:rgba(201,122,106,0.18); color:var(--red-soft); }
+  .sb-prop{ font-size:11px; color:#7FA8C9; font-family:var(--font-mono); margin-top:3px; }
+  .sb-act.ok:hover{ border-color:var(--green); color:var(--green); }
+  .sb-edit-hint{ font-size:11px; color:var(--ink-faint); margin-top:9px; }
+  /* === booking page mobile polish === */
+  @media (max-width: 560px){
+    .booking-view{ padding:calc(18px + env(safe-area-inset-top)) 14px calc(40px + env(safe-area-inset-bottom)); }
+    .bk-card{ border-radius:20px; padding:20px 16px; }
+    .bk-title{ font-size:24px; }
+    .bk-durrow{ gap:7px; margin-bottom:20px; }
+    .bk-durpill{ flex:1 0 auto; padding:10px 13px; text-align:center; }
+    .bk-slots{ grid-template-columns:repeat(auto-fill,minmax(0,1fr)); grid-template-columns:repeat(3,1fr); gap:8px; }
+    .bk-slot{ padding:13px 6px; font-size:13px; }
+    .bk-date{ min-width:58px; }
+    .bk-range{ gap:8px; }
+    .bk-form .field input, .bk-form .field textarea, .bk-range-field input[type=time]{ font-size:16px; }
+    .bk-confirm-title{ font-size:23px; }
+  }
 </style>
 </head>
 <body>
@@ -2288,6 +2342,8 @@
   const BOOK_API = 'https://planner-sync.kaushik4432.workers.dev';
   const _bookToken = new URLSearchParams(location.search).get('book');
   if(_bookToken){ runBookingMode(_bookToken); return; }
+  const _trackRef = new URLSearchParams(location.search).get('track');
+  if(_trackRef){ runTrackMode(_trackRef); return; }
 
   function runBookingMode(token){
     const view = document.getElementById('bookingView');
@@ -2302,7 +2358,7 @@
     const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-    let owner='', cfg=null, blocked={}, dates=[], selDate=null, selSlot=null, selDur=null, customOpen=false;
+    let owner='', cfg=null, blocked={}, dates=[], selDate=null, selSlot=null, selEnd=null, selDur=null, customOpen=false;
 
     function shell(inner){ view.innerHTML = '<div class="bk-card">'+inner+'</div><div class="bk-footer">Powered by your private day planner · your tasks stay private</div>'; }
 
@@ -2321,6 +2377,7 @@
     }
 
     function curDur(){ return selDur || cfg.durationMin || 30; }
+    function bookDur(){ return selEnd!=null ? (selEnd-selSlot) : curDur(); }
     function busyFor(k){ return blocked[k]||[]; }
     // every grid slot in the window, each tagged free / booked / past (kept if it fits the window)
     function slotsMeta(d){
@@ -2337,12 +2394,13 @@
       return out;
     }
     function freeCount(d){ return slotsMeta(d).filter(x=>x.status==='free').length; }
-    // is an arbitrary start valid for the current duration on selDate?
-    function customValid(min){
-      const dur=curDur(); const s1=cfg.endMin||1020, s0=cfg.startMin||540;
-      if(min<s0 || min+dur>s1) return 'Pick a time inside '+fmt12(s0)+'–'+fmt12(s1)+'.';
-      const now=new Date(); if(keyOf(now)===selDate && min <= now.getHours()*60+now.getMinutes()+5) return 'Please pick a time in the future.';
-      if(busyFor(selDate).some(b=> min < b[1] && b[0] < min+dur)) return 'That time overlaps a booked slot.';
+    // validate an arbitrary from–to range on selDate
+    function customRangeValid(from,to){
+      const s1=cfg.endMin||1020, s0=cfg.startMin||540;
+      if(to<=from) return 'End time must be after the start.';
+      if(from<s0 || to>s1) return 'Pick a range inside '+fmt12(s0)+'–'+fmt12(s1)+'.';
+      const now=new Date(); if(keyOf(now)===selDate && from <= now.getHours()*60+now.getMinutes()+5) return 'Please pick a time in the future.';
+      if(busyFor(selDate).some(b=> from < b[1] && b[0] < to)) return 'That range overlaps a booked slot.';
       return '';
     }
 
@@ -2378,25 +2436,30 @@
           });
           h+='</div>';
         }
-        // custom time
+        // custom time range (from → to)
         h+='<div class="bk-custom">';
-        if(!customOpen){ h+='<button class="bk-custom-toggle" id="bkCustomToggle">'+plusIco()+'Need a different time?</button>'; }
+        if(!customOpen){ h+='<button class="bk-custom-toggle" id="bkCustomToggle">'+plusIco()+'Need a specific time range?</button>'; }
         else{
           const s0=cfg.startMin||540, s1=cfg.endMin||1020;
-          h+='<div class="bk-custom-open"><label class="bk-sec-label" style="margin:0 0 9px">Request a custom start time</label>'
-            +'<input type="time" id="bkCustomInput" min="'+minToTimeStr(s0)+'" max="'+minToTimeStr(Math.max(s0,s1-dur))+'" step="300" value="'+(selSlot!=null?minToTimeStr(selSlot):'')+'">'
+          h+='<div class="bk-custom-open"><label class="bk-sec-label" style="margin:0 0 10px">Request your own time range</label>'
+            +'<div class="bk-range">'
+              +'<div class="bk-range-field"><span>From</span><input type="time" id="bkFrom" min="'+minToTimeStr(s0)+'" max="'+minToTimeStr(s1)+'" step="300" value="'+(selEnd!=null&&selSlot!=null?minToTimeStr(selSlot):'')+'"></div>'
+              +'<div class="bk-range-sep">'+arrowIco()+'</div>'
+              +'<div class="bk-range-field"><span>To</span><input type="time" id="bkTo" min="'+minToTimeStr(s0)+'" max="'+minToTimeStr(s1)+'" step="300" value="'+(selEnd!=null?minToTimeStr(selEnd):'')+'"></div>'
+            +'</div>'
             +'<div id="bkCustomMsg" class="bk-custom-msg"></div></div>';
         }
         h+='</div>';
       }
       // form
       if(selDate && selSlot!=null){
+        const bd=bookDur();
         h+='<div class="bk-form">'
           +'<div class="bk-sec-label" style="margin-top:6px">Your details</div>'
           +'<div class="field"><input id="bkName" type="text" placeholder="Your name" autocomplete="name" maxlength="80"></div>'
-          +'<div class="field"><input id="bkEmail" type="email" placeholder="Email (optional)" autocomplete="email" maxlength="120"></div>'
+          +'<div class="field"><input id="bkEmail" type="email" placeholder="Email — so you can track your request" autocomplete="email" maxlength="120"></div>'
           +'<div class="field"><textarea id="bkNote" placeholder="What\'s this about? (optional)" maxlength="500"></textarea></div>'
-          +'<button class="btn btn-primary" id="bkConfirm" style="width:100%">Confirm '+dur+'-min booking · '+fmt12(selSlot)+'</button>'
+          +'<button class="btn btn-primary" id="bkConfirm" style="width:100%">Request '+fmt12(selSlot)+' – '+fmt12(selSlot+bd)+'</button>'
           +'<div id="bkErr" style="color:var(--red-soft);font-size:12.5px;text-align:center;display:none"></div>'
           +'</div>';
       }
@@ -2404,19 +2467,23 @@
       wire();
     }
     function plusIco(){ return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>'; }
+    function arrowIco(){ return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'; }
 
     function wire(){
-      view.querySelectorAll('.bk-durpill').forEach(b=>b.addEventListener('click',()=>{ selDur=parseInt(b.dataset.dur,10); selSlot=null; render(); }));
-      view.querySelectorAll('.bk-date:not([disabled])').forEach(b=>b.addEventListener('click',()=>{ selDate=b.dataset.k; selSlot=null; customOpen=false; render(); }));
-      view.querySelectorAll('.bk-slot:not([disabled])').forEach(b=>b.addEventListener('click',()=>{ selSlot=parseInt(b.dataset.s,10); render(); const f=document.getElementById('bkName'); f&&f.focus(); }));
-      const ct=document.getElementById('bkCustomToggle'); if(ct) ct.addEventListener('click',()=>{ customOpen=true; render(); const i=document.getElementById('bkCustomInput'); i&&i.focus(); });
-      const ci=document.getElementById('bkCustomInput'); if(ci) ci.addEventListener('change',()=>{
-        const v=ci.value; const msg=document.getElementById('bkCustomMsg');
-        if(!v){ return; }
-        const min=t2m(v); const err=customValid(min);
-        if(err){ selSlot=null; msg.textContent=err; msg.className='bk-custom-msg err'; }
-        else { selSlot=min; render(); const f=document.getElementById('bkName'); f&&f.focus(); }
-      });
+      view.querySelectorAll('.bk-durpill').forEach(b=>b.addEventListener('click',()=>{ selDur=parseInt(b.dataset.dur,10); selSlot=null; selEnd=null; render(); }));
+      view.querySelectorAll('.bk-date:not([disabled])').forEach(b=>b.addEventListener('click',()=>{ selDate=b.dataset.k; selSlot=null; selEnd=null; customOpen=false; render(); }));
+      view.querySelectorAll('.bk-slot:not([disabled])').forEach(b=>b.addEventListener('click',()=>{ selSlot=parseInt(b.dataset.s,10); selEnd=null; render(); const f=document.getElementById('bkName'); f&&f.focus(); }));
+      const ct=document.getElementById('bkCustomToggle'); if(ct) ct.addEventListener('click',()=>{ customOpen=true; render(); const i=document.getElementById('bkFrom'); i&&i.focus(); });
+      const fr=document.getElementById('bkFrom'), to=document.getElementById('bkTo');
+      function onRange(){
+        const msg=document.getElementById('bkCustomMsg');
+        if(!fr.value || !to.value){ return; }
+        const from=t2m(fr.value), end=t2m(to.value); const err=customRangeValid(from,end);
+        if(err){ selSlot=null; selEnd=null; msg.textContent=err; msg.className='bk-custom-msg err'; const c=document.getElementById('bkConfirm'); }
+        else { selSlot=from; selEnd=end; render(); const f=document.getElementById('bkName'); f&&f.focus(); }
+      }
+      if(fr) fr.addEventListener('change', onRange);
+      if(to) to.addEventListener('change', onRange);
       const c=document.getElementById('bkConfirm'); if(c) c.addEventListener('click', submit);
     }
     function t2m(v){ const p=String(v||'').split(':'); return (parseInt(p[0],10)||0)*60+(parseInt(p[1],10)||0); }
@@ -2427,30 +2494,33 @@
       const note=(document.getElementById('bkNote').value||'').trim();
       const errEl=document.getElementById('bkErr');
       if(!name){ errEl.textContent='Please enter your name.'; errEl.style.display='block'; document.getElementById('bkName').focus(); return; }
-      const btn=document.getElementById('bkConfirm'); btn.disabled=true; btn.textContent='Booking…';
-      const bookedMin=selSlot, bookedDur=curDur();
+      const btn=document.getElementById('bkConfirm'); btn.disabled=true; btn.textContent='Sending request…';
+      const bookedMin=selSlot, bookedDur=bookDur();
       try{
         const r=await fetch(BOOK_API+'?book='+encodeURIComponent(token), { method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ date:selDate, time:minToTimeStr(bookedMin), duration:bookedDur, name, email, note }) });
-        if(r.status===409){ errEl.textContent='Sorry, that slot was just taken. Please pick another.'; errEl.style.display='block'; btn.disabled=false; btn.textContent='Confirm booking'; selSlot=null; await refresh(true); return; }
+        if(r.status===409){ errEl.textContent='Sorry, that slot was just taken. Please pick another.'; errEl.style.display='block'; btn.disabled=false; btn.textContent='Send request'; selSlot=null; selEnd=null; await refresh(true); return; }
         if(!r.ok) throw new Error('http '+r.status);
-        confirmed(name, email, bookedMin, bookedDur);
-      }catch(e){ errEl.textContent='Something went wrong. Please try again.'; errEl.style.display='block'; btn.disabled=false; btn.textContent='Confirm booking'; }
+        const res=await r.json(); const ref=res.booking&&res.booking.ref;
+        confirmed(name, email, bookedMin, bookedDur, ref);
+      }catch(e){ errEl.textContent='Something went wrong. Please try again.'; errEl.style.display='block'; btn.disabled=false; btn.textContent='Send request'; }
     }
     function minToTimeStr(m){ return pad(Math.floor(m/60))+':'+pad(m%60); }
 
-    function confirmed(name, email, min, dur){
+    function confirmed(name, email, min, dur, ref){
       const d=dates.find(x=>keyOf(x)===selDate);
       const dlabel=d?DOW[d.getDay()]+', '+MON[d.getMonth()]+' '+d.getDate():selDate;
+      const trackUrl = ref ? (location.origin+location.pathname+'?track='+ref) : '';
       shell('<div class="bk-confirm-card">'
-        +'<div class="bk-confirm-ic"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"/></svg></div>'
-        +'<div class="bk-confirm-title">You\'re booked!</div>'
+        +'<div class="bk-confirm-ic pending"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg></div>'
+        +'<div class="bk-confirm-title">Request sent</div>'
         +'<div class="bk-confirm-when">'+brandIco()+dlabel+' · '+fmt12(min)+' – '+fmt12(min+dur)+'</div>'
-        +'<div class="bk-confirm-detail">Thanks, <b>'+esc(name)+'</b>. Your '+dur+'-minute slot with <b>'+esc(owner||'me')+'</b> is confirmed.'
-        +(email?'<br>A copy of these details is yours to keep.':'')+'</div>'
-        +'<button class="btn btn-secondary" id="bkAgain" style="margin-top:22px">Book another time</button>'
+        +'<div class="bk-confirm-detail">Thanks, <b>'+esc(name)+'</b>. <b>'+esc(owner||'me')+'</b> will review your request. You\'ll see the decision \u2014 and any new time they suggest \u2014 on your private tracking link below.</div>'
+        +(trackUrl?('<div class="bk-track-box"><div class="bk-track-label">Your tracking link · save it</div><div class="bk-track-row"><input type="text" id="bkTrackInput" readonly value="'+esc(trackUrl)+'"><button class="copy-btn" id="bkTrackCopy">Copy</button></div><a class="bk-track-open" href="'+esc(trackUrl)+'">Open my tracking page '+arrowIco()+'</a></div>'):'')
+        +'<button class="btn btn-secondary" id="bkAgain" style="margin-top:18px">Request another time</button>'
         +'</div>');
-      const a=document.getElementById('bkAgain'); if(a) a.addEventListener('click',()=>{ selSlot=null; customOpen=false; refresh(true); });
+      const cp=document.getElementById('bkTrackCopy'); if(cp) cp.addEventListener('click',()=>{ const i=document.getElementById('bkTrackInput'); i.select(); navigator.clipboard&&navigator.clipboard.writeText(i.value); cp.textContent='Copied'; cp.classList.add('copied'); setTimeout(()=>{cp.textContent='Copy';cp.classList.remove('copied');},1600); });
+      const a=document.getElementById('bkAgain'); if(a) a.addEventListener('click',()=>{ selSlot=null; selEnd=null; customOpen=false; refresh(true); });
     }
 
     async function refresh(keepDate){
@@ -2468,6 +2538,100 @@
 
     loading();
     refresh(false);
+  }
+
+  // ============================================================
+  // GUEST TRACKING MODE  (?track=REF) — live status of one booking, no private data.
+  // ============================================================
+  function runTrackMode(ref){
+    const view = document.getElementById('bookingView');
+    document.body.classList.add('booking-active');
+    view.style.display = 'block';
+    document.title = 'Your booking';
+    const esc = s => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const pad = n => String(n).padStart(2,'0');
+    const fmt12 = m => { let h=Math.floor(m/60), mi=m%60; const p=h>=12?'pm':'am'; let hh=h%12||12; return hh+':'+pad(mi)+p; };
+    const t2m = v => { const p=String(v||'').split(':'); return (parseInt(p[0],10)||0)*60+(parseInt(p[1],10)||0); };
+    const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const dlabel = dk => { try{ const d=new Date(dk+'T00:00:00'); return DOW[d.getDay()]+', '+MON[d.getMonth()]+' '+d.getDate(); }catch(e){ return dk; } };
+    function brandIco(){ return '<svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17M8 2.5v4M16 2.5v4"/></svg>'; }
+    function slotLine(date,time,dur){ return dlabel(date)+' · '+fmt12(t2m(time))+' – '+fmt12(t2m(time)+(dur||30)); }
+    function shell(inner){ view.innerHTML='<div class="bk-card">'+inner+'</div><div class="bk-footer">This private link updates automatically · it expires once the slot has passed</div>'; }
+    let last=null, busyAct=false;
+
+    const ICONS={
+      pending:{cls:'pending', svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/>'},
+      accepted:{cls:'ok', svg:'<path d="M5 12.5l4.2 4.2L19 7"/>'},
+      declined:{cls:'bad', svg:'<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>'},
+      reschedule_proposed:{cls:'warn', svg:'<path d="M7 4v15M7 4 3.5 7.5M7 4l3.5 3.5"/><path d="M17 20V5M17 20l3.5-3.5M17 20l-3.5-3.5"/>'},
+      cancelled:{cls:'bad', svg:'<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>'},
+      expired:{cls:'bad', svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/>'}
+    };
+    function ic(kind){ const i=ICONS[kind]||ICONS.pending; return '<div class="bk-confirm-ic '+i.cls+'"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">'+i.svg+'</svg></div>'; }
+
+    function render(){
+      if(!last){ shell('<div class="bk-brand">'+brandIco()+'Your booking</div><div class="bk-sub" style="margin:0">Loading…</div>'); return; }
+      const r=last; const owner=esc(r.owner||'them'); const bookUrl=r.bookToken?(location.origin+location.pathname+'?book='+r.bookToken):'';
+      let state=r.status||'pending'; if(r.expired && state!=='accepted') state='expired'; if(r.expired) state=(state==='accepted'?'expired':state);
+      let h='<div class="bk-brand">'+brandIco()+'Your booking</div>';
+      if(r.expired){
+        h+=ic('expired')+'<div class="bk-confirm-title">Link expired</div>'
+          +'<div class="bk-confirm-when">'+brandIco()+slotLine(r.date,r.time,r.duration)+'</div>'
+          +'<div class="bk-confirm-detail">This time has passed, so the tracking link is no longer active.'+(bookUrl?' You can always request a new time.':'')+'</div>'
+          +(bookUrl?'<a class="btn btn-secondary" style="margin-top:18px;display:block;text-decoration:none" href="'+esc(bookUrl)+'">Request a new time</a>':'');
+      } else if(r.status==='accepted'){
+        h+=ic('accepted')+'<div class="bk-confirm-title">Confirmed</div>'
+          +'<div class="bk-confirm-when">'+brandIco()+slotLine(r.date,r.time,r.duration)+'</div>'
+          +'<div class="bk-confirm-detail"><b>'+owner+'</b> accepted your booking. See you then!</div>'
+          +'<div class="bk-status-chip ok">Accepted</div>';
+      } else if(r.status==='declined' || r.status==='cancelled'){
+        h+=ic('declined')+'<div class="bk-confirm-title">'+(r.status==='cancelled'?'Cancelled':'Not available')+'</div>'
+          +'<div class="bk-confirm-when" style="text-decoration:line-through;opacity:0.7">'+brandIco()+slotLine(r.date,r.time,r.duration)+'</div>'
+          +'<div class="bk-confirm-detail">Sorry — <b>'+owner+'</b> couldn\'t take this slot.'+(bookUrl?' Please pick another time that works for you.':'')+'</div>'
+          +(bookUrl?'<a class="btn btn-primary" style="margin-top:18px;display:block;text-decoration:none" href="'+esc(bookUrl)+'">Pick another time</a>':'');
+      } else if(r.status==='reschedule_proposed' && r.proposed){
+        h+=ic('reschedule_proposed')+'<div class="bk-confirm-title">New time proposed</div>'
+          +'<div class="bk-confirm-detail" style="margin-bottom:14px"><b>'+owner+'</b> suggested a different time. Accept it, or pick another that suits you.</div>'
+          +'<div class="bk-propose"><div class="bk-prop-row old"><span>Was</span><b>'+slotLine(r.date,r.time,r.duration)+'</b></div>'
+          +'<div class="bk-prop-row new"><span>New</span><b>'+slotLine(r.proposed.date,r.proposed.time,r.proposed.duration)+'</b></div></div>'
+          +'<button class="btn btn-primary" id="tkAccept" style="width:100%;margin-top:16px">Accept new time</button>'
+          +(bookUrl?'<a class="btn btn-secondary" style="margin-top:10px;display:block;text-decoration:none" href="'+esc(bookUrl)+'">Pick another time instead</a>':'')
+          +'<div id="tkMsg" class="bk-custom-msg" style="text-align:center"></div>';
+      } else {
+        h+=ic('pending')+'<div class="bk-confirm-title">Awaiting confirmation</div>'
+          +'<div class="bk-confirm-when">'+brandIco()+slotLine(r.date,r.time,r.duration)+'</div>'
+          +'<div class="bk-confirm-detail"><b>'+owner+'</b> has your request and will respond soon. This page updates on its own — keep the link handy.</div>'
+          +'<div class="bk-status-chip pending">Pending review</div>'
+          +'<button class="btn btn-secondary" id="tkCancel" style="margin-top:18px;width:100%">Cancel my request</button>';
+      }
+      shell(h);
+      const acc=document.getElementById('tkAccept'); if(acc) acc.addEventListener('click', ()=>act('accept'));
+      const can=document.getElementById('tkCancel'); if(can) can.addEventListener('click', ()=>{ if(confirm('Cancel your request?')) act('cancel'); });
+    }
+
+    async function act(action){
+      if(busyAct) return; busyAct=true;
+      const msg=document.getElementById('tkMsg');
+      try{
+        const r=await fetch(BOOK_API+'?track='+encodeURIComponent(ref), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action }) });
+        if(r.status===409){ if(msg){ msg.textContent='That time was just taken — please pick another.'; msg.className='bk-custom-msg err'; } busyAct=false; return; }
+        const res=await r.json(); if(res && res.ok!==false){ last=Object.assign(last||{}, res); }
+      }catch(e){}
+      busyAct=false; await load();
+    }
+
+    async function load(){
+      try{
+        const r=await fetch(BOOK_API+'?track='+encodeURIComponent(ref), { method:'GET' });
+        const res=await r.json();
+        if(!res || res.ok===false){ last={ expired:true, status:'expired' }; render(); return; }
+        last=res; render();
+      }catch(e){ if(!last){ shell('<div class="bk-confirm-title">Couldn\'t load</div><div class="bk-confirm-detail">Please check your connection and try again.</div>'); } }
+    }
+
+    render(); load();
+    setInterval(()=>{ if(!document.hidden) load(); }, 15000);
+    window.addEventListener('focus', load);
   }
 
   // ---------- inline SVG icon set (replaces all emoji/glyphs) ----------
@@ -4872,38 +5036,40 @@
   function bookingSub(b){ return (b.note||'')+(b.email?((b.note?' · ':'')+b.email):''); }
 
   // Keep the planner in sync with the server's bookings: add new, move/update rescheduled, remove cancelled.
+  function bookingTitle(b){ return (b.status==='accepted'?'Booking · ':'Request · ')+(b.name||'Guest'); }
   function reconcileBookings(bookings){
     let imported=[]; try{ imported=JSON.parse(localStorage.getItem(BK_IMPORTED_KEY)||'[]'); }catch(e){}
     const set=new Set(imported);
-    const serverIds=new Set((bookings||[]).map(b=>b.id));
+    const active=(bookings||[]).filter(b=> b.status!=='declined' && b.status!=='cancelled');
+    const activeIds=new Set(active.map(b=>b.id));
     let added=0, lastName='', changed=false;
-    (bookings||[]).forEach(b=>{
-      const loc=findBookedTask(b.id); const sub=bookingSub(b);
+    active.forEach(b=>{
+      const loc=findBookedTask(b.id); const sub=bookingSub(b); const title=bookingTitle(b);
       if(!loc){
         const d=new Date(b.date+'T00:00:00'); const data=loadDay(d); data.tasks=data.tasks||[];
-        data.tasks.push({ id:'booked_'+b.id, time:b.time, duration:b.duration||30, title:'Booking · '+(b.name||'Guest'), sub, categories:['#meeting'], priority:'high', booked:true, bookingId:b.id, createdAt:Date.now() });
+        data.tasks.push({ id:'booked_'+b.id, time:b.time, duration:b.duration||30, title, sub, categories:['#meeting'], priority:'high', booked:true, bookingId:b.id, bookingStatus:b.status||'pending', createdAt:Date.now() });
         saveDay(d, data);
         if(!set.has(b.id)){ added++; lastName=b.name||lastName; }
         changed=true;
       } else {
         const t=loc.data.tasks[loc.idx]; const needMove = loc.key !== b.date;
-        if(t.time!==b.time || (t.duration||30)!==(b.duration||30) || t.sub!==sub || needMove){
+        if(t.time!==b.time || (t.duration||30)!==(b.duration||30) || t.sub!==sub || t.title!==title || t.bookingStatus!==b.status || needMove){
           if(needMove){
             loc.data.tasks.splice(loc.idx,1); saveDay(new Date(loc.key+'T00:00:00'), loc.data);
             const d2=new Date(b.date+'T00:00:00'); const data2=loadDay(d2); data2.tasks=data2.tasks||[];
-            data2.tasks.push(Object.assign(t,{ time:b.time, duration:b.duration||30, sub }));
+            data2.tasks.push(Object.assign(t,{ time:b.time, duration:b.duration||30, sub, title, bookingStatus:b.status }));
             saveDay(d2, data2);
           } else {
-            t.time=b.time; t.duration=b.duration||30; t.sub=sub; saveDay(new Date(loc.key+'T00:00:00'), loc.data);
+            t.time=b.time; t.duration=b.duration||30; t.sub=sub; t.title=title; t.bookingStatus=b.status; saveDay(new Date(loc.key+'T00:00:00'), loc.data);
           }
           changed=true;
         }
       }
       set.add(b.id);
     });
-    // anything we imported before but is gone from the server was cancelled remotely → drop it
+    // declined / cancelled / removed bookings → drop their planner task
     [...set].forEach(id=>{
-      if(!serverIds.has(id)){
+      if(!activeIds.has(id)){
         const loc=findBookedTask(id);
         if(loc){ loc.data.tasks.splice(loc.idx,1); saveDay(new Date(loc.key+'T00:00:00'), loc.data); changed=true; }
         set.delete(id);
@@ -4911,7 +5077,7 @@
     });
     localStorage.setItem(BK_IMPORTED_KEY, JSON.stringify([...set]));
     if(changed) renderStructure();
-    if(added>0){ bkPublish(); flashToast(added===1?('New booking from '+lastName):(added+' new bookings received')); }
+    if(added>0){ bkPublish(); flashToast(added===1?('New request from '+lastName):(added+' new booking requests')); }
     else if(changed){ bkPublish(); }
   }
 
@@ -4943,8 +5109,23 @@
     if(res.error){ flashToast('Could not reschedule — try again','err'); return false; }
     bkEditId=null;
     reconcileBookings(bkLastBookings); await bkPublish(); renderBookingsList();
-    flashToast('Booking moved to '+fmtTime(time));
+    flashToast('New time proposed — awaiting the guest');
     return true;
+  }
+
+  async function acceptBooking(id){
+    const b=(bkLastBookings||[]).find(x=>x.id===id);
+    const res=await manageBooking('accept', id);
+    if(res.error){ flashToast('Could not accept — try again','err'); return; }
+    reconcileBookings(bkLastBookings); await bkPublish(); renderBookingsList();
+    flashToast('Accepted — '+((b&&b.name)||'guest')+' will see it on their link');
+  }
+  async function declineBooking(id){
+    const b=(bkLastBookings||[]).find(x=>x.id===id);
+    const res=await manageBooking('decline', id);
+    if(res.error){ flashToast('Could not decline — try again','err'); return; }
+    reconcileBookings(bkLastBookings); await bkPublish(); renderBookingsList();
+    flashToast('Declined — '+((b&&b.name)||'guest')+' will see it on their link');
   }
 
   async function bkPoll(silent){
@@ -4955,30 +5136,37 @@
       if(!r.ok) return bkLastBookings;
       const res=await r.json(); const bookings=res.bookings||[];
       bkLastBookings=bookings; reconcileBookings(bookings);
-      if(!silent && shareOverlay.classList.contains('open')) renderBookingsList();
+      if(shareOverlay.classList.contains('open') && !bkEditId) renderBookingsList();
       return bookings;
     }catch(e){ return bkLastBookings; }
   }
 
   let bkEditId=null;
+  const BK_STATUS={ pending:{t:'Pending',c:'amber'}, accepted:{t:'Accepted',c:'green'}, reschedule_proposed:{t:'Awaiting guest',c:'blue'}, declined:{t:'Declined',c:'red'}, cancelled:{t:'Cancelled',c:'red'} };
   function renderBookingsList(){
     const el=document.getElementById('bkList'); if(!el) return;
-    const list=(bkLastBookings||[]).slice().sort((a,b)=> (a.date+a.time) < (b.date+b.time) ? 1 : -1);
-    if(!list.length){ el.innerHTML='<div class="sb-empty">No bookings yet. Share your link to start receiving them.</div>'; return; }
+    const order={ pending:0, reschedule_proposed:1, accepted:2, declined:3, cancelled:3 };
+    const list=(bkLastBookings||[]).slice().sort((a,b)=>{ const oa=order[a.status]??2, ob=order[b.status]??2; if(oa!==ob) return oa-ob; return (a.date+a.time) < (b.date+b.time) ? 1 : -1; });
+    if(!list.length){ el.innerHTML='<div class="sb-empty">No requests yet. Share your link to start receiving them.</div>'; return; }
     const today=dateKey(new Date());
+    function dShort(dk){ try{ return new Date(dk+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }catch(e){ return dk; } }
     el.innerHTML=list.map(b=>{
-      let when=b.date; try{ when=new Date(b.date+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }catch(e){}
-      const past=b.date<today; const dur=b.duration||30; const editing=b.id===bkEditId;
-      let row='<div class="sb-item'+(past?' past':'')+'" data-id="'+escapeHtml(b.id)+'"><div class="sb-row">'
+      const st=b.status||'pending'; const meta=BK_STATUS[st]||BK_STATUS.pending;
+      const when=dShort(b.date); const past=b.date<today; const dur=b.duration||30; const editing=b.id===bkEditId;
+      const dead=(st==='declined'||st==='cancelled');
+      let actions='';
+      if(st==='pending'){ actions='<button type="button" class="sb-act ok" data-act="accept" title="Accept">'+svgIco('check',15)+'</button><button type="button" class="sb-act" data-act="resch" title="Suggest another time">'+svgIco('clock',15)+'</button><button type="button" class="sb-act danger" data-act="decline" title="Decline">'+svgIco('x',15)+'</button>'; }
+      else if(st==='accepted'){ actions='<button type="button" class="sb-act" data-act="resch" title="Reschedule">'+svgIco('clock',15)+'</button><button type="button" class="sb-act danger" data-act="cancel" title="Cancel">'+svgIco('x',15)+'</button>'; }
+      else if(st==='reschedule_proposed'){ actions='<button type="button" class="sb-act" data-act="resch" title="Change proposed time">'+svgIco('clock',15)+'</button><button type="button" class="sb-act danger" data-act="cancel" title="Cancel">'+svgIco('x',15)+'</button>'; }
+      else { actions='<button type="button" class="sb-act danger" data-act="cancel" title="Remove">'+svgIco('x',15)+'</button>'; }
+      let row='<div class="sb-item'+(past||dead?' past':'')+'" data-id="'+escapeHtml(b.id)+'"><div class="sb-row">'
         +'<div class="sb-ic">'+svgIco('calendar',16)+'</div>'
-        +'<div class="sb-main"><div class="sb-name">'+escapeHtml(b.name||'Guest')+'</div>'
+        +'<div class="sb-main"><div class="sb-name">'+escapeHtml(b.name||'Guest')+' <span class="sb-badge sb-'+meta.c+'">'+meta.t+'</span></div>'
         +'<div class="sb-when">'+escapeHtml(when)+' · '+escapeHtml(fmtTime(b.time))+' · '+dur+'m'+(b.email?' · '+escapeHtml(b.email):'')+'</div>'
+        +(st==='reschedule_proposed'&&b.proposed?'<div class="sb-prop">You proposed → '+escapeHtml(dShort(b.proposed.date))+' · '+escapeHtml(fmtTime(b.proposed.time))+'</div>':'')
         +(b.note?'<div class="sb-note">'+escapeHtml(b.note)+'</div>':'')
         +'</div>'
-        +'<div class="sb-actions">'
-          +'<button type="button" class="sb-act" data-act="resch" title="Reschedule" aria-label="Reschedule">'+svgIco('clock',15)+'</button>'
-          +'<button type="button" class="sb-act danger" data-act="cancel" title="Cancel booking" aria-label="Cancel">'+svgIco('x',15)+'</button>'
-        +'</div></div>';
+        +'<div class="sb-actions">'+actions+'</div></div>';
       if(editing){
         row+='<div class="sb-edit">'
           +'<div class="sb-edit-grid">'
@@ -4986,14 +5174,18 @@
             +'<label>Time<input type="time" class="sbE-time" value="'+escapeHtml(b.time)+'"></label>'
             +'<label>Mins<input type="number" class="sbE-dur" min="5" max="480" step="5" value="'+dur+'"></label>'
           +'</div>'
-          +'<div class="sb-edit-btns"><button type="button" class="btn-mini ghost" data-act="recancel">Discard</button><button type="button" class="btn-mini" data-act="resave">Save change</button></div>'
+          +'<div class="sb-edit-hint">The guest will be asked to accept this new time.</div>'
+          +'<div class="sb-edit-btns"><button type="button" class="btn-mini ghost" data-act="recancel">Discard</button><button type="button" class="btn-mini" data-act="resave">Propose time</button></div>'
         +'</div>';
       }
       return row+'</div>';
     }).join('');
     el.querySelectorAll('.sb-act').forEach(btn=>btn.addEventListener('click',()=>{
       const item=btn.closest('.sb-item'); const id=item.dataset.id; const act=btn.dataset.act;
-      if(act==='cancel'){ const b=(bkLastBookings||[]).find(x=>x.id===id); if(confirm('Cancel the booking with '+((b&&b.name)||'this guest')+'? Their slot will be freed up.')) cancelBooking(id); }
+      const b=(bkLastBookings||[]).find(x=>x.id===id);
+      if(act==='cancel'){ if(confirm('Cancel the booking with '+((b&&b.name)||'this guest')+'? Their slot will be freed up.')) cancelBooking(id); }
+      else if(act==='accept'){ acceptBooking(id); }
+      else if(act==='decline'){ if(confirm('Decline '+((b&&b.name)||'this guest')+'\u2019s request?')) declineBooking(id); }
       else if(act==='resch'){ bkEditId=(bkEditId===id?null:id); renderBookingsList(); }
     }));
     el.querySelectorAll('.sb-edit').forEach(ed=>{
@@ -5093,7 +5285,7 @@
   function startBookingLoops(){
     if(!bkEnabled()) return;
     bkPublish(); bkPoll(true);
-    if(!bkPollTimer) bkPollTimer=setInterval(()=>{ if(!document.hidden) bkPoll(true); }, 30000);
+    if(!bkPollTimer) bkPollTimer=setInterval(()=>{ bkPoll(true); }, 30000);
     if(!bkPubTimer) bkPubTimer=setInterval(()=>{ if(bkEnabled()) bkPublish(); }, 120000);
     if(!window._bkReturnHooked){
       window._bkReturnHooked=true;
