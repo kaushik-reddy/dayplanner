@@ -3198,8 +3198,9 @@
   // ---------- view switching ----------
   function showView(v){
     const planner = v!=='audit';
-    plannerView.style.display = planner?'block':'none';
-    auditView.style.display = planner?'none':'block';
+    // use '' (not 'block') so the responsive CSS layout (desktop grid / mobile block) stays in control
+    plannerView.style.display = planner ? '' : 'none';
+    auditView.style.display = planner ? 'none' : '';
     tabPlanner.classList.toggle('active', planner);
     tabAudit.classList.toggle('active', !planner);
     if(!planner) renderAudit(true);
