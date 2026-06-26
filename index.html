@@ -1675,10 +1675,17 @@
   body.booking-active .topbar{ display:none !important; }
   body.booking-active{ background:radial-gradient(120% 90% at 50% -10%, #1c1a16 0%, var(--bg) 60%); min-height:100vh; }
   /* owner share modal */
-  .share-field{ margin-bottom:14px; }
-  .share-field > label{ display:block; font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:7px; font-weight:600; }
+  .share-field{ margin-bottom:16px; }
+  .share-field > label{ display:block; font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px; font-weight:600; }
+  .modal-share .modal-body input[type=text],
+  .modal-share .modal-body input[type=email],
+  .modal-share .modal-body input[type=time]{ width:100%; box-sizing:border-box; background:var(--bg); border:1px solid var(--line); color:var(--ink); font-size:15px; font-family:inherit; font-weight:500; padding:12px 14px; border-radius:12px; outline:none; transition:border-color .15s, box-shadow .15s; }
+  .modal-share .modal-body input::placeholder{ color:var(--ink-faint); font-weight:400; }
+  .modal-share .modal-body input:focus{ border-color:var(--brass); box-shadow:0 0 0 3px var(--brass-soft); }
+  .modal-share .modal-body input[type=time]{ font-family:var(--font-mono); }
+  .modal-share .modal-body input[type=time]::-webkit-calendar-picker-indicator{ filter:invert(0.7) sepia(1) saturate(2) hue-rotate(5deg); opacity:0.6; cursor:pointer; }
   .share-link-row{ display:flex; gap:8px; }
-  .share-link-row input{ flex:1; min-width:0; }
+  .share-link-row input{ flex:1; min-width:0; font-size:12.5px !important; color:var(--ink-dim) !important; font-family:var(--font-mono); }
   .copy-btn{ flex-shrink:0; display:inline-flex; align-items:center; gap:6px; background:var(--brass); color:#15110A; border:none; border-radius:11px; padding:0 14px; font-weight:700; font-size:12.5px; font-family:inherit; cursor:pointer; }
   .copy-btn.copied{ background:var(--green); }
   .dow-toggle{ display:flex; gap:6px; }
@@ -1715,11 +1722,27 @@
   .bd-dow{ font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); }
   .bd-day{ font-family:var(--font-display); font-size:20px; font-weight:600; color:var(--ink); line-height:1.1; margin:3px 0; }
   .bd-mon{ font-size:9.5px; text-transform:uppercase; color:var(--ink-faint); letter-spacing:0.06em; }
-  .bk-slots{ display:grid; grid-template-columns:repeat(auto-fill,minmax(92px,1fr)); gap:9px; }
-  .bk-slot{ border:1px solid var(--line); border-radius:11px; padding:11px 8px; background:var(--bg); color:var(--ink); font-family:var(--font-mono); font-size:13px; font-weight:600; cursor:pointer; transition:border-color .15s, background .15s, color .15s; }
+  .bk-durrow{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px; }
+  .bk-durpill{ border:1px solid var(--line); background:var(--bg); color:var(--ink-dim); border-radius:999px; padding:9px 16px; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; transition:border-color .15s, background .15s, color .15s; }
+  .bk-durpill:hover{ border-color:var(--brass); color:var(--brass); }
+  .bk-durpill.sel{ background:var(--brass); border-color:var(--brass); color:#15110A; }
+  .bk-slots{ display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:9px; }
+  .bk-slot{ position:relative; border:1px solid var(--line); border-radius:11px; padding:12px 8px; background:var(--bg); color:var(--ink); font-family:var(--font-mono); font-size:13.5px; font-weight:600; cursor:pointer; transition:border-color .15s, background .15s, color .15s; }
   .bk-slot:hover{ border-color:var(--brass); color:var(--brass); }
   .bk-slot.sel{ background:var(--brass); border-color:var(--brass); color:#15110A; }
+  .bk-slot.booked{ cursor:not-allowed; background:repeating-linear-gradient(135deg, rgba(255,255,255,0.015) 0 7px, transparent 7px 14px), var(--bg); border-style:dashed; border-color:var(--line); color:var(--ink-faint); display:flex; flex-direction:column; align-items:center; gap:2px; }
+  .bk-slot.booked span{ text-decoration:line-through; opacity:0.75; }
+  .bk-slot.booked em{ font-style:normal; font-family:var(--font-display); font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--red-soft); font-weight:700; }
   .bk-empty-slots{ text-align:center; color:var(--ink-faint); font-size:13px; padding:24px; border:1px dashed var(--line); border-radius:14px; }
+  .bk-custom{ margin-top:14px; }
+  .bk-custom-toggle{ display:inline-flex; align-items:center; gap:7px; background:transparent; border:1px dashed var(--line); color:var(--ink-dim); border-radius:11px; padding:11px 16px; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; width:100%; justify-content:center; transition:border-color .15s, color .15s; }
+  .bk-custom-toggle:hover{ border-color:var(--brass); color:var(--brass); }
+  .bk-custom-open{ border:1px solid var(--line); border-radius:14px; padding:16px; background:var(--bg); }
+  .bk-custom-open input[type=time]{ width:100%; box-sizing:border-box; background:var(--bg-card); border:1px solid var(--line); color:var(--ink); font-size:16px; font-family:var(--font-mono); padding:12px 14px; border-radius:11px; outline:none; }
+  .bk-custom-open input[type=time]:focus{ border-color:var(--brass); box-shadow:0 0 0 3px var(--brass-soft); }
+  .bk-custom-open input[type=time]::-webkit-calendar-picker-indicator{ filter:invert(0.7) sepia(1) saturate(2) hue-rotate(5deg); opacity:0.6; cursor:pointer; }
+  .bk-custom-msg{ font-size:12px; margin-top:9px; min-height:1px; }
+  .bk-custom-msg.err{ color:var(--red-soft); }
   .bk-form{ margin-top:22px; display:flex; flex-direction:column; gap:13px; }
   .bk-form .field input, .bk-form .field textarea{ width:100%; box-sizing:border-box; background:var(--bg); border:1px solid var(--line); color:var(--ink); font-size:16px; font-family:inherit; padding:12px 14px; border-radius:11px; }
   .bk-form .field textarea{ min-height:72px; resize:vertical; }
@@ -2257,9 +2280,9 @@
     const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-    let owner='', cfg=null, blocked={}, dates=[], selDate=null, selSlot=null;
+    let owner='', cfg=null, blocked={}, dates=[], selDate=null, selSlot=null, selDur=null, customOpen=false;
 
-    function shell(inner){ view.innerHTML = '<div class="bk-card">'+inner+'</div><div class="bk-footer">Powered by your private day planner · only free slots are shared</div>'; }
+    function shell(inner){ view.innerHTML = '<div class="bk-card">'+inner+'</div><div class="bk-footer">Powered by your private day planner · your tasks stay private</div>'; }
 
     function loading(){ shell('<div class="bk-brand">'+brandIco()+'Scheduling</div><div class="bk-sub" style="margin:0">Loading availability…</div>'); }
     function brandIco(){ return '<svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17M8 2.5v4M16 2.5v4"/></svg>'; }
@@ -2275,40 +2298,74 @@
       }
     }
 
-    function slotsFor(d){
-      const k=keyOf(d); const busy=blocked[k]||[];
-      const dur=cfg.durationMin||30, step=cfg.slotMin||30, s0=cfg.startMin||540, s1=cfg.endMin||1020;
+    function curDur(){ return selDur || cfg.durationMin || 30; }
+    function busyFor(k){ return blocked[k]||[]; }
+    // every grid slot in the window, each tagged free / booked / past (kept if it fits the window)
+    function slotsMeta(d){
+      const k=keyOf(d); const busy=busyFor(k); const dur=curDur();
+      const step=cfg.slotMin||30, s0=cfg.startMin||540, s1=cfg.endMin||1020;
       const now=new Date(); const isToday=keyOf(now)===k; const nowMin=now.getHours()*60+now.getMinutes();
       const out=[];
       for(let s=s0; s+dur<=s1; s+=step){
-        if(isToday && s <= nowMin+5) continue;
-        const clash=busy.some(b=> s < b[1] && b[0] < s+dur);
-        if(!clash) out.push(s);
+        let status='free';
+        if(isToday && s <= nowMin+5) status='past';
+        else if(busy.some(b=> s < b[1] && b[0] < s+dur)) status='booked';
+        out.push({ s, status });
       }
       return out;
     }
+    function freeCount(d){ return slotsMeta(d).filter(x=>x.status==='free').length; }
+    // is an arbitrary start valid for the current duration on selDate?
+    function customValid(min){
+      const dur=curDur(); const s1=cfg.endMin||1020, s0=cfg.startMin||540;
+      if(min<s0 || min+dur>s1) return 'Pick a time inside '+fmt12(s0)+'–'+fmt12(s1)+'.';
+      const now=new Date(); if(keyOf(now)===selDate && min <= now.getHours()*60+now.getMinutes()+5) return 'Please pick a time in the future.';
+      if(busyFor(selDate).some(b=> min < b[1] && b[0] < min+dur)) return 'That time overlaps a booked slot.';
+      return '';
+    }
 
     function render(){
-      const durLabel=(cfg.durationMin||30)+' min';
+      const dur=curDur(); const durOpts=[15,30,45,60,90,120];
       let h='<div class="bk-brand">'+brandIco()+'Scheduling</div>';
       h+='<div class="bk-title">Book time with '+esc(owner||'me')+'</div>';
-      h+='<div class="bk-sub">Pick an open slot below. You\'ll only see times that are free.<span class="bk-dur-pill">'+brandIco()+durLabel+'</span></div>';
+      h+='<div class="bk-sub">Choose a time below. Greyed-out times are already taken.</div>';
+      // duration chooser
+      h+='<div class="bk-sec-label">How long do you need?</div><div class="bk-durrow">';
+      durOpts.forEach(o=>{ h+='<button class="bk-durpill'+(o===dur?' sel':'')+'" data-dur="'+o+'">'+(o<60?o+' min':(o/60)+' hr')+'</button>'; });
+      h+='</div>';
       // dates
       h+='<div class="bk-sec-label">Choose a day</div><div class="bk-dates">';
       if(!dates.length){ h+='<div class="bk-empty-slots" style="min-width:100%">No open days right now. Check back soon.</div>'; }
       dates.forEach((d,i)=>{
-        const k=keyOf(d); const has=slotsFor(d).length>0;
+        const k=keyOf(d); const has=freeCount(d)>0;
         h+='<button class="bk-date'+(k===selDate?' sel':'')+'" data-k="'+k+'" data-i="'+i+'"'+(has?'':' disabled')+'>'
           +'<div class="bd-dow">'+DOW[d.getDay()]+'</div><div class="bd-day">'+d.getDate()+'</div><div class="bd-mon">'+MON[d.getMonth()]+'</div></button>';
       });
       h+='</div>';
-      // slots
+      // slots — show ALL, booked greyed
       if(selDate){
         const d=dates.find(x=>keyOf(x)===selDate);
-        const slots=d?slotsFor(d):[];
-        h+='<div class="bk-sec-label">Available times</div>';
-        if(!slots.length){ h+='<div class="bk-empty-slots">No open times this day. Try another.</div>'; }
-        else{ h+='<div class="bk-slots">'; slots.forEach(s=>{ h+='<button class="bk-slot'+(s===selSlot?' sel':'')+'" data-s="'+s+'">'+fmt12(s)+'</button>'; }); h+='</div>'; }
+        const slots=d?slotsMeta(d).filter(x=>x.status!=='past'):[];
+        h+='<div class="bk-sec-label">Pick a start time</div>';
+        if(!slots.length){ h+='<div class="bk-empty-slots">No times fit on this day. Try another day or a shorter duration.</div>'; }
+        else{
+          h+='<div class="bk-slots">';
+          slots.forEach(o=>{
+            if(o.status==='booked') h+='<button class="bk-slot booked" disabled title="Already booked"><span>'+fmt12(o.s)+'</span><em>Booked</em></button>';
+            else h+='<button class="bk-slot'+(o.s===selSlot?' sel':'')+'" data-s="'+o.s+'">'+fmt12(o.s)+'</button>';
+          });
+          h+='</div>';
+        }
+        // custom time
+        h+='<div class="bk-custom">';
+        if(!customOpen){ h+='<button class="bk-custom-toggle" id="bkCustomToggle">'+plusIco()+'Need a different time?</button>'; }
+        else{
+          const s0=cfg.startMin||540, s1=cfg.endMin||1020;
+          h+='<div class="bk-custom-open"><label class="bk-sec-label" style="margin:0 0 9px">Request a custom start time</label>'
+            +'<input type="time" id="bkCustomInput" min="'+minToTimeStr(s0)+'" max="'+minToTimeStr(Math.max(s0,s1-dur))+'" step="300" value="'+(selSlot!=null?minToTimeStr(selSlot):'')+'">'
+            +'<div id="bkCustomMsg" class="bk-custom-msg"></div></div>';
+        }
+        h+='</div>';
       }
       // form
       if(selDate && selSlot!=null){
@@ -2317,19 +2374,30 @@
           +'<div class="field"><input id="bkName" type="text" placeholder="Your name" autocomplete="name" maxlength="80"></div>'
           +'<div class="field"><input id="bkEmail" type="email" placeholder="Email (optional)" autocomplete="email" maxlength="120"></div>'
           +'<div class="field"><textarea id="bkNote" placeholder="What\'s this about? (optional)" maxlength="500"></textarea></div>'
-          +'<button class="btn btn-primary" id="bkConfirm" style="width:100%">Confirm booking · '+fmt12(selSlot)+'</button>'
+          +'<button class="btn btn-primary" id="bkConfirm" style="width:100%">Confirm '+dur+'-min booking · '+fmt12(selSlot)+'</button>'
           +'<div id="bkErr" style="color:var(--red-soft);font-size:12.5px;text-align:center;display:none"></div>'
           +'</div>';
       }
       shell(h);
       wire();
     }
+    function plusIco(){ return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>'; }
 
     function wire(){
-      view.querySelectorAll('.bk-date:not([disabled])').forEach(b=>b.addEventListener('click',()=>{ selDate=b.dataset.k; selSlot=null; render(); view.querySelector('.bk-sec-label')&&0; }));
-      view.querySelectorAll('.bk-slot').forEach(b=>b.addEventListener('click',()=>{ selSlot=parseInt(b.dataset.s,10); render(); const f=document.getElementById('bkName'); f&&f.focus(); }));
+      view.querySelectorAll('.bk-durpill').forEach(b=>b.addEventListener('click',()=>{ selDur=parseInt(b.dataset.dur,10); selSlot=null; render(); }));
+      view.querySelectorAll('.bk-date:not([disabled])').forEach(b=>b.addEventListener('click',()=>{ selDate=b.dataset.k; selSlot=null; customOpen=false; render(); }));
+      view.querySelectorAll('.bk-slot:not([disabled])').forEach(b=>b.addEventListener('click',()=>{ selSlot=parseInt(b.dataset.s,10); render(); const f=document.getElementById('bkName'); f&&f.focus(); }));
+      const ct=document.getElementById('bkCustomToggle'); if(ct) ct.addEventListener('click',()=>{ customOpen=true; render(); const i=document.getElementById('bkCustomInput'); i&&i.focus(); });
+      const ci=document.getElementById('bkCustomInput'); if(ci) ci.addEventListener('change',()=>{
+        const v=ci.value; const msg=document.getElementById('bkCustomMsg');
+        if(!v){ return; }
+        const min=t2m(v); const err=customValid(min);
+        if(err){ selSlot=null; msg.textContent=err; msg.className='bk-custom-msg err'; }
+        else { selSlot=min; render(); const f=document.getElementById('bkName'); f&&f.focus(); }
+      });
       const c=document.getElementById('bkConfirm'); if(c) c.addEventListener('click', submit);
     }
+    function t2m(v){ const p=String(v||'').split(':'); return (parseInt(p[0],10)||0)*60+(parseInt(p[1],10)||0); }
 
     async function submit(){
       const name=(document.getElementById('bkName').value||'').trim();
@@ -2338,28 +2406,29 @@
       const errEl=document.getElementById('bkErr');
       if(!name){ errEl.textContent='Please enter your name.'; errEl.style.display='block'; document.getElementById('bkName').focus(); return; }
       const btn=document.getElementById('bkConfirm'); btn.disabled=true; btn.textContent='Booking…';
+      const bookedMin=selSlot, bookedDur=curDur();
       try{
         const r=await fetch(BOOK_API+'?book='+encodeURIComponent(token), { method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ date:selDate, time:minToTimeStr(selSlot), duration:cfg.durationMin||30, name, email, note }) });
-        if(r.status===409){ errEl.textContent='Sorry, that slot was just taken. Please pick another.'; errEl.style.display='block'; btn.disabled=false; btn.textContent='Confirm booking'; await refresh(true); return; }
+          body: JSON.stringify({ date:selDate, time:minToTimeStr(bookedMin), duration:bookedDur, name, email, note }) });
+        if(r.status===409){ errEl.textContent='Sorry, that slot was just taken. Please pick another.'; errEl.style.display='block'; btn.disabled=false; btn.textContent='Confirm booking'; selSlot=null; await refresh(true); return; }
         if(!r.ok) throw new Error('http '+r.status);
-        confirmed(name, email);
+        confirmed(name, email, bookedMin, bookedDur);
       }catch(e){ errEl.textContent='Something went wrong. Please try again.'; errEl.style.display='block'; btn.disabled=false; btn.textContent='Confirm booking'; }
     }
     function minToTimeStr(m){ return pad(Math.floor(m/60))+':'+pad(m%60); }
 
-    function confirmed(name, email){
+    function confirmed(name, email, min, dur){
       const d=dates.find(x=>keyOf(x)===selDate);
       const dlabel=d?DOW[d.getDay()]+', '+MON[d.getMonth()]+' '+d.getDate():selDate;
       shell('<div class="bk-confirm-card">'
         +'<div class="bk-confirm-ic"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"/></svg></div>'
         +'<div class="bk-confirm-title">You\'re booked!</div>'
-        +'<div class="bk-confirm-when">'+brandIco()+dlabel+' · '+fmt12(selSlot)+'</div>'
-        +'<div class="bk-confirm-detail">Thanks, <b>'+esc(name)+'</b>. Your '+( (cfg.durationMin||30) )+'-minute slot with <b>'+esc(owner||'me')+'</b> is confirmed.'
+        +'<div class="bk-confirm-when">'+brandIco()+dlabel+' · '+fmt12(min)+' – '+fmt12(min+dur)+'</div>'
+        +'<div class="bk-confirm-detail">Thanks, <b>'+esc(name)+'</b>. Your '+dur+'-minute slot with <b>'+esc(owner||'me')+'</b> is confirmed.'
         +(email?'<br>A copy of these details is yours to keep.':'')+'</div>'
         +'<button class="btn btn-secondary" id="bkAgain" style="margin-top:22px">Book another time</button>'
         +'</div>');
-      const a=document.getElementById('bkAgain'); if(a) a.addEventListener('click',()=>{ selSlot=null; refresh(true); });
+      const a=document.getElementById('bkAgain'); if(a) a.addEventListener('click',()=>{ selSlot=null; customOpen=false; refresh(true); });
     }
 
     async function refresh(keepDate){
@@ -4891,6 +4960,12 @@
     bkPublish(); bkPoll(true);
     if(!bkPollTimer) bkPollTimer=setInterval(()=>{ if(!document.hidden) bkPoll(true); }, 30000);
     if(!bkPubTimer) bkPubTimer=setInterval(()=>{ if(bkEnabled()) bkPublish(); }, 120000);
+    if(!window._bkReturnHooked){
+      window._bkReturnHooked=true;
+      // catch bookings that arrived while away — poll (and toast) the moment we return
+      document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && bkEnabled()) bkPoll(true); });
+      window.addEventListener('focus', ()=>{ if(bkEnabled()) bkPoll(true); });
+    }
   }
 
   if(shareBtn) shareBtn.addEventListener('click', openShareModal);
