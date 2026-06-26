@@ -1063,6 +1063,37 @@
   .acc-leg b{ color:var(--ink); font-family:var(--font-mono); }
   .acc-summary{ margin-top:14px; padding-top:14px; border-top:1px solid var(--line); font-size:12.5px; color:var(--ink-dim); }
   .acc-summary b{ color:var(--ink); }
+  /* audit export toolbar */
+  .audit-tools{ display:flex; gap:8px; flex-shrink:0; }
+  .atool{ display:inline-flex; align-items:center; gap:6px; background:var(--bg-card); border:1px solid var(--line); color:var(--ink-dim); border-radius:10px; padding:8px 13px; font-family:inherit; font-size:12px; font-weight:600; cursor:pointer; transition:border-color .15s, color .15s; }
+  .atool:hover{ border-color:var(--brass); color:var(--brass); }
+  /* booking analytics card */
+  .bk-stat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .bk-stat{ text-align:center; border:1px solid var(--line); border-radius:12px; padding:14px 6px; background:var(--bg); }
+  .bks-val{ font-family:var(--font-display); font-size:26px; font-weight:600; line-height:1; }
+  .bks-lbl{ font-size:10px; letter-spacing:0.06em; text-transform:uppercase; color:var(--ink-faint); margin-top:6px; }
+  /* weekly / monthly summary tables */
+  #auditWeeklyCard{ margin-bottom:22px; }
+  .wsum-sub{ font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; margin:0 0 10px; }
+  .wsum-scroll{ overflow-x:auto; scrollbar-width:thin; }
+  .wsum-table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  .wsum-table th{ text-align:right; font-size:9.5px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; padding:0 0 9px; border-bottom:1px solid var(--line); }
+  .wsum-table th:first-child{ text-align:left; }
+  .wsum-table td{ text-align:right; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--ink); font-family:var(--font-mono); }
+  .wsum-table td.wt-period{ text-align:left; font-family:inherit; color:var(--ink-dim); white-space:nowrap; padding-right:14px; }
+  .wsum-table td.wt-warn{ color:var(--red-soft); }
+  .wsum-table tr:last-child td{ border-bottom:none; }
+  .wt-pct{ font-weight:700; }
+  .wt-pct.g{ color:var(--green); } .wt-pct.a{ color:var(--brass); } .wt-pct.r{ color:var(--red-soft); }
+  @media (max-width:560px){ .bk-stat-grid{ grid-template-columns:repeat(2,1fr); } .bks-val{ font-size:22px; } }
+  @media print{
+    .topbar, #fabDock, .viewtabs, .audit-tools, #auditLog, .sync-toast, .overlay{ display:none !important; }
+    #plannerView{ display:none !important; }
+    #auditView{ display:block !important; }
+    .wrap{ max-width:100% !important; padding:0 !important; }
+    .chart-card, .acard, .audit-hero, .audit-insights, .wsum-scroll{ break-inside:avoid; }
+    *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  }
 
   .section-title{ font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-dim); font-weight:600; margin:0 0 13px; }
 
@@ -1914,6 +1945,10 @@
         <div class="day-name" style="color:var(--brass);margin-bottom:6px;">All-time</div>
         <div class="a-date" id="auditDate">Across your history</div>
       </div>
+      <div class="audit-tools">
+        <button type="button" class="atool" id="auditCsvBtn" title="Download every task as CSV"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11"/><path d="M7.5 10 12 14.5 16.5 10"/><path d="M5 20.5h14"/></svg>CSV</button>
+        <button type="button" class="atool" id="auditPrintBtn" title="Print or save as PDF"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3.5h12V9"/><rect x="4.5" y="9" width="15" height="8" rx="1.5"/><path d="M7 17h10v3.5H7z"/></svg>Print</button>
+      </div>
     </div>
 
     <div class="audit-hero" id="auditHero"></div>
@@ -1949,9 +1984,24 @@
       <div id="auditPrio"></div>
     </div>
 
+    <div class="chart-card" id="auditPunctCard">
+      <div class="chart-head"><span class="ch-title">Punctuality</span><span class="ch-note" id="auditPunctNote"></span></div>
+      <div id="auditPunct"></div>
+    </div>
+
     <div class="chart-card" id="auditAccCard">
       <div class="chart-head"><span class="ch-title">Estimation accuracy</span><span class="ch-note" id="auditAccNote"></span></div>
       <div id="auditAcc"></div>
+    </div>
+
+    <div class="chart-card" id="auditCatCard">
+      <div class="chart-head"><span class="ch-title">Categories</span><span class="ch-note" id="auditCatNote"></span></div>
+      <div id="auditCats"></div>
+    </div>
+
+    <div class="chart-card" id="auditBookCard" style="display:none;">
+      <div class="chart-head"><span class="ch-title">Booking requests</span><span class="ch-note" id="auditBookNote"></span></div>
+      <div id="auditBook"></div>
     </div>
 
     <div class="chart-card" id="auditDonutCard">
@@ -1962,6 +2012,11 @@
       </div>
     </div>
     </div><!-- /audit-charts -->
+
+    <div class="chart-card" id="auditWeeklyCard">
+      <div class="chart-head"><span class="ch-title">Weekly &amp; monthly summary</span><span class="ch-note" id="auditWeeklyNote"></span></div>
+      <div class="wsum-wrap" id="auditWeekly"></div>
+    </div>
 
     <div class="section-title">Timeline log · every action recorded</div>
     <div id="auditLog"></div>
@@ -2898,6 +2953,8 @@
         auditDow=document.getElementById('auditDow'), auditDowNote=document.getElementById('auditDowNote'),
         auditPrio=document.getElementById('auditPrio'), auditPrioNote=document.getElementById('auditPrioNote'),
         auditAcc=document.getElementById('auditAcc'), auditAccNote=document.getElementById('auditAccNote'),
+        auditPunct=document.getElementById('auditPunct'), auditPunctNote=document.getElementById('auditPunctNote'),
+        auditCats=document.getElementById('auditCats'), auditCatNote=document.getElementById('auditCatNote'),
         auditInsights=document.getElementById('auditInsights');
   const closeOverlay=document.getElementById('closeOverlay'), closeList=document.getElementById('closeList'),
         closeBackBtn=document.getElementById('closeBackBtn'), closeConfirmBtn=document.getElementById('closeConfirmBtn');
@@ -4038,6 +4095,19 @@
     let streak=0; let si = completedDays.has(dateKey(new Date())) ? 0 : 1;
     for(;si<400;si++){ const d=new Date(); d.setDate(d.getDate()-si); if(completedDays.has(dateKey(d))) streak++; else break; }
 
+    // longest streak + days active
+    let longestStreak=0; { let run=0, prev=null; [...completedDays].sort().forEach(k=>{ const d=new Date(k+'T00:00:00'); if(prev && Math.round((d-prev)/86400000)===1){ run++; } else { run=1; } if(run>longestStreak) longestStreak=run; prev=d; }); }
+    const activeDays=completedDays.size;
+
+    // punctuality: started clock-time vs scheduled time (same calendar day only)
+    let punctOn=0, punctLate=0, punctEarly=0, punctN=0, delaySum2=0;
+    days.forEach(dy=>{ (dy.data.tasks||[]).forEach(t=>{ if(t.startedAt && t.time){ const sd=new Date(t.startedAt); if(dateKey(sd)===dy.key){ const sched=timeToMinutes(t.time); const startMin=sd.getHours()*60+sd.getMinutes(); const delay=startMin-sched; punctN++; delaySum2+=delay; if(delay>10) punctLate++; else if(delay< -10) punctEarly++; else punctOn++; } } }); });
+    const avgDelay = punctN ? Math.round(delaySum2/punctN) : null;
+
+    // category aggregation (count / done / time)
+    const catAgg={};
+    all.forEach(t=>{ let cats=getCategories(t); if(!cats.length) cats=['uncategorised']; const ms=spentMsOf(t); const isDone=taskState(t)==='completed'; cats.forEach(c=>{ const key=String(c).replace(/^#/,'').toLowerCase()||'uncategorised'; const a=catAgg[key]||(catAgg[key]={count:0,done:0,ms:0}); a.count++; if(isDone)a.done++; a.ms+=ms; }); });
+
     // ---- hero: completion ring + headline metrics ----
     const compPct = total ? Math.round(done/total*100) : 0;
     const onTimePct = tracked ? Math.round(onTime/tracked*100) : null;
@@ -4071,7 +4141,10 @@
       {lbl:'Plan changes', val: planChanges, sub: planChanges?(resch+' resched · '+moves+' moved · '+swaps+' swap'):'stuck to plan', cls: planChanges>total?'warn':''},
       {lbl:'Cancelled', val: cancelled, sub: total?Math.round(cancelled/total*100)+'% of tasks':'none', cls: cancelled?'warn':''},
       {lbl:'Carried', val: carriedN, sub: carriedN?'pushed to later':'none deferred'},
-      {lbl:'Streak', val: streak, sub: streak?'days in a row':'start today', cls: streak?'good':''}
+      {lbl:'Streak', val: streak, sub: streak?'days in a row':'start today', cls: streak?'good':''},
+      {lbl:'Best streak', val: longestStreak, sub: longestStreak?'days record':'—'},
+      {lbl:'Active days', val: activeDays, sub: dayCountN?('of '+dayCountN+' logged'):'none yet'},
+      {lbl:'On-time start', val: punctN?Math.round(punctOn/punctN*100)+'%':'—', sub: punctN?(avgDelay>0?('~'+avgDelay+'m late avg'):(avgDelay<0?('~'+(-avgDelay)+'m early avg'):'right on time')):'no starts', cls: punctN?(punctOn/punctN>=0.6?'good':'warn'):''}
     ];
     auditCards.innerHTML=cards.map(c=>`<div class="acard ${c.cls||''}"><div class="lbl">${c.lbl}</div><div class="val">${c.val}</div><div class="sub">${c.sub}</div></div>`).join('');
 
@@ -4101,6 +4174,11 @@
     renderDow(days, animate);
     renderPriority(prioStats, animate);
     renderAccuracy(onTime, underCount, overCount, tracked, driftSum, animate);
+    renderPunctuality(punctOn, punctLate, punctEarly, punctN, avgDelay, animate);
+    renderCategories(catAgg, animate);
+    renderBookingStats();
+    renderWeekly(days);
+    wireAuditExport(all, days);
 
     if(!total){ auditLog.innerHTML='<div class="audit-empty">No tasks logged yet. Start planning and the audit fills itself.</div>'; renderCatDonut([],0); return; }
     // ---- timeline log: progressive day → week → month → year roll-up ----
@@ -4271,6 +4349,89 @@
       '</div>'+
       (function(){ const avg=Math.round(driftSum/tracked/60000); if(avg===0) return '<div class="acc-summary">On average you finish <b>right on time</b>.</div>'; return '<div class="acc-summary">On average you run <b>'+fmtPlanned(Math.abs(avg))+' '+(avg>0?'over':'under')+'</b> your estimate.</div>'; })();
     if(animate){ requestAnimationFrame(()=>{ auditAcc.querySelectorAll('.acc-seg').forEach(s=>{ s.style.width=s.getAttribute('data-w')+'%'; }); }); }
+  }
+
+  // ---- punctuality: started vs scheduled clock time ----
+  function renderPunctuality(on, late, early, n, avgDelay, animate){
+    if(!n){ auditPunct.innerHTML='<div class="audit-empty" style="padding:14px 0;">Start tasks at their planned time to measure punctuality.</div>'; auditPunctNote.textContent=''; return; }
+    const onP=Math.round(on/n*100), earlyP=Math.round(early/n*100), lateP=100-onP-earlyP;
+    auditPunctNote.textContent=n+' starts';
+    const seg=(cls,p,txt)=> p>0?('<div class="acc-seg '+cls+'" style="width:'+(animate?'0':p+'%')+'" data-w="'+p+'">'+(p>=14?txt:'')+'</div>'):'';
+    auditPunct.innerHTML='<div class="acc-bar">'+seg('under',earlyP,earlyP+'%')+seg('ontime',onP,onP+'%')+seg('over',lateP,lateP+'%')+'</div>'
+      +'<div class="acc-legend"><span class="acc-leg"><span class="al-dot" style="background:var(--green)"></span>Early <b>'+early+'</b></span><span class="acc-leg"><span class="al-dot" style="background:var(--brass)"></span>On time <b>'+on+'</b></span><span class="acc-leg"><span class="al-dot" style="background:var(--red-soft)"></span>Late <b>'+late+'</b></span></div>'
+      +'<div class="acc-summary">'+(avgDelay>0?('You start about <b>'+fmtPlanned(avgDelay)+' late</b> on average.'):(avgDelay<0?('You start about <b>'+fmtPlanned(-avgDelay)+' early</b> on average.'):'You start <b>right on schedule</b>.'))+'</div>';
+    if(animate){ requestAnimationFrame(()=>{ auditPunct.querySelectorAll('.acc-seg').forEach(s=>{ s.style.width=s.getAttribute('data-w')+'%'; }); }); }
+  }
+
+  // ---- category breakdown: count · time · completion ----
+  function renderCategories(catAgg, animate){
+    const entries=Object.entries(catAgg).sort((a,b)=>b[1].count-a[1].count);
+    if(!entries.length){ auditCats.innerHTML='<div class="audit-empty" style="padding:14px 0;">No categories yet.</div>'; auditCatNote.textContent=''; return; }
+    auditCatNote.textContent=entries.length+(entries.length>1?' categories':' category');
+    const maxC=Math.max.apply(null, entries.map(e=>e[1].count));
+    auditCats.innerHTML=entries.slice(0,10).map(function(e){
+      const name=e[0], a=e[1]; const col=catColor(name); const pct=maxC?Math.round(a.count/maxC*100):0; const donePct=a.count?Math.round(a.done/a.count*100):0; const mins=Math.round(a.ms/60000);
+      return '<div class="prio-row"><div class="prio-top"><span class="pr-name"><span class="pr-dot" style="background:'+col+'"></span>'+escapeHtml(catLabelOf(name))+'</span><span class="pr-val">'+a.count+'\u00d7 \u00b7 '+(mins?fmtPlanned(mins):'0m')+' \u00b7 '+donePct+'%</span></div><div class="prio-track"><div class="prio-fill" style="width:'+(animate?'0':pct+'%')+';background:'+col+'" data-w="'+pct+'"></div></div></div>';
+    }).join('');
+    if(animate){ requestAnimationFrame(()=>{ auditCats.querySelectorAll('.prio-fill').forEach(f=>{ f.style.width=f.getAttribute('data-w')+'%'; }); }); }
+  }
+
+  // ---- booking request analytics (from the public scheduling link) ----
+  function renderBookingStats(){
+    const card=document.getElementById('auditBookCard'); if(!card) return;
+    const list=(typeof bkLastBookings!=='undefined' && bkLastBookings)?bkLastBookings:[];
+    if(!list.length){ card.style.display='none'; return; }
+    card.style.display='';
+    const c={pending:0,accepted:0,declined:0,reschedule_proposed:0};
+    list.forEach(b=>{ const s=b.status||'pending'; if(c[s]!=null) c[s]++; });
+    const total=list.length, decided=c.accepted+c.declined, accRate=decided?Math.round(c.accepted/decided*100):null;
+    document.getElementById('auditBookNote').textContent=total+(total>1?' requests':' request');
+    const rows=[['Accepted',c.accepted,'var(--green)'],['Pending',c.pending,'var(--brass)'],['Awaiting',c.reschedule_proposed,'#7FA8C9'],['Declined',c.declined,'var(--red-soft)']];
+    let h='<div class="bk-stat-grid">'+rows.map(function(r){ return '<div class="bk-stat"><div class="bks-val" style="color:'+r[2]+'">'+r[1]+'</div><div class="bks-lbl">'+r[0]+'</div></div>'; }).join('')+'</div>';
+    if(accRate!=null) h+='<div class="acc-summary">You accept <b>'+accRate+'%</b> of decided requests.</div>';
+    document.getElementById('auditBook').innerHTML=h;
+  }
+
+  // ---- weekly & monthly summary tables (completion, tracked, cancelled, carried over time) ----
+  function renderWeekly(days){
+    const el=document.getElementById('auditWeekly'); if(!el) return;
+    const wk={}, mo={};
+    function getAgg(obj,k,ts){ let a=obj[k]; if(!a){ a=obj[k]={tasks:0,done:0,ms:0,cancelled:0,carried:0,ts:ts}; } return a; }
+    days.forEach(dy=>{ const tasks=dy.data.tasks||[]; if(!tasks.length) return; const d=new Date(dy.key+'T00:00:00');
+      const ws=new Date(d); ws.setDate(d.getDate()-d.getDay()); const wkey=dateKey(ws); const mkey=dy.key.slice(0,7);
+      const aw=getAgg(wk,wkey,ws.getTime()), am=getAgg(mo,mkey,new Date(mkey+'-01T00:00:00').getTime());
+      tasks.forEach(t=>{ const st=taskState(t); [aw,am].forEach(a=>{ a.tasks++; if(st==='completed')a.done++; if(st==='cancelled')a.cancelled++; if(t.carried)a.carried++; a.ms+=spentMsOf(t); }); });
+    });
+    function tableFor(obj, labelFn, limit){
+      const arr=Object.entries(obj).sort((a,b)=>b[1].ts-a[1].ts).slice(0,limit);
+      if(!arr.length) return '<div class="audit-empty" style="padding:12px 0;">Nothing yet.</div>';
+      return '<div class="wsum-scroll"><table class="wsum-table"><thead><tr><th>Period</th><th>Tasks</th><th>Done</th><th>Tracked</th><th>Cancel</th><th>Carry</th></tr></thead><tbody>'
+        +arr.map(function(e){ const a=e[1]; const pct=a.tasks?Math.round(a.done/a.tasks*100):0; const pc=pct>=70?'g':(pct>=40?'a':'r'); return '<tr><td class="wt-period">'+escapeHtml(labelFn(e[0]))+'</td><td>'+a.tasks+'</td><td><span class="wt-pct '+pc+'">'+pct+'%</span></td><td>'+(a.ms?fmtPlanned(Math.round(a.ms/60000)):'\u2014')+'</td><td'+(a.cancelled?' class="wt-warn"':'')+'>'+a.cancelled+'</td><td'+(a.carried?' class="wt-warn"':'')+'>'+a.carried+'</td></tr>'; }).join('')
+        +'</tbody></table></div>';
+    }
+    const wkLabel=k=>{ const ws=new Date(k+'T00:00:00'); const we=new Date(ws); we.setDate(ws.getDate()+6); return ws.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' \u2013 '+we.toLocaleDateString(undefined,{month:'short',day:'numeric'}); };
+    const moLabel=k=> new Date(k+'-01T00:00:00').toLocaleDateString(undefined,{month:'long',year:'numeric'});
+    const wn=document.getElementById('auditWeeklyNote'); if(wn) wn.textContent='trends over time';
+    el.innerHTML='<div class="wsum-sub">By week</div>'+tableFor(wk,wkLabel,8)+'<div class="wsum-sub" style="margin-top:18px">By month</div>'+tableFor(mo,moLabel,6);
+  }
+
+  // ---- CSV export + print (bound once) ----
+  let _auditExportWired=false;
+  function wireAuditExport(){
+    if(_auditExportWired) return; _auditExportWired=true;
+    const prBtn=document.getElementById('auditPrintBtn'); if(prBtn) prBtn.addEventListener('click', ()=>window.print());
+    const csvBtn=document.getElementById('auditCsvBtn');
+    if(csvBtn) csvBtn.addEventListener('click', ()=>{
+      const rows=[['Date','Time','Title','Duration(min)','Status','Spent(min)','Priority','Categories','Started','Completed']];
+      allPlannerDays().slice().reverse().forEach(dy=>{ (dy.data.tasks||[]).slice().sort((a,b)=>timeToMinutes(a.time)-timeToMinutes(b.time)).forEach(t=>{
+        rows.push([dy.key, t.time||'', t.title||'', t.duration||0, taskState(t), Math.round(spentMsOf(t)/60000), t.priority||'', getCategories(t).join('|'), t.startedAt?new Date(t.startedAt).toISOString():'', t.completedAt?new Date(t.completedAt).toISOString():'']);
+      }); });
+      const ec=v=>{ v=String(v==null?'':v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+      const csv=rows.map(r=>r.map(ec).join(',')).join('\r\n');
+      const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download='dayplanner-audit-'+dateKey(new Date())+'.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500);
+      flashToast('Exported '+(rows.length-1)+' tasks to CSV');
+    });
   }
 
   function renderActivityBars(days, animate){
