@@ -1483,6 +1483,12 @@
     .planner-aside{ grid-area: aside; position: sticky; top: 24px; align-self: start; display:flex; flex-direction:column; gap:16px; }
     .planner-aside .hero{ margin:0; }
     .planner-aside .day-progress{ margin:0; }
+    /* countdown fits the sidebar: Days on its own top row, H:M:S on the row below */
+    .planner-aside .hero-clock{ flex-wrap:wrap; row-gap:12px; column-gap:14px; }
+    .planner-aside .hero-clock > .hero-unit:first-child{ flex-basis:100%; }
+    .planner-aside .hero-clock > .hero-unit:first-child + .hero-sep{ display:none; }
+    .planner-aside .hero-num{ font-size:clamp(32px, 3.1vw, 44px); }
+    .planner-aside .hero-sep{ font-size:clamp(24px, 2.4vw, 34px); }
     .planner-main{ grid-area: main; min-width: 0; }
     .planner-main .timeline{ margin-top: 0; }
 
@@ -2086,8 +2092,9 @@
 <div class="overlay" id="bulkOverlay">
   <div class="modal">
     <h2>Move selected tasks</h2>
-    <p class="modal-sub" id="bulkSub">Move the chosen tasks to another date — their times are kept.</p>
+    <p class="modal-sub" id="bulkSub">Move the chosen tasks to another date and/or time.</p>
     <div class="field"><label>Move to date</label><button type="button" class="date-pick-btn" id="bulkDateBtn">—</button></div>
+    <div class="field"><label>New time <span class="opt">optional · keeps each task's time if blank</span></label><input type="time" id="bulkTime"></div>
     <div class="modal-actions">
       <button class="btn btn-secondary" id="bulkCancel">Cancel</button>
       <button class="btn btn-primary" id="bulkMoveSave">Move tasks</button>
@@ -2391,7 +2398,7 @@
   const moveBtn=document.getElementById('moveBtn');
   const selectBtn=document.getElementById('selectBtn');
   const bulkBar=document.getElementById('bulkBar'), bulkCount=document.getElementById('bulkCount'), bulkMoveBtn=document.getElementById('bulkMoveBtn'), bulkDoneBtn=document.getElementById('bulkDoneBtn');
-  const bulkOverlay=document.getElementById('bulkOverlay'), bulkSub=document.getElementById('bulkSub'), bulkDateBtn=document.getElementById('bulkDateBtn'), bulkCancel=document.getElementById('bulkCancel'), bulkMoveSave=document.getElementById('bulkMoveSave');
+  const bulkOverlay=document.getElementById('bulkOverlay'), bulkSub=document.getElementById('bulkSub'), bulkDateBtn=document.getElementById('bulkDateBtn'), bulkTime=document.getElementById('bulkTime'), bulkCancel=document.getElementById('bulkCancel'), bulkMoveSave=document.getElementById('bulkMoveSave');
   const calOverlay=document.getElementById('calOverlay'), calTitle=document.getElementById('calTitle'), calPrev=document.getElementById('calPrev'), calNext=document.getElementById('calNext'), calGrid=document.getElementById('calGrid');
   let selectMode=false; const selectedIds=new Set();
   let modalRepeat='none';
@@ -3984,7 +3991,8 @@
   bulkMoveBtn.addEventListener('click',()=>{
     if(!selectedIds.size) return;
     setBulkDate(dateKey(currentDate));
-    bulkSub.textContent='Move '+selectedIds.size+' task'+(selectedIds.size>1?'s':'')+' to another date — their times are kept.';
+    if(bulkTime) bulkTime.value='';
+    bulkSub.textContent='Move '+selectedIds.size+' task'+(selectedIds.size>1?'s':'')+' to another date and/or time.';
     bulkOverlay.classList.add('open');
   });
   bulkCancel.addEventListener('click',()=>bulkOverlay.classList.remove('open'));
@@ -3994,11 +4002,17 @@
     const data=loadDay(currentDate);
     const moving=data.tasks.filter(t=>selectedIds.has(t.id));
     const movedCount=moving.length;
+    const newTime = (bulkTime && bulkTime.value) ? bulkTime.value : null;
+    const sameDate = bulkSelDate===dateKey(currentDate);
     let didMove=false;
-    if(bulkSelDate!==dateKey(currentDate)){
+    if(!sameDate){
       data.tasks=data.tasks.filter(t=>!selectedIds.has(t.id)); saveDay(currentDate,data);
       const td=new Date(bulkSelDate+'T00:00:00'); const tData=loadDay(td);
-      moving.forEach(t=>{ delete t.recurId; delete t.repeat; recordChange(t,'moved',t.time,t.time,dateKey(currentDate),bulkSelDate); t.createdAt=Date.now(); tData.tasks.push(t); }); saveDay(td,tData);
+      moving.forEach(t=>{ delete t.recurId; delete t.repeat; const nt=newTime||t.time; recordChange(t,'moved',t.time,nt,dateKey(currentDate),bulkSelDate); t.time=nt; t.createdAt=Date.now(); tData.tasks.push(t); }); saveDay(td,tData);
+      didMove=true;
+    } else if(newTime){
+      moving.forEach(t=>{ if(t.time!==newTime){ recordChange(t,'rescheduled',t.time,newTime,dateKey(currentDate),bulkSelDate); t.time=newTime; } });
+      saveDay(currentDate,data);
       didMove=true;
     }
     bulkOverlay.classList.remove('open');
