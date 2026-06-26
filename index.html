@@ -1941,11 +1941,28 @@
   .bk-prefill-note{ display:flex; align-items:center; gap:8px; font-size:12px; color:var(--ink-dim); background:var(--brass-soft); border:1px solid rgba(201,151,74,0.25); border-radius:10px; padding:9px 12px; line-height:1.4; }
   .bk-prefill-note .ico{ color:var(--brass); flex-shrink:0; }
   .bk-field-label{ font-size:11px; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; margin:4px 0 -4px; }
+  .bk-form .field input:focus, .bk-form .field textarea:focus{ outline:none; border-color:var(--brass); box-shadow:0 0 0 3px var(--brass-soft); }
   .bk-select{ width:100%; box-sizing:border-box; -webkit-appearance:none; appearance:none; background:var(--bg) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23a08a6a' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>") no-repeat right 14px center; border:1px solid var(--line); color:var(--ink); font-size:16px; font-family:inherit; padding:12px 38px 12px 14px; border-radius:11px; cursor:pointer; }
   .bk-select:focus{ outline:none; border-color:var(--brass); }
+  /* reason chips */
+  .bk-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .bk-chip{ display:inline-flex; align-items:center; gap:6px; background:var(--bg); border:1px solid var(--line); color:var(--ink-dim); border-radius:999px; padding:9px 15px; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; transition:border-color .15s, color .15s, background .15s; }
+  .bk-chip:hover{ border-color:var(--brass); color:var(--ink); }
+  .bk-chip.on{ background:var(--brass); border-color:var(--brass); color:#15110A; }
+  .bk-chip-custom{ border-style:dashed; }
+  .bk-chip-custom svg{ width:13px; height:13px; }
+  .bk-customreason input{ animation:bkFade .18s ease; }
+  @keyframes bkFade{ from{ opacity:0; transform:translateY(-3px); } to{ opacity:1; transform:none; } }
+  /* priority */
   .bk-prio{ display:flex; gap:8px; }
-  .bk-prio button{ flex:1; background:var(--bg); border:1px solid var(--line); color:var(--ink-dim); border-radius:11px; padding:11px 8px; font-family:inherit; font-size:13.5px; font-weight:600; cursor:pointer; transition:border-color .15s, color .15s, background .15s; }
-  .bk-prio button.on{ background:var(--brass); border-color:var(--brass); color:#15110A; }
+  .bk-prio-btn{ flex:1; display:inline-flex; align-items:center; justify-content:center; gap:8px; background:var(--bg); border:1px solid var(--line); color:var(--ink-dim); border-radius:11px; padding:11px 8px; font-family:inherit; font-size:13.5px; font-weight:600; cursor:pointer; transition:border-color .15s, color .15s, background .15s; }
+  .bk-prio-dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .p-low .bk-prio-dot{ background:#8fa3bf; } .p-medium .bk-prio-dot{ background:var(--brass); } .p-high .bk-prio-dot{ background:var(--red-soft); }
+  .bk-prio-btn.on{ color:var(--ink); }
+  .p-low.on{ border-color:#8fa3bf; background:rgba(143,163,191,0.14); }
+  .p-medium.on{ border-color:var(--brass); background:var(--brass-soft); }
+  .p-high.on{ border-color:var(--red-soft); background:rgba(196,108,98,0.16); }
+  .bk-confirm-btn{ width:100%; margin-top:6px; padding:14px; font-size:15px; }
   .bk-confirm-card{ text-align:center; padding:12px 0; }
   .bk-confirm-ic{ width:64px; height:64px; border-radius:50%; margin:0 auto 18px; background:rgba(111,168,138,0.16); color:var(--green); display:flex; align-items:center; justify-content:center; }
   .bk-confirm-title{ font-family:var(--font-display); font-size:26px; font-weight:600; margin-bottom:10px; }
@@ -2735,23 +2752,27 @@
       // form
       if(selDate && selSlot!=null){
         const bd=bookDur();
+        const reasons=['Casual Talk','Work Talk','Friends Catch-up','Wife Time','Family Time','Coffee','Quick Sync','Brainstorm','Celebration'];
         h+='<div class="bk-form">'
           +'<div class="bk-sec-label" style="margin-top:6px">Your details</div>'
           +(prefilled?'<div class="bk-prefill-note">'+brandIco()+'Using your details from before — these stay the same.</div>':'')
           +'<div class="field"><input id="bkName" type="text" placeholder="Your name" autocomplete="name" maxlength="80" value="'+esc(prefillName)+'"'+(prefillName?' readonly class="locked"':'')+'></div>'
           +'<div class="field"><input id="bkEmail" type="email" placeholder="Email — so you can track your request" autocomplete="email" maxlength="120" value="'+esc(prefillEmail)+'"'+(prefillEmail?' readonly class="locked"':'')+'></div>'
           +'<div class="bk-field-label">Reason for the meet</div>'
-          +'<div class="field"><select id="bkReason" class="bk-select">'
-            +'<option value="">Pick a reason…</option>'
-            +'<option>Casual Talk</option><option>Work Talk</option><option>Friends Catch-up</option>'
-            +'<option>Wife Time</option><option>Family Time</option><option>Coffee</option>'
-            +'<option>Quick Sync</option><option>Brainstorm</option><option>Celebration</option>'
-            +'<option value="__custom">Custom (one word)…</option></select></div>'
-          +'<div class="field" id="bkReasonCustomWrap" style="display:none"><input id="bkReasonCustom" type="text" placeholder="One word only" maxlength="20"></div>'
+          +'<div class="bk-chips" id="bkReason">'
+            +reasons.map(r=>'<button type="button" class="bk-chip" data-r="'+esc(r)+'">'+esc(r)+'</button>').join('')
+            +'<button type="button" class="bk-chip bk-chip-custom" data-r="__custom">'+plusIco()+'Custom</button>'
+          +'</div>'
+          +'<div class="field bk-customreason" id="bkReasonCustomWrap" style="display:none"><input id="bkReasonCustom" type="text" placeholder="Type one word…" maxlength="20"></div>'
           +'<div class="bk-field-label">Priority</div>'
-          +'<div class="bk-prio" id="bkPrio"><button type="button" data-p="low">Low</button><button type="button" data-p="medium" class="on">Medium</button><button type="button" data-p="high">High</button></div>'
-          +'<div class="field"><textarea id="bkNote" placeholder="Anything to add? (optional)" maxlength="500"></textarea></div>'
-          +'<button class="btn btn-primary" id="bkConfirm" style="width:100%">Request '+fmt12(selSlot)+' – '+fmt12(selSlot+bd)+'</button>'
+          +'<div class="bk-prio" id="bkPrio">'
+            +'<button type="button" class="bk-prio-btn p-low" data-p="low"><span class="bk-prio-dot"></span>Low</button>'
+            +'<button type="button" class="bk-prio-btn p-medium on" data-p="medium"><span class="bk-prio-dot"></span>Medium</button>'
+            +'<button type="button" class="bk-prio-btn p-high" data-p="high"><span class="bk-prio-dot"></span>High</button>'
+          +'</div>'
+          +'<div class="bk-field-label">Anything to add?</div>'
+          +'<div class="field"><textarea id="bkNote" placeholder="A quick note (optional)" maxlength="500"></textarea></div>'
+          +'<button class="btn btn-primary bk-confirm-btn" id="bkConfirm">Request '+fmt12(selSlot)+' – '+fmt12(selSlot+bd)+'</button>'
           +'<div id="bkErr" style="color:var(--red-soft);font-size:12.5px;text-align:center;display:none"></div>'
           +'</div>';
       }
@@ -2776,8 +2797,12 @@
       }
       if(fr) fr.addEventListener('change', onRange);
       if(to) to.addEventListener('change', onRange);
-      const rsel=document.getElementById('bkReason'), rcw=document.getElementById('bkReasonCustomWrap'), rci=document.getElementById('bkReasonCustom');
-      if(rsel) rsel.addEventListener('change',()=>{ const cu=rsel.value==='__custom'; if(rcw) rcw.style.display=cu?'':'none'; if(cu&&rci) rci.focus(); });
+      const rcw=document.getElementById('bkReasonCustomWrap'), rci=document.getElementById('bkReasonCustom');
+      view.querySelectorAll('#bkReason .bk-chip').forEach(c=>c.addEventListener('click',()=>{
+        view.querySelectorAll('#bkReason .bk-chip').forEach(x=>x.classList.remove('on'));
+        c.classList.add('on');
+        const cu=c.dataset.r==='__custom'; if(rcw) rcw.style.display=cu?'':'none'; if(cu&&rci) setTimeout(()=>rci.focus(),0);
+      }));
       if(rci) rci.addEventListener('input',()=>{ const w=rci.value.replace(/\s+/g,''); if(rci.value!==w) rci.value=w; }); // one word only — no spaces
       view.querySelectorAll('#bkPrio button').forEach(b=>b.addEventListener('click',()=>{ view.querySelectorAll('#bkPrio button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); }));
       const c=document.getElementById('bkConfirm'); if(c) c.addEventListener('click', submit);
@@ -2788,7 +2813,7 @@
       const name=(document.getElementById('bkName').value||'').trim();
       const email=(document.getElementById('bkEmail').value||'').trim();
       const note=(document.getElementById('bkNote').value||'').trim();
-      const rsel=document.getElementById('bkReason'); let reason=(rsel&&rsel.value)||'';
+      const rchip=document.querySelector('#bkReason .bk-chip.on'); let reason=rchip?(rchip.dataset.r||''):'';
       if(reason==='__custom'){ const rci=document.getElementById('bkReasonCustom'); reason=(rci&&rci.value||'').replace(/\s+/g,'').slice(0,20); }
       const prioBtn=document.querySelector('#bkPrio button.on'); const priority=(prioBtn&&prioBtn.dataset.p)||'medium';
       const errEl=document.getElementById('bkErr');
