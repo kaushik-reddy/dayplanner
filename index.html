@@ -1847,6 +1847,17 @@
   .bk-g-btn{ flex-shrink:0; display:inline-flex; align-items:center; text-decoration:none; background:var(--brass); color:#15110A; font-weight:700; font-size:12.5px; padding:9px 16px; border-radius:999px; }
   .bk-g-btn.ghost{ background:transparent; border:1px solid var(--line); color:var(--ink-dim); }
   .bk-g-btn.ghost:hover{ border-color:var(--brass); color:var(--brass); }
+  /* collapsed/connected state — minimal animated green check */
+  .bk-gcard.connected{ gap:10px; padding:11px 16px; background:rgba(111,168,138,0.08); border-color:rgba(111,168,138,0.32); }
+  .bk-gcheck{ display:inline-flex; flex-shrink:0; }
+  .bk-gcheck-svg{ width:24px; height:24px; transform:scale(0); animation:gcPop .32s cubic-bezier(.16,1.3,.4,1) .05s forwards; }
+  .bk-gcheck-circle{ fill:none; stroke:var(--green); stroke-width:3; stroke-dasharray:151; stroke-dashoffset:151; animation:gcDraw .45s ease forwards; }
+  .bk-gcheck-tick{ fill:none; stroke:var(--green); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:36; stroke-dashoffset:36; animation:gcDraw .3s .42s ease forwards; }
+  @keyframes gcPop{ to{ transform:scale(1); } }
+  @keyframes gcDraw{ to{ stroke-dashoffset:0; } }
+  .bk-g-connlabel{ font-size:13px; font-weight:600; color:var(--green); }
+  .bk-g-reconnect{ margin-left:auto; flex-shrink:0; font-size:11px; color:var(--ink-faint); text-decoration:none; }
+  .bk-g-reconnect:hover{ color:var(--brass); }
   .bk-sec{ display:flex; align-items:center; gap:9px; }
   .bk-count{ font-family:var(--font-mono); font-size:11px; font-weight:700; color:#15110A; background:var(--brass); min-width:18px; height:18px; padding:0 5px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; }
   .bk-count:empty{ display:none; }
@@ -5831,17 +5842,20 @@
   function gmeetIco(s){ return '<svg width="'+(s||16)+'" height="'+(s||16)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="13" height="12" rx="2.5"/><path d="M15.5 10l5-3v10l-5-3z"/></svg>'; }
   function renderGoogleCard(){
     const el=document.getElementById('bkGCard'); if(!el) return;
+    if(bkGoogleConnected && el.classList.contains('connected')) return; // already shown — don't replay the animation on every poll
     const tok=localStorage.getItem(BK_TOKEN_KEY), sec=localStorage.getItem(BK_SECRET_KEY);
     const authUrl=BOOK_API+'/gauth/start?book='+encodeURIComponent(tok||'')+'&secret='+encodeURIComponent(sec||'');
     if(bkGoogleConnected){
-      el.innerHTML='<div class="bk-g-ic ok">'+gmeetIco(18)+'</div>'
-        +'<div class="bk-g-body"><div class="bk-g-title">Google Meet connected</div><div class="bk-g-sub">Every booking you accept gets a Meet link — added to your calendar &amp; emailed to the guest.</div></div>'
-        +'<a class="bk-g-btn ghost" href="'+escapeHtml(authUrl)+'" target="_blank" rel="noopener">Reconnect</a>';
-    } else {
-      el.innerHTML='<div class="bk-g-ic">'+gmeetIco(18)+'</div>'
-        +'<div class="bk-g-body"><div class="bk-g-title">Add Google Meet to bookings</div><div class="bk-g-sub">Connect your Google Calendar to auto-create a Meet link whenever you accept a booking.</div></div>'
-        +'<a class="bk-g-btn" href="'+escapeHtml(authUrl)+'" target="_blank" rel="noopener">Connect</a>';
+      el.className='bk-gcard connected';
+      el.innerHTML='<span class="bk-gcheck"><svg class="bk-gcheck-svg" viewBox="0 0 52 52"><circle class="bk-gcheck-circle" cx="26" cy="26" r="24"/><path class="bk-gcheck-tick" d="M15 27l7.5 7.5L37 20"/></svg></span>'
+        +'<span class="bk-g-connlabel">Google Meet connected</span>'
+        +'<a class="bk-g-reconnect" href="'+escapeHtml(authUrl)+'" target="_blank" rel="noopener">Reconnect</a>';
+      return;
     }
+    el.className='bk-gcard';
+    el.innerHTML='<div class="bk-g-ic">'+gmeetIco(18)+'</div>'
+      +'<div class="bk-g-body"><div class="bk-g-title">Add Google Meet to bookings</div><div class="bk-g-sub">Connect your Google Calendar to auto-create a Meet link whenever you accept a booking.</div></div>'
+      +'<a class="bk-g-btn" href="'+escapeHtml(authUrl)+'" target="_blank" rel="noopener">Connect</a>';
   }
 
   // ---- Teams/Outlook-style day timeline: your personal time vs slots booked by others ----
