@@ -1874,6 +1874,17 @@
   .bk-g-connlabel{ font-size:13px; font-weight:600; color:var(--green); }
   .bk-g-reconnect{ margin-left:auto; flex-shrink:0; font-size:11px; color:var(--ink-faint); text-decoration:none; }
   .bk-g-reconnect:hover{ color:var(--brass); }
+  /* Google Meet popup */
+  .modal-meet{ max-width:380px; text-align:center; position:relative; }
+  .meet-pop{ padding:14px 6px 4px; }
+  .meet-pop .bk-gcheck{ display:inline-flex; margin-bottom:14px; }
+  .meet-pop .bk-gcheck-svg{ width:64px; height:64px; }
+  .meet-pop-ic{ width:62px; height:62px; border-radius:50%; margin:0 auto 14px; display:flex; align-items:center; justify-content:center; background:var(--brass-soft); color:var(--brass); }
+  .meet-pop-title{ font-family:var(--font-display); font-size:21px; font-weight:600; margin-bottom:8px; }
+  .meet-pop-sub{ font-size:13px; color:var(--ink-dim); line-height:1.55; }
+  .meet-pop-acts{ display:flex; gap:10px; justify-content:center; margin-top:22px; }
+  .meet-pop-acts .btn{ flex:1; }
+  .meet-pop-hint{ font-size:11.5px; color:var(--ink-faint); margin-top:14px; }
   .bk-sec{ display:flex; align-items:center; gap:9px; }
   .bk-count{ font-family:var(--font-mono); font-size:11px; font-weight:700; color:#15110A; background:var(--brass); min-width:18px; height:18px; padding:0 5px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; }
   .bk-count:empty{ display:none; }
@@ -2314,6 +2325,14 @@
     </div>
     <div class="modal-body" id="bkdBody"></div>
     <div class="modal-foot" id="bkdFoot"></div>
+  </div>
+</div>
+
+<!-- Owner: Google Meet connection popup -->
+<div class="overlay" id="meetOverlay">
+  <div class="modal modal-meet">
+    <button type="button" class="modal-close" id="meetClose" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+    <div id="meetBody"></div>
   </div>
 </div>
 
@@ -5836,7 +5855,7 @@
       '<div class="bk-toolbar">'
         +'<button type="button" class="bk-linkpill" id="bkPageCopy" title="Copy your booking link"><span class="bk-live-dot"></span><span class="bk-linkpill-url">'+escapeHtml(pretty)+'</span><span class="bk-linkpill-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15"/></svg></span></button>'
         +'<button type="button" class="bk-tbtn" id="bkPageShare" title="Share booking link" aria-label="Share booking link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>'
-        +'<a class="bk-tbtn bk-meet-tbtn" id="bkMeetBtn" href="'+escapeHtml(gAuthUrl)+'" target="_blank" rel="noopener" aria-label="Google Meet">'+gmeetIco(17)+'<span class="bk-meet-dot"></span></a>'
+        +'<button type="button" class="bk-tbtn bk-meet-tbtn" id="bkMeetBtn" aria-label="Google Meet">'+gmeetIco(17)+'<span class="bk-meet-dot"></span></button>'
       +'</div>'
       +'<div class="bk-grid">'
         +'<div class="bk-col bk-col-left">'
@@ -5849,7 +5868,7 @@
       +'</div>';
     const copy=document.getElementById('bkPageCopy'); if(copy) copy.addEventListener('click',()=>{ if(navigator.clipboard) navigator.clipboard.writeText(link); copy.classList.add('copied'); flashToast('Booking link copied'); setTimeout(()=>{ copy.classList.remove('copied'); },1400); });
     const share=document.getElementById('bkPageShare'); if(share) share.addEventListener('click',()=>{ if(navigator.share){ navigator.share({ title:'Book time with me', url:link }).catch(()=>{}); } else { if(navigator.clipboard) navigator.clipboard.writeText(link); flashToast('Link copied — paste it anywhere'); } });
-    const meet=document.getElementById('bkMeetBtn'); if(meet) meet.addEventListener('click',()=>{ if(bkGoogleConnected) flashToast('Reopening Google to reconnect…'); });
+    const meet=document.getElementById('bkMeetBtn'); if(meet) meet.addEventListener('click', openMeetModal);
     renderMeetBtn();
     renderBookingDay();
     fillBookingLists();
@@ -5861,8 +5880,38 @@
   function renderMeetBtn(){
     const b=document.getElementById('bkMeetBtn'); if(!b) return;
     b.classList.toggle('connected', !!bkGoogleConnected);
-    b.title = bkGoogleConnected ? 'Google Meet connected — tap to reconnect' : 'Connect Google Meet for automatic meeting links';
+    b.title = bkGoogleConnected ? 'Google Meet connected' : 'Connect Google Meet for automatic meeting links';
   }
+  function bkAuthUrl(){ const t=localStorage.getItem(BK_TOKEN_KEY), s=localStorage.getItem(BK_SECRET_KEY); return BOOK_API+'/gauth/start?book='+encodeURIComponent(t||'')+'&secret='+encodeURIComponent(s||''); }
+  const meetOverlay=document.getElementById('meetOverlay');
+  function openMeetModal(){ if(!meetOverlay) return; renderMeetModal(); meetOverlay.classList.add('open'); }
+  function closeMeetModal(){ if(meetOverlay) meetOverlay.classList.remove('open'); }
+  function renderMeetModal(){
+    const el=document.getElementById('meetBody'); if(!el) return; const url=bkAuthUrl();
+    if(bkGoogleConnected){
+      el.innerHTML='<div class="meet-pop"><span class="bk-gcheck"><svg class="bk-gcheck-svg" viewBox="0 0 52 52"><circle class="bk-gcheck-circle" cx="26" cy="26" r="24"/><path class="bk-gcheck-tick" d="M15 27l7.5 7.5L37 20"/></svg></span>'
+        +'<div class="meet-pop-title">Google Meet connected</div>'
+        +'<div class="meet-pop-sub">Every booking you accept gets a Meet link — added to your calendar &amp; emailed to the guest.</div>'
+        +'<div class="meet-pop-acts"><button type="button" class="btn btn-danger" id="meetDisconnect">Disconnect</button><a class="btn btn-secondary" href="'+escapeHtml(url)+'" target="_blank" rel="noopener" id="meetReconnect">Reconnect</a></div></div>';
+      const dis=document.getElementById('meetDisconnect'); if(dis) dis.addEventListener('click',()=>{ closeMeetModal(); askConfirm('Disconnect Google Meet?','New bookings won\u2019t get a Meet link until you reconnect. Existing meetings are unaffected.','Disconnect', disconnectMeet); });
+    } else {
+      el.innerHTML='<div class="meet-pop"><div class="meet-pop-ic">'+gmeetIco(26)+'</div>'
+        +'<div class="meet-pop-title">Connect Google Meet</div>'
+        +'<div class="meet-pop-sub">Auto-create a Google Meet link whenever you accept a booking — added to your calendar and emailed to the guest.</div>'
+        +'<div class="meet-pop-acts"><a class="btn btn-primary" href="'+escapeHtml(url)+'" target="_blank" rel="noopener" id="meetConnect">Connect Google account</a></div>'
+        +'<div class="meet-pop-hint">After authorizing, return here — the badge turns green.</div></div>';
+    }
+  }
+  async function disconnectMeet(){
+    const t=localStorage.getItem(BK_TOKEN_KEY), s=localStorage.getItem(BK_SECRET_KEY);
+    try{
+      const r=await fetch(BOOK_API+'/gauth/disconnect', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ book:t, secret:s }) });
+      if(!r.ok) throw new Error('http');
+      bkGoogleConnected=false; renderMeetBtn(); flashToast('Google Meet disconnected');
+    }catch(e){ flashToast('Could not disconnect — try again','err'); }
+  }
+  { const _mc=document.getElementById('meetClose'); if(_mc) _mc.addEventListener('click', closeMeetModal); }
+  if(meetOverlay) meetOverlay.addEventListener('click', e=>{ if(e.target===meetOverlay) closeMeetModal(); });
   function renderGoogleCard_unused(){
     const el=document.getElementById('bkGCard'); if(!el) return;
     if(bkGoogleConnected && el.classList.contains('connected')) return; // already shown — don't replay the animation on every poll
