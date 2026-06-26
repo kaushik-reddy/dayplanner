@@ -5645,7 +5645,8 @@
   }
 
   async function rescheduleBooking(id, date, time, dur){
-    const res=await manageBooking('reschedule', id, { date, time, duration:dur });
+    let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone||''; }catch(e){}
+    const res=await manageBooking('reschedule', id, { date, time, duration:dur, tz });
     if(res.error==='clash'){ flashToast('That time clashes with another booking','err'); return false; }
     if(res.error){ flashToast('Could not reschedule — try again','err'); return false; }
     bkEditId=null;
