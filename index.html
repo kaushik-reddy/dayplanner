@@ -1824,9 +1824,10 @@
   .bk-pagesub{ font-size:12.5px; color:var(--ink-faint); margin-top:3px; }
   .bk-grid{ display:grid; gap:22px; }
   @media (min-width:900px){
-    .bk-grid{ grid-template-columns: minmax(0,1.05fr) minmax(0,1fr); gap:32px; align-items:start; }
-    .bk-col-left{ position:sticky; top:24px; }
+    .bk-grid{ grid-template-columns: minmax(0,0.9fr) minmax(0,1.1fr); gap:30px; align-items:start; }
   }
+  .bk-col-right{ order:-1; }
+  @media (min-width:900px){ .bk-col-right{ order:0; } }
   .bk-col{ min-width:0; }
   .bk-col .section-title:first-child{ margin-top:0; }
   .bk-linkcard{ background:var(--bg-card); border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:24px; }
@@ -5631,7 +5632,7 @@
       if(!r.ok) return bkLastBookings;
       const res=await r.json(); const bookings=res.bookings||[];
       bkLastBookings=bookings; reconcileBookings(bookings);
-      if(bookingsView && bookingsView.style.display!=='none' && !bkEditId) fillBookingLists();
+      if(bookingsView && bookingsView.style.display!=='none' && !bkEditId){ fillBookingLists(); if(document.getElementById('bkCalWrap')) renderBookingDay(); }
       return bookings;
     }catch(e){ return bkLastBookings; }
   }
@@ -5657,18 +5658,18 @@
   }
   function renderBookingsInto(el, list, readonly){
     if(!el) return;
-    if(!list.length){ el.innerHTML='<div class="sb-empty">'+(readonly?'No past bookings yet.':'No active requests right now.')+'</div>'; return; }
+    if(!list.length){ el.innerHTML='<div class="sb-empty">'+(readonly?'Nothing in history for this day.':'No bookings for this day.')+'</div>'; return; }
     const today=dateKey(new Date());
     el.innerHTML=list.map(b=>bookingRowHtml(b, today, readonly)).join('');
     wireBookingContainer(el);
   }
   function fillBookingLists(){
-    const today=dateKey(new Date());
+    const sel=bkCalDate;
     const dismissed=new Set(bkDismissed());
-    const all=(bkLastBookings||[]).filter(b=>!dismissed.has(b.id));
-    const isActive=b=>{ const s=b.status||'pending'; return s!=='declined' && s!=='cancelled' && b.date>=today; };
-    const active=all.filter(isActive).sort((a,b)=> (a.date+a.time) < (b.date+b.time) ? -1 : 1);
-    const history=all.filter(b=>!isActive(b)).sort((a,b)=> (a.date+a.time) < (b.date+b.time) ? 1 : -1);
+    const all=(bkLastBookings||[]).filter(b=>!dismissed.has(b.id) && b.date===sel);
+    const isActive=b=>{ const s=b.status||'pending'; return s!=='declined' && s!=='cancelled'; };
+    const active=all.filter(isActive).sort((a,b)=> a.time < b.time ? -1 : 1);
+    const history=all.filter(b=>!isActive(b)).sort((a,b)=> a.time < b.time ? 1 : -1);
     renderBookingsInto(document.getElementById('bkPageActive'), active, false);
     renderBookingsInto(document.getElementById('bkPageHistory'), history, true);
     const ac=document.getElementById('bkActiveCount'); if(ac) ac.textContent=active.length?active.length:'';
@@ -5757,6 +5758,7 @@
     }
     const link=bkLink();
     const pretty=link.replace(/^https?:\/\//,'').replace(/^file:\/\/\//,'');
+    bkCalDate=dateKey(new Date());
     body.innerHTML=
       '<div class="bk-linkcard">'
         +'<div class="bk-linkcard-label"><span class="bk-live-dot"></span>Your booking link · live</div>'
@@ -5764,13 +5766,13 @@
         +'<div class="bk-linkactions"><button type="button" class="btn btn-primary bk-linkbtn" id="bkPageCopy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15"/></svg>Copy link</button>'
           +'<button type="button" class="btn btn-secondary bk-linkbtn" id="bkPageShare"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button></div>'
       +'</div>'
-      +'<div class="bk-calwrap" id="bkCalWrap"></div>'
       +'<div class="bk-grid">'
         +'<div class="bk-col bk-col-left">'
-          +'<div class="section-title bk-sec">Requests &amp; upcoming <span class="bk-count" id="bkActiveCount"></span></div><div id="bkPageActive"></div>'
+          +'<div class="section-title bk-sec">Requests &amp; bookings <span class="bk-count" id="bkActiveCount"></span></div><div id="bkPageActive"></div>'
+          +'<div class="section-title bk-sec">History <span class="bk-count" id="bkHistoryCount"></span></div><div id="bkPageHistory"></div>'
         +'</div>'
         +'<div class="bk-col bk-col-right">'
-          +'<div class="section-title bk-sec">History <span class="bk-count" id="bkHistoryCount"></span></div><div id="bkPageHistory"></div>'
+          +'<div class="bk-calwrap" id="bkCalWrap"></div>'
         +'</div>'
       +'</div>';
     const copy=document.getElementById('bkPageCopy'); if(copy) copy.addEventListener('click',()=>{ if(navigator.clipboard) navigator.clipboard.writeText(link); copy.innerHTML='Copied'; copy.classList.add('copied'); setTimeout(()=>{ renderBookingsPage(); },1400); });
@@ -5821,11 +5823,13 @@
       +'<div class="bk-cal-grid" style="height:'+H+'px">'+lines+nowLine+'<div class="bk-cal-events">'+(blocks||'')+'</div>'
         +(evs.length?'':'<div class="bk-cal-empty">Nothing scheduled — your day is open.</div>')
       +'</div></div>';
-    const pv=document.getElementById('bkDayPrev'); if(pv) pv.addEventListener('click',()=>{ const x=new Date(bkCalDate+'T00:00:00'); x.setDate(x.getDate()-1); bkCalDate=dateKey(x); renderBookingDay(); });
-    const nx=document.getElementById('bkDayNext'); if(nx) nx.addEventListener('click',()=>{ const x=new Date(bkCalDate+'T00:00:00'); x.setDate(x.getDate()+1); bkCalDate=dateKey(x); renderBookingDay(); });
-    const td=document.getElementById('bkDayToday'); if(td) td.addEventListener('click',()=>{ bkCalDate=dateKey(new Date()); renderBookingDay(); });
+    const pv=document.getElementById('bkDayPrev'); if(pv) pv.addEventListener('click',()=>{ const x=new Date(bkCalDate+'T00:00:00'); x.setDate(x.getDate()-1); bkChangeDay(dateKey(x)); });
+    const nx=document.getElementById('bkDayNext'); if(nx) nx.addEventListener('click',()=>{ const x=new Date(bkCalDate+'T00:00:00'); x.setDate(x.getDate()+1); bkChangeDay(dateKey(x)); });
+    const td=document.getElementById('bkDayToday'); if(td) td.addEventListener('click',()=>{ bkChangeDay(dateKey(new Date())); });
     wrap.querySelectorAll('.bk-ev[data-bid]').forEach(el=>el.addEventListener('click',()=>openBookingDetail(el.dataset.bid)));
   }
+  // change the selected day for BOTH the calendar and the day-scoped lists
+  function bkChangeDay(dk){ bkCalDate=dk; renderBookingDay(); fillBookingLists(); }
 
   let bkDraft=null;
   function renderShareBody(){
