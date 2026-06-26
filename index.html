@@ -1466,6 +1466,11 @@
   .planner-rail{ display:none; }
   @media (min-width: 1000px){
     .wrap{ max-width: min(1760px, 95vw); }
+    /* compact segmented control instead of full-width stretched pills */
+    .viewtabs{ display:inline-flex; gap:4px; padding:4px; border:1px solid var(--line); border-radius:999px; background:var(--bg-card); margin-bottom:24px; }
+    .viewtab{ flex:0 0 auto; padding:9px 28px; border:none; background:transparent; }
+    .viewtab.active{ background:var(--brass); }
+    .viewtab:not(.active):hover{ border-color:transparent; color:var(--brass); background:rgba(255,255,255,0.05); }
     #plannerView{
       display:grid;
       grid-template-columns: minmax(330px, 380px) minmax(0, 1fr);
