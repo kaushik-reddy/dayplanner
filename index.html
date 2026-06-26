@@ -1340,6 +1340,51 @@
   .hist-row .h-act{ font-size:13px; color:var(--ink); font-weight:600; }
   .hist-row .h-act b{ color:var(--brass); }
   .hist-row .h-meta{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); margin-top:2px; }
+
+  /* ---- task audit / full-story modal ---- */
+  .modal-audit{ max-width:460px; }
+  .ta-titles{ min-width:0; }
+  .ta-when{ font-size:11.5px; color:var(--ink-faint); margin-top:3px; font-family:var(--font-mono); }
+  .ta-sec{ margin-bottom:18px; }
+  .ta-sec:last-child{ margin-bottom:0; }
+  .ta-sec-label{ font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--brass); font-weight:700; margin-bottom:11px; display:flex; align-items:center; gap:8px; }
+  .ta-sec-label::before{ content:''; width:13px; height:2px; border-radius:2px; background:var(--brass); opacity:0.7; }
+  .ta-chips{ display:flex; flex-wrap:wrap; gap:7px; }
+  .ta-chip{ display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600; padding:6px 11px; border-radius:999px; border:1px solid var(--line); color:var(--ink-dim); }
+  .ta-chip .cdot{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .ta-chip.pri-must{ color:#D9645A; border-color:rgba(217,100,90,0.45); }
+  .ta-chip.pri-high{ color:#E0915A; border-color:rgba(224,145,90,0.45); }
+  .ta-chip.pri-medium{ color:#C9974A; border-color:rgba(201,151,74,0.45); }
+  .ta-chip.pri-low{ color:#7FA8C9; border-color:rgba(127,168,201,0.45); }
+  .ta-status-pill{ display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; padding:4px 10px; border-radius:999px; }
+  .ta-status-pill.s-completed{ color:var(--green); background:rgba(111,168,138,0.14); }
+  .ta-status-pill.s-cancelled{ color:var(--red-soft); background:rgba(201,122,106,0.16); }
+  .ta-status-pill.s-carried{ color:#7FA8C9; background:rgba(127,168,201,0.16); }
+  .ta-status-pill.s-running{ color:var(--brass); background:var(--brass-soft); }
+  .ta-status-pill.s-pending{ color:var(--ink-dim); background:rgba(255,255,255,0.05); }
+  .ta-detail{ font-size:13px; color:var(--ink-dim); line-height:1.55; }
+  .ta-stats{ display:grid; grid-template-columns:repeat(2,1fr); gap:9px; }
+  .ta-stat{ border:1px solid var(--line); border-radius:12px; padding:11px 12px; background:var(--bg); }
+  .ta-stat .s-l{ font-size:9.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:6px; }
+  .ta-stat .s-v{ font-family:var(--font-mono); font-size:15px; font-weight:600; color:var(--ink); }
+  .ta-stat.good .s-v{ color:var(--green); }
+  .ta-stat.warn .s-v{ color:var(--red-soft); }
+  .ta-timeline{ position:relative; }
+  .ta-ev{ position:relative; padding:0 0 16px 22px; }
+  .ta-ev:last-child{ padding-bottom:0; }
+  .ta-ev::before{ content:''; position:absolute; left:4px; top:13px; bottom:-3px; width:2px; background:var(--line); }
+  .ta-ev:last-child::before{ display:none; }
+  .ta-ev .ev-dot{ position:absolute; left:0; top:2px; width:10px; height:10px; border-radius:50%; background:var(--ink-faint); box-shadow:0 0 0 3px var(--bg-card); }
+  .ta-ev.added .ev-dot{ background:var(--ink-dim); }
+  .ta-ev.start .ev-dot{ background:var(--brass); }
+  .ta-ev.change .ev-dot{ background:#9C8FD0; }
+  .ta-ev.pause .ev-dot{ background:#C9A74A; }
+  .ta-ev.done .ev-dot{ background:var(--green); }
+  .ta-ev.cancel .ev-dot{ background:var(--red-soft); }
+  .ta-ev.carry .ev-dot{ background:#7FA8C9; }
+  .ta-ev .ev-act{ font-size:12.5px; font-weight:600; color:var(--ink); }
+  .ta-ev .ev-act b{ color:var(--brass); font-weight:700; }
+  .ta-ev .ev-meta{ font-size:11px; color:var(--ink-faint); font-family:var(--font-mono); margin-top:2px; }
   .proj-end{ display:flex; align-items:center; gap:6px; margin-top:11px; font-size:11.5px; color:var(--ink-dim); font-family:var(--font-mono); }
   .proj-end .ico{ color:var(--brass); }
   .proj-end b{ color:var(--ink); font-weight:600; }
@@ -1825,10 +1870,30 @@
 <div class="overlay" id="resolvedOverlay">
   <div class="modal">
     <h2>Resolved tasks</h2>
-    <p class="close-intro">Completed, cancelled and carried-forward tasks for this day. Reset any one to send it back to the timeline.</p>
+    <p class="close-intro">Completed, cancelled and carried-forward tasks for this day. Tap any task for its full story, or reset it to the timeline.</p>
     <div id="resolvedList"></div>
     <div class="modal-actions">
       <button class="btn btn-primary" id="resolvedCloseBtn">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Task audit / full-story modal -->
+<div class="overlay" id="taskAuditOverlay">
+  <div class="modal modal-form modal-audit">
+    <div class="modal-head">
+      <div class="ta-titles">
+        <h2 id="taTitle">Task</h2>
+        <div class="ta-when" id="taWhen"></div>
+      </div>
+      <button type="button" class="modal-close" id="taClose" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="taBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" id="taReset" style="display:none;">Reset to timeline</button>
+      <button class="btn btn-primary" id="taDone">Done</button>
     </div>
   </div>
 </div>
@@ -2574,6 +2639,10 @@
       if(s==='completed'){ daySegEls[i].classList.add('done'); doneCount++; }
       else if(s==='cancelled'){ daySegEls[i].classList.add('seg-cancel'); cancelCount++; }
       else if(s==='carried'){ daySegEls[i].classList.add('seg-carry'); carryCnt++; }
+      const seg=daySegEls[i];
+      seg.style.cursor='pointer';
+      seg.title=fmtTime(t.time)+' · '+t.title;
+      seg.addEventListener('click',(e)=>{ e.stopPropagation(); openTaskAudit(t); });
     });
 
     const total=data.tasks.length;
@@ -3099,6 +3168,72 @@
 
   // change history viewer
   const historyOverlay=document.getElementById('historyOverlay'), historySub=document.getElementById('historySub'), historyList=document.getElementById('historyList'), historyClose=document.getElementById('historyClose');
+  const taskAuditOverlay=document.getElementById('taskAuditOverlay'), taTitle=document.getElementById('taTitle'), taWhen=document.getElementById('taWhen'), taBody=document.getElementById('taBody'), taClose=document.getElementById('taClose'), taDone=document.getElementById('taDone'), taReset=document.getElementById('taReset');
+  let taAuditTask=null;
+  function fmtDateTime(ts){ const dt=new Date(ts); return dt.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' · '+dt.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}); }
+  function openTaskAudit(task){
+    if(!task) return;
+    taAuditTask=task;
+    const st=taskState(task);
+    const stLabel={completed:'Completed',cancelled:'Cancelled',carried:'Carried forward',running:isPaused(task)?'Paused':'In progress',pending:'Pending'}[st]||st;
+    const stCls={completed:'s-completed',cancelled:'s-cancelled',carried:'s-carried',running:'s-running',pending:'s-pending'}[st]||'s-pending';
+    taTitle.textContent=task.title;
+    const sm=timeToMinutes(task.time), em=sm+(task.duration||0);
+    const endClock=fmtTime(pad2(Math.floor(em/60)%24)+':'+pad2(em%60));
+    taWhen.textContent=fmtTime(task.time)+(task.duration?(' – '+endClock+' · '+task.duration+'m planned'):'');
+    let html='';
+    // status + overview
+    html+='<div class="ta-sec"><div class="ta-sec-label">Status</div><div class="ta-chips">';
+    html+='<span class="ta-status-pill '+stCls+'">'+stLabel+'</span>';
+    if(task.priority){ const pl={low:'Low',medium:'Medium',high:'High',must:'Must'}[task.priority]||task.priority; html+='<span class="ta-chip pri-'+task.priority+'">'+pl+' priority</span>'; }
+    getCategories(task).forEach(c=>{ html+='<span class="ta-chip"><span class="cdot" style="background:'+catColor(c)+'"></span>'+escapeHtml(catLabelOf(c))+'</span>'; });
+    if(task.repeat && task.repeat!=='none'){ html+='<span class="ta-chip">'+svgIco('repeat',11)+' Repeats</span>'; }
+    if(task.carryCount){ html+='<span class="ta-chip">'+svgIco('move',11)+' Carried ×'+task.carryCount+'</span>'; }
+    html+='</div></div>';
+    // detail
+    if(task.sub){ html+='<div class="ta-sec"><div class="ta-sec-label">Detail</div><div class="ta-detail">'+escapeHtml(task.sub)+'</div></div>'; }
+    // time tracking
+    if(task.startedAt){
+      const spentM=Math.round(spentMsOf(task)/60000), plannedM=task.duration||0, pausedM=Math.round(pausedMsOf(task)/60000);
+      let diffCls='', diffTxt='In progress';
+      if(plannedM>0 && task.completedAt){ const d=spentM-plannedM; diffTxt=d===0?'On plan':(d>0?('+'+fmtPlanned(d)+' over'):('−'+fmtPlanned(-d)+' under')); diffCls=d>0?'warn':'good'; }
+      html+='<div class="ta-sec"><div class="ta-sec-label">Time tracking</div><div class="ta-stats">';
+      html+='<div class="ta-stat"><div class="s-l">Planned</div><div class="s-v">'+(plannedM?fmtPlanned(plannedM):'—')+'</div></div>';
+      html+='<div class="ta-stat"><div class="s-l">Spent</div><div class="s-v">'+(spentM?fmtPlanned(spentM):'—')+'</div></div>';
+      html+='<div class="ta-stat"><div class="s-l">Paused</div><div class="s-v">'+(pausedM?fmtPlanned(pausedM):'0m')+'</div></div>';
+      html+='<div class="ta-stat '+diffCls+'"><div class="s-l">Result</div><div class="s-v">'+diffTxt+'</div></div>';
+      html+='</div></div>';
+    }
+    // timeline / full story
+    const evts=[];
+    if(task.createdAt){ evts.push({cls:'added', act:'Added to the day', meta:fmtDateTime(task.createdAt)}); }
+    if(task.origTime){ evts.push({cls:'added', act:'Originally planned for <b>'+escapeHtml((task.origKey?fmtDateShort(task.origKey)+' ':'')+fmtTime(task.origTime))+'</b>', meta:''}); }
+    (task.changes||[]).forEach(c=>{
+      const label={moved:'Moved',rescheduled:'Rescheduled',swapped:'Swapped'}[c.type]||'Changed';
+      const crossDay=c.fromKey&&c.toKey&&c.fromKey!==c.toKey;
+      const fromLbl=(crossDay?fmtDateShort(c.fromKey)+' ':'')+fmtTime(c.from);
+      const toLbl=(crossDay?fmtDateShort(c.toKey)+' ':'')+fmtTime(c.to);
+      evts.push({cls:'change', act:label+' '+escapeHtml(fromLbl)+' → <b>'+escapeHtml(toLbl)+'</b>', meta:c.at?fmtDateTime(c.at):''});
+    });
+    if(task.startedAt){ evts.push({cls:'start', act:'Started', meta:fmtDateTime(task.startedAt)}); }
+    const pausedM2=Math.round(pausedMsOf(task)/60000);
+    if(pausedM2>0){ evts.push({cls:'pause', act:'Paused for <b>'+fmtPlanned(pausedM2)+'</b> total', meta:''}); }
+    if(st==='completed' && task.completedAt){ const spentM=Math.round(spentMsOf(task)/60000); evts.push({cls:'done', act:'Completed', meta:fmtDateTime(task.completedAt)+(spentM?(' · '+fmtPlanned(spentM)+' spent'):'')}); }
+    else if(st==='cancelled'){ evts.push({cls:'cancel', act:'Cancelled', meta:''}); }
+    else if(st==='carried'){ evts.push({cls:'carry', act:'Carried forward'+(task.carriedTo?(' to <b>'+escapeHtml(task.carriedTo)+'</b>'):''), meta:''}); }
+    else if(st==='running'){ evts.push({cls:'start', act:isPaused(task)?'Currently paused':'Currently running', meta:''}); }
+    else if(st==='pending'){ evts.push({cls:'added', act:'Waiting to start', meta:'Scheduled '+fmtTime(task.time)}); }
+    html+='<div class="ta-sec"><div class="ta-sec-label">Full story</div><div class="ta-timeline">';
+    evts.forEach(e=>{ html+='<div class="ta-ev '+e.cls+'"><span class="ev-dot"></span><div class="ev-act">'+e.act+'</div>'+(e.meta?'<div class="ev-meta">'+escapeHtml(e.meta)+'</div>':'')+'</div>'; });
+    html+='</div></div>';
+    taBody.innerHTML=html;
+    taReset.style.display=(st==='completed'||st==='cancelled'||st==='carried')?'':'none';
+    taskAuditOverlay.classList.add('open');
+  }
+  taClose.addEventListener('click',()=>taskAuditOverlay.classList.remove('open'));
+  taDone.addEventListener('click',()=>taskAuditOverlay.classList.remove('open'));
+  taskAuditOverlay.addEventListener('click',e=>{ if(e.target===taskAuditOverlay) taskAuditOverlay.classList.remove('open'); });
+  taReset.addEventListener('click',()=>{ if(taAuditTask){ const id=taAuditTask.id; taskAuditOverlay.classList.remove('open'); restoreResolved(id); } });
   function openHistory(task){
     const cc=changeCounts(task);
     const sum=[]; if(cc.moved) sum.push(cc.moved+'× moved'); if(cc.rescheduled) sum.push(cc.rescheduled+'× rescheduled'); if(cc.swapped) sum.push(cc.swapped+'× swapped');
@@ -3591,7 +3726,11 @@
       groups.forEach(g=>{ if(!g.items.length) return; body+='<div class="rgroup"><div class="rgroup-head">'+escapeHtml(g.label)+'<span class="rg-count">'+g.items.length+'</span></div>'+g.items.map(cardHtml).join('')+'</div>'; });
       resolvedList.innerHTML=hero+body;
       resolvedList.querySelectorAll('.rrestore').forEach(btn=>{
-        btn.addEventListener('click',()=>restoreResolved(btn.getAttribute('data-id')));
+        btn.addEventListener('click',(e)=>{ e.stopPropagation(); restoreResolved(btn.getAttribute('data-id')); });
+      });
+      resolvedList.querySelectorAll('.rcard').forEach(card=>{
+        card.style.cursor='pointer';
+        card.addEventListener('click',()=>{ const t=resolved.find(x=>x.id===card.getAttribute('data-id')); if(t) openTaskAudit(t); });
       });
     }
     resolvedOverlay.classList.add('open');
