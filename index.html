@@ -1831,7 +1831,23 @@
   .bk-col{ min-width:0; }
   .bk-col .section-title:first-child{ margin-top:0; }
   .bk-linkcard{ background:var(--bg-card); border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:24px; }
-  .bk-linkcard-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+  /* compact booking toolbar (link + share + meet) */
+  .bk-toolbar{ display:flex; align-items:stretch; gap:9px; margin-bottom:22px; }
+  .bk-linkpill{ flex:1; min-width:0; display:flex; align-items:center; gap:9px; background:var(--bg-card); border:1px solid var(--line); border-radius:12px; padding:0 6px 0 14px; height:44px; font-family:inherit; cursor:pointer; transition:border-color .15s, background .15s; }
+  .bk-linkpill:hover{ border-color:var(--brass); }
+  .bk-linkpill .bk-live-dot{ width:8px; height:8px; flex-shrink:0; }
+  .bk-linkpill-url{ flex:1; min-width:0; text-align:left; font-family:var(--font-mono); font-size:12.5px; color:var(--ink-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bk-linkpill-ic{ flex-shrink:0; width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; color:var(--ink-dim); background:rgba(255,255,255,0.04); transition:color .15s, background .15s; }
+  .bk-linkpill:hover .bk-linkpill-ic{ color:var(--brass); }
+  .bk-linkpill.copied{ border-color:var(--green); }
+  .bk-linkpill.copied .bk-linkpill-ic{ color:var(--green); }
+  .bk-tbtn{ flex-shrink:0; width:44px; height:44px; border-radius:12px; border:1px solid var(--line); background:var(--bg-card); color:var(--ink-dim); display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; transition:border-color .15s, color .15s; text-decoration:none; }
+  .bk-tbtn:hover{ border-color:var(--brass); color:var(--brass); }
+  .bk-meet-dot{ position:absolute; top:7px; right:7px; width:8px; height:8px; border-radius:50%; background:var(--ink-faint); border:2px solid var(--bg-card); }
+  .bk-meet-tbtn.connected{ border-color:rgba(111,168,138,0.4); color:var(--green); }
+  .bk-meet-tbtn.connected .bk-meet-dot{ background:var(--green); box-shadow:0 0 0 3px rgba(111,168,138,0.18); }
+  .bk-meet-tbtn:not(.connected) .bk-meet-dot{ background:var(--brass); animation:meetPulse 1.8s ease-in-out infinite; }
+  @keyframes meetPulse{ 0%,100%{ opacity:0.5; } 50%{ opacity:1; } }
   .bk-linkcard-label{ display:flex; align-items:center; gap:8px; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-dim); font-weight:700; margin-bottom:12px; }
   .bk-live-dot{ width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 0 3px rgba(111,168,138,0.18); flex-shrink:0; }
   .bk-linkbox{ display:flex; align-items:center; background:var(--bg); border:1px solid var(--line); border-radius:11px; padding:11px 14px; margin-bottom:11px; }
@@ -5685,7 +5701,7 @@
       const res=await r.json(); const bookings=res.bookings||[];
       bkLastBookings=bookings; reconcileBookings(bookings);
       bkGoogleConnected=!!res.googleConnected;
-      if(bookingsView && bookingsView.style.display!=='none' && !bkEditId){ fillBookingLists(); if(document.getElementById('bkCalWrap')) renderBookingDay(); if(typeof renderGoogleCard==='function') renderGoogleCard(); }
+      if(bookingsView && bookingsView.style.display!=='none' && !bkEditId){ fillBookingLists(); if(document.getElementById('bkCalWrap')) renderBookingDay(); if(typeof renderMeetBtn==='function') renderMeetBtn(); }
       return bookings;
     }catch(e){ return bkLastBookings; }
   }
@@ -5814,14 +5830,14 @@
     const link=bkLink();
     const pretty=link.replace(/^https?:\/\//,'').replace(/^file:\/\/\//,'');
     bkCalDate=dateKey(new Date());
+    const _tok=localStorage.getItem(BK_TOKEN_KEY), _sec=localStorage.getItem(BK_SECRET_KEY);
+    const gAuthUrl=BOOK_API+'/gauth/start?book='+encodeURIComponent(_tok||'')+'&secret='+encodeURIComponent(_sec||'');
     body.innerHTML=
-      '<div class="bk-linkcard">'
-        +'<div class="bk-linkcard-label"><span class="bk-live-dot"></span>Your booking link · live</div>'
-        +'<div class="bk-linkbox"><span class="bk-linkurl" title="'+escapeHtml(link)+'">'+escapeHtml(pretty)+'</span></div>'
-        +'<div class="bk-linkactions"><button type="button" class="btn btn-primary bk-linkbtn" id="bkPageCopy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15"/></svg>Copy link</button>'
-          +'<button type="button" class="btn btn-secondary bk-linkbtn" id="bkPageShare"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button></div>'
+      '<div class="bk-toolbar">'
+        +'<button type="button" class="bk-linkpill" id="bkPageCopy" title="Copy your booking link"><span class="bk-live-dot"></span><span class="bk-linkpill-url">'+escapeHtml(pretty)+'</span><span class="bk-linkpill-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15"/></svg></span></button>'
+        +'<button type="button" class="bk-tbtn" id="bkPageShare" title="Share booking link" aria-label="Share booking link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>'
+        +'<a class="bk-tbtn bk-meet-tbtn" id="bkMeetBtn" href="'+escapeHtml(gAuthUrl)+'" target="_blank" rel="noopener" aria-label="Google Meet">'+gmeetIco(17)+'<span class="bk-meet-dot"></span></a>'
       +'</div>'
-      +'<div class="bk-gcard" id="bkGCard"></div>'
       +'<div class="bk-grid">'
         +'<div class="bk-col bk-col-left">'
           +'<div class="section-title bk-sec">Requests &amp; bookings <span class="bk-count" id="bkActiveCount"></span></div><div id="bkPageActive"></div>'
@@ -5831,17 +5847,23 @@
           +'<div class="bk-calwrap" id="bkCalWrap"></div>'
         +'</div>'
       +'</div>';
-    const copy=document.getElementById('bkPageCopy'); if(copy) copy.addEventListener('click',()=>{ if(navigator.clipboard) navigator.clipboard.writeText(link); copy.innerHTML='Copied'; copy.classList.add('copied'); setTimeout(()=>{ renderBookingsPage(); },1400); });
+    const copy=document.getElementById('bkPageCopy'); if(copy) copy.addEventListener('click',()=>{ if(navigator.clipboard) navigator.clipboard.writeText(link); copy.classList.add('copied'); flashToast('Booking link copied'); setTimeout(()=>{ copy.classList.remove('copied'); },1400); });
     const share=document.getElementById('bkPageShare'); if(share) share.addEventListener('click',()=>{ if(navigator.share){ navigator.share({ title:'Book time with me', url:link }).catch(()=>{}); } else { if(navigator.clipboard) navigator.clipboard.writeText(link); flashToast('Link copied — paste it anywhere'); } });
-    renderGoogleCard();
+    const meet=document.getElementById('bkMeetBtn'); if(meet) meet.addEventListener('click',()=>{ if(bkGoogleConnected) flashToast('Reopening Google to reconnect…'); });
+    renderMeetBtn();
     renderBookingDay();
     fillBookingLists();
     bkPoll(true);
   }
 
-  // ---- Google Meet connection card (auto-create Meet links on accept) ----
+  // ---- Google Meet button state (compact toolbar) ----
   function gmeetIco(s){ return '<svg width="'+(s||16)+'" height="'+(s||16)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="13" height="12" rx="2.5"/><path d="M15.5 10l5-3v10l-5-3z"/></svg>'; }
-  function renderGoogleCard(){
+  function renderMeetBtn(){
+    const b=document.getElementById('bkMeetBtn'); if(!b) return;
+    b.classList.toggle('connected', !!bkGoogleConnected);
+    b.title = bkGoogleConnected ? 'Google Meet connected — tap to reconnect' : 'Connect Google Meet for automatic meeting links';
+  }
+  function renderGoogleCard_unused(){
     const el=document.getElementById('bkGCard'); if(!el) return;
     if(bkGoogleConnected && el.classList.contains('connected')) return; // already shown — don't replay the animation on every poll
     const tok=localStorage.getItem(BK_TOKEN_KEY), sec=localStorage.getItem(BK_SECRET_KEY);
