@@ -1693,11 +1693,33 @@
   .dow-toggle button.on{ background:var(--brass); border-color:var(--brass); color:#15110A; }
   .share-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .share-bookings{ margin-top:4px; display:flex; flex-direction:column; gap:8px; }
-  .sb-row{ display:flex; align-items:center; gap:11px; border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:var(--bg); }
+  .sb-item{ border:1px solid var(--line); border-radius:12px; background:var(--bg); overflow:hidden; }
+  .sb-item.past{ opacity:0.62; }
+  .sb-row{ display:flex; align-items:center; gap:11px; padding:10px 12px; }
   .sb-ic{ width:32px; height:32px; border-radius:9px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:rgba(201,151,74,0.16); color:var(--brass); }
   .sb-main{ flex:1; min-width:0; }
   .sb-name{ font-size:13px; font-weight:600; color:var(--ink); }
   .sb-when{ font-size:11px; color:var(--ink-faint); font-family:var(--font-mono); margin-top:2px; }
+  .sb-note{ font-size:11.5px; color:var(--ink-dim); margin-top:4px; line-height:1.4; }
+  .sb-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .sb-act{ width:30px; height:30px; border-radius:8px; border:1px solid var(--line); background:transparent; color:var(--ink-dim); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:border-color .15s, color .15s; }
+  .sb-act:hover{ border-color:var(--brass); color:var(--brass); }
+  .sb-act.danger:hover{ border-color:var(--red-soft); color:var(--red-soft); }
+  .sb-edit{ border-top:1px solid var(--line); padding:12px; background:var(--bg-card); }
+  .sb-edit-grid{ display:grid; grid-template-columns:1.4fr 1fr 0.8fr; gap:8px; }
+  .sb-edit-grid label{ display:flex; flex-direction:column; gap:5px; font-size:9.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-faint); font-weight:600; }
+  .sb-edit-grid input{ width:100%; box-sizing:border-box; background:var(--bg); border:1px solid var(--line); color:var(--ink); font-size:13px; font-family:var(--font-mono); padding:8px 9px; border-radius:9px; outline:none; }
+  .sb-edit-grid input:focus{ border-color:var(--brass); box-shadow:0 0 0 2px var(--brass-soft); }
+  .sb-edit-grid input::-webkit-calendar-picker-indicator{ filter:invert(0.7) sepia(1) saturate(2) hue-rotate(5deg); opacity:0.6; cursor:pointer; }
+  .sb-edit-btns{ display:flex; gap:8px; justify-content:flex-end; margin-top:11px; }
+  .btn-mini{ border:none; border-radius:9px; padding:8px 16px; font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; background:var(--brass); color:#15110A; }
+  .btn-mini.ghost{ background:transparent; border:1px solid var(--line); color:var(--ink-dim); }
+  .btn-mini.ghost:hover{ color:var(--ink); border-color:var(--ink-faint); }
+  .bk-customnum{ display:flex; align-items:center; gap:8px; margin-top:9px; }
+  .bk-customnum span{ font-size:11px; color:var(--ink-faint); }
+  .bk-customnum em{ font-size:11px; color:var(--ink-faint); font-style:normal; }
+  .bk-customnum input{ width:72px; background:var(--bg) !important; border:1px solid var(--line); color:var(--ink); font-size:13px !important; font-family:var(--font-mono); padding:7px 10px; border-radius:9px; outline:none; }
+  .bk-customnum input:focus{ border-color:var(--brass); box-shadow:0 0 0 2px var(--brass-soft); }
   .sb-empty{ font-size:12.5px; color:var(--ink-faint); text-align:center; padding:14px; border:1px dashed var(--line); border-radius:12px; }
   .bk-pillrow{ display:flex; gap:7px; flex-wrap:wrap; }
   .bk-pill{ border:1px solid var(--line); background:transparent; color:var(--ink-dim); border-radius:999px; padding:8px 15px; font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer; }
@@ -4836,23 +4858,93 @@
     try{ await fetch(BOOK_API+'?book='+encodeURIComponent(tok)+'&publish=1', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ownerSecret:sec, config:cfg, busy }) }); }catch(e){}
   }
 
-  function importBookings(bookings){
-    let imported=[]; try{ imported=JSON.parse(localStorage.getItem(BK_IMPORTED_KEY)||'[]'); }catch(e){}
-    const set=new Set(imported); let added=0, lastName='';
-    (bookings||[]).forEach(b=>{
-      if(set.has(b.id)) return;
-      const d=new Date(b.date+'T00:00:00'); const data=loadDay(d); data.tasks=data.tasks||[];
-      if(!data.tasks.some(t=>t.bookingId===b.id)){
-        data.tasks.push({ id:'booked_'+b.id, time:b.time, duration:b.duration||30, title:'Booking · '+(b.name||'Guest'), sub:(b.note||'')+(b.email?((b.note?' · ':'')+b.email):''), categories:['#meeting'], priority:'high', booked:true, bookingId:b.id, createdAt:Date.now() });
-        saveDay(d, data); added++;
+  function findBookedTask(bookingId){
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k && k.indexOf(STORAGE_PREFIX)===0){
+        let data; try{ data=JSON.parse(localStorage.getItem(k)); }catch(e){ continue; }
+        const idx=(data.tasks||[]).findIndex(t=>t.bookingId===bookingId);
+        if(idx>=0) return { key:k.slice(STORAGE_PREFIX.length), data, idx };
       }
-      set.add(b.id); lastName=b.name||lastName;
-    });
-    if(added>0){
-      localStorage.setItem(BK_IMPORTED_KEY, JSON.stringify([...set]));
-      renderStructure(); bkPublish();
-      flashToast(added===1?('New booking from '+lastName):(added+' new bookings received'));
     }
+    return null;
+  }
+  function bookingSub(b){ return (b.note||'')+(b.email?((b.note?' · ':'')+b.email):''); }
+
+  // Keep the planner in sync with the server's bookings: add new, move/update rescheduled, remove cancelled.
+  function reconcileBookings(bookings){
+    let imported=[]; try{ imported=JSON.parse(localStorage.getItem(BK_IMPORTED_KEY)||'[]'); }catch(e){}
+    const set=new Set(imported);
+    const serverIds=new Set((bookings||[]).map(b=>b.id));
+    let added=0, lastName='', changed=false;
+    (bookings||[]).forEach(b=>{
+      const loc=findBookedTask(b.id); const sub=bookingSub(b);
+      if(!loc){
+        const d=new Date(b.date+'T00:00:00'); const data=loadDay(d); data.tasks=data.tasks||[];
+        data.tasks.push({ id:'booked_'+b.id, time:b.time, duration:b.duration||30, title:'Booking · '+(b.name||'Guest'), sub, categories:['#meeting'], priority:'high', booked:true, bookingId:b.id, createdAt:Date.now() });
+        saveDay(d, data);
+        if(!set.has(b.id)){ added++; lastName=b.name||lastName; }
+        changed=true;
+      } else {
+        const t=loc.data.tasks[loc.idx]; const needMove = loc.key !== b.date;
+        if(t.time!==b.time || (t.duration||30)!==(b.duration||30) || t.sub!==sub || needMove){
+          if(needMove){
+            loc.data.tasks.splice(loc.idx,1); saveDay(new Date(loc.key+'T00:00:00'), loc.data);
+            const d2=new Date(b.date+'T00:00:00'); const data2=loadDay(d2); data2.tasks=data2.tasks||[];
+            data2.tasks.push(Object.assign(t,{ time:b.time, duration:b.duration||30, sub }));
+            saveDay(d2, data2);
+          } else {
+            t.time=b.time; t.duration=b.duration||30; t.sub=sub; saveDay(new Date(loc.key+'T00:00:00'), loc.data);
+          }
+          changed=true;
+        }
+      }
+      set.add(b.id);
+    });
+    // anything we imported before but is gone from the server was cancelled remotely → drop it
+    [...set].forEach(id=>{
+      if(!serverIds.has(id)){
+        const loc=findBookedTask(id);
+        if(loc){ loc.data.tasks.splice(loc.idx,1); saveDay(new Date(loc.key+'T00:00:00'), loc.data); changed=true; }
+        set.delete(id);
+      }
+    });
+    localStorage.setItem(BK_IMPORTED_KEY, JSON.stringify([...set]));
+    if(changed) renderStructure();
+    if(added>0){ bkPublish(); flashToast(added===1?('New booking from '+lastName):(added+' new bookings received')); }
+    else if(changed){ bkPublish(); }
+  }
+
+  async function manageBooking(action, id, extra){
+    const tok=localStorage.getItem(BK_TOKEN_KEY), sec=localStorage.getItem(BK_SECRET_KEY);
+    if(!tok||!sec) return { error:'nokeys' };
+    try{
+      const r=await fetch(BOOK_API+'?book='+encodeURIComponent(tok)+'&manage=1', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(Object.assign({ ownerSecret:sec, action, bookingId:id }, extra||{})) });
+      if(r.status===409) return { error:'clash' };
+      if(!r.ok) return { error:'http' };
+      const res=await r.json(); if(res.bookings) bkLastBookings=res.bookings; return res;
+    }catch(e){ return { error:'net' }; }
+  }
+
+  async function cancelBooking(id){
+    const b=(bkLastBookings||[]).find(x=>x.id===id);
+    const res=await manageBooking('cancel', id);
+    if(res.error){ flashToast('Could not cancel — try again','err'); return; }
+    const loc=findBookedTask(id); if(loc){ loc.data.tasks.splice(loc.idx,1); saveDay(new Date(loc.key+'T00:00:00'), loc.data); }
+    let imp=[]; try{ imp=JSON.parse(localStorage.getItem(BK_IMPORTED_KEY)||'[]'); }catch(e){}
+    localStorage.setItem(BK_IMPORTED_KEY, JSON.stringify(imp.filter(x=>x!==id)));
+    renderStructure(); await bkPublish(); renderBookingsList();
+    flashToast('Booking with '+((b&&b.name)||'guest')+' cancelled');
+  }
+
+  async function rescheduleBooking(id, date, time, dur){
+    const res=await manageBooking('reschedule', id, { date, time, duration:dur });
+    if(res.error==='clash'){ flashToast('That time clashes with another booking','err'); return false; }
+    if(res.error){ flashToast('Could not reschedule — try again','err'); return false; }
+    bkEditId=null;
+    reconcileBookings(bkLastBookings); await bkPublish(); renderBookingsList();
+    flashToast('Booking moved to '+fmtTime(time));
+    return true;
   }
 
   async function bkPoll(silent){
@@ -4862,52 +4954,95 @@
       const r=await fetch(BOOK_API+'?book='+encodeURIComponent(tok)+'&pull=1&secret='+encodeURIComponent(sec));
       if(!r.ok) return bkLastBookings;
       const res=await r.json(); const bookings=res.bookings||[];
-      bkLastBookings=bookings; importBookings(bookings);
+      bkLastBookings=bookings; reconcileBookings(bookings);
       if(!silent && shareOverlay.classList.contains('open')) renderBookingsList();
       return bookings;
     }catch(e){ return bkLastBookings; }
   }
 
+  let bkEditId=null;
   function renderBookingsList(){
     const el=document.getElementById('bkList'); if(!el) return;
     const list=(bkLastBookings||[]).slice().sort((a,b)=> (a.date+a.time) < (b.date+b.time) ? 1 : -1);
     if(!list.length){ el.innerHTML='<div class="sb-empty">No bookings yet. Share your link to start receiving them.</div>'; return; }
+    const today=dateKey(new Date());
     el.innerHTML=list.map(b=>{
       let when=b.date; try{ when=new Date(b.date+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }catch(e){}
-      const t=fmtTime(b.time);
-      return '<div class="sb-row"><div class="sb-ic">'+svgIco('calendar',16)+'</div><div class="sb-main"><div class="sb-name">'+escapeHtml(b.name||'Guest')+'</div><div class="sb-when">'+escapeHtml(when)+' · '+escapeHtml(t)+(b.email?' · '+escapeHtml(b.email):'')+'</div></div></div>';
+      const past=b.date<today; const dur=b.duration||30; const editing=b.id===bkEditId;
+      let row='<div class="sb-item'+(past?' past':'')+'" data-id="'+escapeHtml(b.id)+'"><div class="sb-row">'
+        +'<div class="sb-ic">'+svgIco('calendar',16)+'</div>'
+        +'<div class="sb-main"><div class="sb-name">'+escapeHtml(b.name||'Guest')+'</div>'
+        +'<div class="sb-when">'+escapeHtml(when)+' · '+escapeHtml(fmtTime(b.time))+' · '+dur+'m'+(b.email?' · '+escapeHtml(b.email):'')+'</div>'
+        +(b.note?'<div class="sb-note">'+escapeHtml(b.note)+'</div>':'')
+        +'</div>'
+        +'<div class="sb-actions">'
+          +'<button type="button" class="sb-act" data-act="resch" title="Reschedule" aria-label="Reschedule">'+svgIco('clock',15)+'</button>'
+          +'<button type="button" class="sb-act danger" data-act="cancel" title="Cancel booking" aria-label="Cancel">'+svgIco('x',15)+'</button>'
+        +'</div></div>';
+      if(editing){
+        row+='<div class="sb-edit">'
+          +'<div class="sb-edit-grid">'
+            +'<label>Date<input type="date" class="sbE-date" value="'+escapeHtml(b.date)+'"></label>'
+            +'<label>Time<input type="time" class="sbE-time" value="'+escapeHtml(b.time)+'"></label>'
+            +'<label>Mins<input type="number" class="sbE-dur" min="5" max="480" step="5" value="'+dur+'"></label>'
+          +'</div>'
+          +'<div class="sb-edit-btns"><button type="button" class="btn-mini ghost" data-act="recancel">Discard</button><button type="button" class="btn-mini" data-act="resave">Save change</button></div>'
+        +'</div>';
+      }
+      return row+'</div>';
     }).join('');
+    el.querySelectorAll('.sb-act').forEach(btn=>btn.addEventListener('click',()=>{
+      const item=btn.closest('.sb-item'); const id=item.dataset.id; const act=btn.dataset.act;
+      if(act==='cancel'){ const b=(bkLastBookings||[]).find(x=>x.id===id); if(confirm('Cancel the booking with '+((b&&b.name)||'this guest')+'? Their slot will be freed up.')) cancelBooking(id); }
+      else if(act==='resch'){ bkEditId=(bkEditId===id?null:id); renderBookingsList(); }
+    }));
+    el.querySelectorAll('.sb-edit').forEach(ed=>{
+      const item=ed.closest('.sb-item'); const id=item.dataset.id;
+      ed.querySelector('[data-act="recancel"]').addEventListener('click',()=>{ bkEditId=null; renderBookingsList(); });
+      ed.querySelector('[data-act="resave"]').addEventListener('click',()=>{
+        const date=ed.querySelector('.sbE-date').value, time=ed.querySelector('.sbE-time').value;
+        let dur=parseInt(ed.querySelector('.sbE-dur').value,10); if(isNaN(dur)||dur<5) dur=30;
+        if(!date||!time){ flashToast('Pick a date and time','err'); return; }
+        rescheduleBooking(id, date, time, dur);
+      });
+    });
   }
 
   let bkDraft=null;
   function renderShareBody(){
     const c=bkDraft; const enabled=bkEnabled(); const link=bkLink();
-    const dowL=['S','M','T','W','T','F','S']; const durOpts=[15,30,45,60], slotOpts=[15,30,60], horOpts=[7,14,30];
+    const dowL=['S','M','T','W','T','F','S'];
+    const durOpts=[15,30,45,60,90,120], slotOpts=[10,15,20,30,45,60], horOpts=[3,7,14,30,60,90];
+    const pillRow=(kind,opts,val,fmt)=> '<div class="bk-pillrow" data-pill="'+kind+'">'+opts.map(o=>'<button type="button" class="bk-pill'+(val===o?' on':'')+'" data-v="'+o+'">'+fmt(o)+'</button>').join('')+'</div>';
     let h='';
-    h+='<p class="share-note">Guests see only open time slots — your tasks, titles and notes stay private. Bookings appear in your planner automatically.</p>';
+    h+='<p class="share-note">Guests see only open time slots — your tasks, titles and notes stay private. Edit anything here and hit Save to update your live link instantly.</p>';
     if(enabled && link){
       h+='<div class="share-field"><label>Your shareable link · live</label><div class="share-link-row"><input id="bkLinkInput" type="text" readonly value="'+escapeHtml(link)+'"><button type="button" class="copy-btn" id="bkCopy">Copy</button></div></div>';
     }
     h+='<div class="share-field"><label>Display name (shown to guests)</label><input id="bkOwner" type="text" placeholder="e.g. Kaushik" value="'+escapeHtml(c.owner||'')+'"></div>';
-    h+='<div class="share-field"><label>Meeting length</label><div class="bk-pillrow" data-pill="dur">'+durOpts.map(o=>'<button type="button" class="bk-pill'+(c.durationMin===o?' on':'')+'" data-v="'+o+'">'+o+' min</button>').join('')+'</div></div>';
+    h+='<div class="share-field"><label>Default meeting length</label>'+pillRow('dur',durOpts,c.durationMin,o=>o<60?o+' min':(o/60)+' hr')
+      +'<div class="bk-customnum"><span>or custom</span><input type="number" id="bkDurNum" min="5" max="480" step="5" value="'+(c.durationMin||30)+'"><em>minutes</em></div></div>';
     h+='<div class="share-field"><label>Available days</label><div class="dow-toggle" id="bkDows">'+dowL.map((l,i)=>'<button type="button" class="'+(c.days.indexOf(i)>=0?'on':'')+'" data-d="'+i+'">'+l+'</button>').join('')+'</div></div>';
     h+='<div class="share-grid2"><div class="share-field"><label>Day starts</label><input id="bkStart" type="time" value="'+mm2t(c.startMin)+'"></div><div class="share-field"><label>Day ends</label><input id="bkEnd" type="time" value="'+mm2t(c.endMin)+'"></div></div>';
-    h+='<div class="share-field"><label>Slot spacing</label><div class="bk-pillrow" data-pill="slot">'+slotOpts.map(o=>'<button type="button" class="bk-pill'+(c.slotMin===o?' on':'')+'" data-v="'+o+'">every '+o+'m</button>').join('')+'</div></div>';
-    h+='<div class="share-field"><label>Bookable window</label><div class="bk-pillrow" data-pill="hor">'+horOpts.map(o=>'<button type="button" class="bk-pill'+(c.horizonDays===o?' on':'')+'" data-v="'+o+'">next '+o+' days</button>').join('')+'</div></div>';
+    h+='<div class="share-field"><label>Slot spacing</label>'+pillRow('slot',slotOpts,c.slotMin,o=>'every '+o+'m')
+      +'<div class="bk-customnum"><span>or custom</span><input type="number" id="bkSlotNum" min="5" max="240" step="5" value="'+(c.slotMin||30)+'"><em>minutes</em></div></div>';
+    h+='<div class="share-field"><label>Bookable window</label>'+pillRow('hor',horOpts,c.horizonDays,o=>o+' days')
+      +'<div class="bk-customnum"><span>or custom</span><input type="number" id="bkHorNum" min="1" max="365" step="1" value="'+(c.horizonDays||14)+'"><em>days ahead</em></div></div>';
     h+='<div class="share-field"><label>Bookings received</label><div class="share-bookings" id="bkList"><div class="sb-empty">Loading…</div></div></div>';
     shareBody.innerHTML=h;
 
     const owner=document.getElementById('bkOwner'); owner.addEventListener('input',()=>{ bkDraft.owner=owner.value; });
     document.getElementById('bkStart').addEventListener('change', e=>{ bkDraft.startMin=t2mm(e.target.value); });
     document.getElementById('bkEnd').addEventListener('change', e=>{ bkDraft.endMin=t2mm(e.target.value); });
-    shareBody.querySelectorAll('.bk-pillrow').forEach(row=>{
-      const kind=row.dataset.pill;
-      row.querySelectorAll('.bk-pill').forEach(b=>b.addEventListener('click',()=>{
-        row.querySelectorAll('.bk-pill').forEach(x=>x.classList.remove('on')); b.classList.add('on');
-        const v=parseInt(b.dataset.v,10);
-        if(kind==='dur') bkDraft.durationMin=v; else if(kind==='slot') bkDraft.slotMin=v; else if(kind==='hor') bkDraft.horizonDays=v;
-      }));
-    });
+    function wireSetting(kind, numId, apply){
+      const row=shareBody.querySelector('.bk-pillrow[data-pill="'+kind+'"]'); const num=document.getElementById(numId);
+      const syncPills=v=>row.querySelectorAll('.bk-pill').forEach(x=>x.classList.toggle('on', parseInt(x.dataset.v,10)===v));
+      row.querySelectorAll('.bk-pill').forEach(b=>b.addEventListener('click',()=>{ const v=parseInt(b.dataset.v,10); apply(v); if(num) num.value=v; syncPills(v); }));
+      if(num) num.addEventListener('input',()=>{ let v=parseInt(num.value,10); if(isNaN(v)) return; apply(v); syncPills(v); });
+    }
+    wireSetting('dur','bkDurNum',v=>bkDraft.durationMin=v);
+    wireSetting('slot','bkSlotNum',v=>bkDraft.slotMin=v);
+    wireSetting('hor','bkHorNum',v=>bkDraft.horizonDays=v);
     document.querySelectorAll('#bkDows button').forEach(b=>b.addEventListener('click',()=>{
       const d=parseInt(b.dataset.d,10); const i=bkDraft.days.indexOf(d);
       if(i>=0) bkDraft.days.splice(i,1); else bkDraft.days.push(d);
@@ -4920,7 +5055,7 @@
 
   function openShareModal(){
     bkEnsureKeys();
-    bkDraft=bkCfg();
+    bkDraft=bkCfg(); bkEditId=null;
     renderShareBody();
     shareDisableBtn.style.display = bkEnabled()?'':'none';
     shareOverlay.classList.add('open');
