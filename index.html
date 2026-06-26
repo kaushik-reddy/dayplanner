@@ -1726,8 +1726,12 @@
   .dow-toggle button.on{ background:var(--brass); border-color:var(--brass); color:#15110A; }
   .share-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .share-bookings{ margin-top:4px; display:flex; flex-direction:column; gap:8px; }
-  .sb-item{ border:1px solid var(--line); border-radius:12px; background:var(--bg); overflow:hidden; }
+  .sb-item{ display:block; width:100%; text-align:left; font-family:inherit; color:inherit; border:1px solid var(--line); border-radius:12px; background:var(--bg); overflow:hidden; cursor:pointer; transition:border-color .15s, background .15s; }
+  .sb-item:hover{ border-color:var(--brass); background:rgba(201,151,74,0.05); }
   .sb-item.past{ opacity:0.62; }
+  .sb-item.past:hover{ opacity:0.8; }
+  .sb-chev{ flex-shrink:0; color:var(--ink-faint); display:flex; align-items:center; }
+  .sb-item:hover .sb-chev{ color:var(--brass); }
   .sb-row{ display:flex; align-items:flex-start; gap:11px; padding:11px 12px; }
   .sb-ic{ width:32px; height:32px; border-radius:9px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:rgba(201,151,74,0.16); color:var(--brass); margin-top:1px; }
   .sb-main{ flex:1; min-width:0; }
@@ -1781,8 +1785,12 @@
   #bookingsView{ max-width:720px; margin:0 auto; }
   .bk-linkcard{ background:var(--bg-card); border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:24px; }
   .bk-linkcard-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
-  .bk-linkcard-label{ display:flex; align-items:center; gap:8px; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-dim); font-weight:700; }
-  .bk-live-dot{ width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 0 3px rgba(111,168,138,0.18); }
+  .bk-linkcard-label{ display:flex; align-items:center; gap:8px; font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-dim); font-weight:700; margin-bottom:12px; }
+  .bk-live-dot{ width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 0 3px rgba(111,168,138,0.18); flex-shrink:0; }
+  .bk-linkbox{ display:flex; align-items:center; background:var(--bg); border:1px solid var(--line); border-radius:11px; padding:11px 14px; margin-bottom:11px; }
+  .bk-linkurl{ flex:1; min-width:0; font-family:var(--font-mono); font-size:12.5px; color:var(--ink-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bk-linkactions{ display:flex; gap:9px; }
+  .bk-linkbtn{ flex:1; display:inline-flex; align-items:center; justify-content:center; gap:7px; padding:11px 14px; font-size:13px; }
   .bk-sec{ display:flex; align-items:center; gap:9px; }
   .bk-count{ font-family:var(--font-mono); font-size:11px; font-weight:700; color:#15110A; background:var(--brass); min-width:18px; height:18px; padding:0 5px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; }
   .bk-count:empty{ display:none; }
@@ -1792,6 +1800,18 @@
   .bk-setup-ic{ width:60px; height:60px; border-radius:50%; margin:0 auto 18px; display:flex; align-items:center; justify-content:center; background:var(--brass-soft); color:var(--brass); }
   .bk-setup-title{ font-family:var(--font-display); font-size:22px; font-weight:600; margin-bottom:10px; }
   .bk-setup-text{ font-size:13.5px; color:var(--ink-dim); line-height:1.55; }
+  /* booking detail modal */
+  #bkdName .sb-badge{ vertical-align:middle; }
+  .bkd-field{ padding:13px 0; border-bottom:1px solid var(--line); }
+  .bkd-field:first-child{ padding-top:2px; }
+  .bkd-field:last-child{ border-bottom:none; padding-bottom:2px; }
+  .bkd-lbl{ display:block; font-size:9.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; margin-bottom:6px; }
+  .bkd-val{ font-size:14px; color:var(--ink); line-height:1.5; word-break:break-word; }
+  .bkd-link{ color:var(--brass); text-decoration:none; }
+  .bkd-link:hover{ text-decoration:underline; }
+  .bkd-empty{ font-size:13px; color:var(--ink-faint); text-align:center; padding:8px 0; }
+  #bkdFoot{ flex-wrap:wrap; }
+  #bkdFoot .btn{ flex:1 1 auto; }
 
   /* public booking page */
   .booking-view{ max-width:560px; margin:0 auto; padding:calc(28px + env(safe-area-inset-top)) clamp(16px,5vw,28px) 60px; }
@@ -2128,6 +2148,21 @@
       <button class="btn btn-secondary" id="shareDisable" style="display:none;">Turn off</button>
       <button class="btn btn-primary" id="shareSave">Save &amp; publish</button>
     </div>
+  </div>
+</div>
+
+<!-- Owner: single booking detail modal -->
+<div class="overlay" id="bkDetailOverlay">
+  <div class="modal modal-form">
+    <div class="modal-head">
+      <div class="ta-titles">
+        <h2 id="bkdName">Booking</h2>
+        <div class="ta-when" id="bkdWhen"></div>
+      </div>
+      <button type="button" class="modal-close" id="bkdClose" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></button>
+    </div>
+    <div class="modal-body" id="bkdBody"></div>
+    <div class="modal-foot" id="bkdFoot"></div>
   </div>
 </div>
 
@@ -5458,11 +5493,10 @@
     reconcileBookings(bkLastBookings); await bkPublish(); refreshBookings();
     flashToast('Declined — '+((b&&b.name)||'guest')+' will see it on their link');
   }
-  // jump to the Bookings page and open one booking's reschedule editor (called from the task card)
+  // jump to the Bookings page and open one booking's detail (called from the task card)
   function bookingReschedule(id){
     showView('bookings');
-    bkEditId=id; refreshBookings();
-    setTimeout(()=>{ const el=document.querySelector('#bkPageActive .sb-item[data-id="'+id+'"]'); if(el) el.scrollIntoView({block:'center', behavior:'smooth'}); }, 150);
+    setTimeout(()=>{ openBookingDetail(id); bkEditId=id; renderBookingDetail(); }, 60);
   }
 
   async function bkPoll(silent){
@@ -5481,57 +5515,20 @@
   let bkEditId=null;
   const BK_STATUS={ pending:{t:'Pending',c:'amber'}, accepted:{t:'Accepted',c:'green'}, reschedule_proposed:{t:'Awaiting guest',c:'blue'}, declined:{t:'Declined',c:'red'}, cancelled:{t:'Cancelled',c:'red'} };
   function bkDShort(dk){ try{ return new Date(dk+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }catch(e){ return dk; } }
+  function bkDLong(dk){ try{ return new Date(dk+'T00:00:00').toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'}); }catch(e){ return dk; } }
   function bookingRowHtml(b, today, readonly){
     const st=b.status||'pending'; const meta=BK_STATUS[st]||BK_STATUS.pending;
-    const when=bkDShort(b.date); const past=b.date<today; const dur=b.duration||30; const editing=!readonly && b.id===bkEditId;
-    const dead=(st==='declined'||st==='cancelled');
-    let actions='';
-    if(!readonly){
-      if(st==='pending'){ actions='<button type="button" class="sb-act ok" data-act="accept" title="Accept">'+svgIco('check',15)+'</button><button type="button" class="sb-act" data-act="resch" title="Suggest another time">'+svgIco('clock',15)+'</button><button type="button" class="sb-act danger" data-act="decline" title="Decline">'+svgIco('x',15)+'</button>'; }
-      else if(st==='accepted'){ actions='<button type="button" class="sb-act" data-act="resch" title="Reschedule">'+svgIco('clock',15)+'</button><button type="button" class="sb-act danger" data-act="cancel" title="Cancel">'+svgIco('x',15)+'</button>'; }
-      else if(st==='reschedule_proposed'){ actions='<button type="button" class="sb-act" data-act="resch" title="Change proposed time">'+svgIco('clock',15)+'</button><button type="button" class="sb-act danger" data-act="cancel" title="Cancel">'+svgIco('x',15)+'</button>'; }
-      else { actions='<button type="button" class="sb-act danger" data-act="cancel" title="Remove">'+svgIco('x',15)+'</button>'; }
-    }
-    let row='<div class="sb-item'+(past||dead?' past':'')+'" data-id="'+escapeHtml(b.id)+'"><div class="sb-row">'
+    const when=bkDShort(b.date); const past=b.date<today; const dur=b.duration||30; const dead=(st==='declined'||st==='cancelled');
+    return '<button type="button" class="sb-item'+(past||dead?' past':'')+'" data-id="'+escapeHtml(b.id)+'"><div class="sb-row">'
       +'<div class="sb-ic">'+svgIco('calendar',16)+'</div>'
       +'<div class="sb-main"><div class="sb-name"><span class="sb-nm">'+escapeHtml(b.name||'Guest')+'</span><span class="sb-badge sb-'+meta.c+'">'+meta.t+'</span></div>'
-      +'<div class="sb-when">'+escapeHtml(when)+' · '+escapeHtml(fmtTime(b.time))+' · '+dur+'m'+(b.email?' · '+escapeHtml(b.email):'')+'</div>'
-      +(st==='reschedule_proposed'&&b.proposed?'<div class="sb-prop">You proposed → '+escapeHtml(bkDShort(b.proposed.date))+' · '+escapeHtml(fmtTime(b.proposed.time))+'</div>':'')
+      +'<div class="sb-when">'+escapeHtml(when)+' · '+escapeHtml(fmtTime(b.time))+' · '+dur+'m</div>'
       +(b.note?'<div class="sb-note">'+escapeHtml(b.note)+'</div>':'')
       +'</div>'
-      +(actions?'<div class="sb-actions">'+actions+'</div>':'')+'</div>';
-    if(editing){
-      row+='<div class="sb-edit">'
-        +'<div class="sb-edit-grid">'
-          +'<label>Date<input type="date" class="sbE-date" value="'+escapeHtml(b.date)+'"></label>'
-          +'<label>Time<input type="time" class="sbE-time" value="'+escapeHtml(b.time)+'"></label>'
-          +'<label>Mins<input type="number" class="sbE-dur" min="5" max="480" step="5" value="'+dur+'"></label>'
-        +'</div>'
-        +'<div class="sb-edit-hint">The guest will be asked to accept this new time.</div>'
-        +'<div class="sb-edit-btns"><button type="button" class="btn-mini ghost" data-act="recancel">Discard</button><button type="button" class="btn-mini" data-act="resave">Propose time</button></div>'
-      +'</div>';
-    }
-    return row+'</div>';
+      +'<div class="sb-chev">'+svgIco('chevR',16)+'</div></div></button>';
   }
   function wireBookingContainer(el){
-    el.querySelectorAll('.sb-act').forEach(btn=>btn.addEventListener('click',()=>{
-      const item=btn.closest('.sb-item'); const id=item.dataset.id; const act=btn.dataset.act;
-      const b=(bkLastBookings||[]).find(x=>x.id===id);
-      if(act==='cancel'){ if(confirm('Cancel the booking with '+((b&&b.name)||'this guest')+'? Their slot will be freed up.')) cancelBooking(id); }
-      else if(act==='accept'){ acceptBooking(id); }
-      else if(act==='decline'){ if(confirm('Decline '+((b&&b.name)||'this guest')+'\u2019s request?')) declineBooking(id); }
-      else if(act==='resch'){ bkEditId=(bkEditId===id?null:id); refreshBookings(); }
-    }));
-    el.querySelectorAll('.sb-edit').forEach(ed=>{
-      const item=ed.closest('.sb-item'); const id=item.dataset.id;
-      ed.querySelector('[data-act="recancel"]').addEventListener('click',()=>{ bkEditId=null; refreshBookings(); });
-      ed.querySelector('[data-act="resave"]').addEventListener('click',()=>{
-        const date=ed.querySelector('.sbE-date').value, time=ed.querySelector('.sbE-time').value;
-        let dur=parseInt(ed.querySelector('.sbE-dur').value,10); if(isNaN(dur)||dur<5) dur=30;
-        if(!date||!time){ flashToast('Pick a date and time','err'); return; }
-        rescheduleBooking(id, date, time, dur);
-      });
-    });
+    el.querySelectorAll('.sb-item').forEach(it=>it.addEventListener('click',()=>{ openBookingDetail(it.dataset.id); }));
   }
   function renderBookingsInto(el, list, readonly){
     if(!el) return;
@@ -5553,6 +5550,49 @@
   }
   function refreshBookings(){ if(document.getElementById('bkPageActive')) fillBookingLists(); }
 
+  // ---- single booking detail modal (opened by tapping a booking card) ----
+  const bkDetailOverlay=document.getElementById('bkDetailOverlay');
+  let bkdId=null;
+  function closeBkDetail(){ if(bkDetailOverlay) bkDetailOverlay.classList.remove('open'); bkdId=null; bkEditId=null; }
+  function openBookingDetail(id){ const b=(bkLastBookings||[]).find(x=>x.id===id); if(!b) return; bkdId=id; bkEditId=null; renderBookingDetail(); bkDetailOverlay.classList.add('open'); }
+  function renderBookingDetail(){
+    const b=(bkLastBookings||[]).find(x=>x.id===bkdId); if(!b){ closeBkDetail(); return; }
+    const st=b.status||'pending'; const meta=BK_STATUS[st]||BK_STATUS.pending;
+    const today=dateKey(new Date()); const past=b.date<today; const dead=(st==='declined'||st==='cancelled'); const readonly=past||dead;
+    const dur=b.duration||30; const endT=minToTime(timeToMinutes(b.time)+dur);
+    document.getElementById('bkdName').innerHTML=escapeHtml(b.name||'Guest')+' <span class="sb-badge sb-'+meta.c+'">'+meta.t+'</span>';
+    document.getElementById('bkdWhen').textContent=bkDLong(b.date)+' · '+fmtTime(b.time)+' – '+fmtTime(endT)+' · '+dur+' min';
+    const editing=bkEditId===bkdId;
+    let body='';
+    if(b.email) body+='<div class="bkd-field"><span class="bkd-lbl">Email</span><a class="bkd-val bkd-link" href="mailto:'+escapeHtml(b.email)+'">'+escapeHtml(b.email)+'</a></div>';
+    if(b.note) body+='<div class="bkd-field"><span class="bkd-lbl">What it\u2019s about</span><div class="bkd-val">'+escapeHtml(b.note)+'</div></div>';
+    if(st==='reschedule_proposed'&&b.proposed) body+='<div class="bkd-field"><span class="bkd-lbl">You proposed</span><div class="bkd-val">'+escapeHtml(bkDShort(b.proposed.date))+' · '+escapeHtml(fmtTime(b.proposed.time))+'</div></div>';
+    if(editing){
+      body+='<div class="bkd-field"><span class="bkd-lbl">Suggest a new time</span><div class="sb-edit" style="border:none;background:transparent;padding:0;margin-top:4px"><div class="sb-edit-grid"><label>Date<input type="date" class="sbE-date" value="'+escapeHtml(b.date)+'"></label><label>Time<input type="time" class="sbE-time" value="'+escapeHtml(b.time)+'"></label><label>Mins<input type="number" class="sbE-dur" min="5" max="480" step="5" value="'+dur+'"></label></div><div class="sb-edit-hint">The guest will be asked to accept this new time.</div></div></div>';
+    }
+    if(!body) body='<div class="bkd-empty">No extra details — just the slot above.</div>';
+    document.getElementById('bkdBody').innerHTML=body;
+    let foot='';
+    if(editing){ foot='<button type="button" class="btn btn-secondary" data-act="recancel">Discard</button><button type="button" class="btn btn-primary" data-act="resave">Propose time</button>'; }
+    else if(!readonly){
+      if(st==='pending'){ foot='<button type="button" class="btn btn-danger" data-act="decline">Decline</button><button type="button" class="btn btn-secondary" data-act="resch">Suggest time</button><button type="button" class="btn btn-primary" data-act="accept">Accept</button>'; }
+      else if(st==='accepted'){ foot='<button type="button" class="btn btn-danger" data-act="cancel">Cancel</button><button type="button" class="btn btn-primary" data-act="resch">Reschedule</button>'; }
+      else if(st==='reschedule_proposed'){ foot='<button type="button" class="btn btn-danger" data-act="cancel">Cancel</button><button type="button" class="btn btn-secondary" data-act="resch">Change time</button>'; }
+    } else if(dead){ foot='<button type="button" class="btn btn-secondary" data-act="cancel">Remove from history</button>'; }
+    document.getElementById('bkdFoot').innerHTML=foot;
+    document.getElementById('bkdFoot').querySelectorAll('[data-act]').forEach(btn=>btn.addEventListener('click',()=>{
+      const act=btn.dataset.act; const id=bkdId;
+      if(act==='accept'){ closeBkDetail(); acceptBooking(id); }
+      else if(act==='decline'){ if(confirm('Decline '+((b&&b.name)||'this guest')+'\u2019s request?')){ closeBkDetail(); declineBooking(id); } }
+      else if(act==='cancel'){ if(confirm('Cancel/remove the booking with '+((b&&b.name)||'this guest')+'?')){ closeBkDetail(); cancelBooking(id); } }
+      else if(act==='resch'){ bkEditId=bkdId; renderBookingDetail(); }
+      else if(act==='recancel'){ bkEditId=null; renderBookingDetail(); }
+      else if(act==='resave'){ const ed=document.getElementById('bkdBody'); const date=ed.querySelector('.sbE-date').value, time=ed.querySelector('.sbE-time').value; let d=parseInt(ed.querySelector('.sbE-dur').value,10); if(isNaN(d)||d<5)d=30; if(!date||!time){ flashToast('Pick a date and time','err'); return; } closeBkDetail(); rescheduleBooking(id, date, time, d); }
+    }));
+  }
+  { const _c=document.getElementById('bkdClose'); if(_c) _c.addEventListener('click', closeBkDetail); }
+  if(bkDetailOverlay) bkDetailOverlay.addEventListener('click', e=>{ if(e.target===bkDetailOverlay) closeBkDetail(); });
+
   function renderBookingsPage(){
     const body=document.getElementById('bkPageBody'); if(!body) return;
     const token=localStorage.getItem(BK_TOKEN_KEY);
@@ -5565,13 +5605,18 @@
       return;
     }
     const link=bkLink();
+    const pretty=link.replace(/^https?:\/\//,'').replace(/^file:\/\/\//,'');
     body.innerHTML=
-      '<div class="bk-linkcard"><div class="bk-linkcard-top"><div class="bk-linkcard-label"><span class="bk-live-dot"></span>Your booking link · live</div><button type="button" class="atool" id="bkPageSettings2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l1.7-1.3-1.8-3.1-2 .8a7.6 7.6 0 0 0-2.6-1.5L14.4 2h-3.6L10.4 4a7.6 7.6 0 0 0-2.6 1.5l-2-.8L4 7.8l1.7 1.3a7.8 7.8 0 0 0 0 3L4 13.4l1.8 3.1 2-.8a7.6 7.6 0 0 0 2.6 1.5l.4 2.1h3.6l.4-2.1a7.6 7.6 0 0 0 2.6-1.5l2 .8 1.8-3.1z"/></svg>Settings</button></div>'
-        +'<div class="share-link-row"><input id="bkPageLinkInput" type="text" readonly value="'+escapeHtml(link)+'"><button type="button" class="copy-btn" id="bkPageCopy">Copy</button></div></div>'
+      '<div class="bk-linkcard">'
+        +'<div class="bk-linkcard-label"><span class="bk-live-dot"></span>Your booking link · live</div>'
+        +'<div class="bk-linkbox"><span class="bk-linkurl" title="'+escapeHtml(link)+'">'+escapeHtml(pretty)+'</span></div>'
+        +'<div class="bk-linkactions"><button type="button" class="btn btn-primary bk-linkbtn" id="bkPageCopy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V5.5A1.5 1.5 0 0 1 6.5 4H15"/></svg>Copy link</button>'
+          +'<button type="button" class="btn btn-secondary bk-linkbtn" id="bkPageShare"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button></div>'
+      +'</div>'
       +'<div class="section-title bk-sec">Requests &amp; upcoming <span class="bk-count" id="bkActiveCount"></span></div><div id="bkPageActive"></div>'
       +'<div class="section-title bk-sec">History <span class="bk-count" id="bkHistoryCount"></span></div><div id="bkPageHistory"></div>';
-    const copy=document.getElementById('bkPageCopy'); if(copy) copy.addEventListener('click',()=>{ const inp=document.getElementById('bkPageLinkInput'); inp.select(); navigator.clipboard&&navigator.clipboard.writeText(inp.value); copy.textContent='Copied'; copy.classList.add('copied'); setTimeout(()=>{ copy.textContent='Copy'; copy.classList.remove('copied'); },1600); });
-    const s2=document.getElementById('bkPageSettings2'); if(s2) s2.addEventListener('click', openShareModal);
+    const copy=document.getElementById('bkPageCopy'); if(copy) copy.addEventListener('click',()=>{ if(navigator.clipboard) navigator.clipboard.writeText(link); const t=copy.querySelector('svg'); copy.innerHTML='Copied'; copy.classList.add('copied'); setTimeout(()=>{ renderBookingsPage(); },1400); });
+    const share=document.getElementById('bkPageShare'); if(share) share.addEventListener('click',()=>{ if(navigator.share){ navigator.share({ title:'Book time with me', url:link }).catch(()=>{}); } else { if(navigator.clipboard) navigator.clipboard.writeText(link); flashToast('Link copied — paste it anywhere'); } });
     fillBookingLists();
     bkPoll(true);
   }
