@@ -1284,42 +1284,38 @@
   .rsum-chip.done{ color:var(--green); border-color:rgba(111,168,138,0.4); }
   .rsum-chip.cancel{ color:var(--red-soft); border-color:rgba(201,122,106,0.4); }
   .rsum-chip.carry{ color:#7FA8C9; border-color:rgba(127,168,201,0.4); }
-  /* ---- resolved hero + groups (revamped) ---- */
-  .rhero{ display:flex; align-items:center; gap:15px; padding:14px 15px; margin-bottom:16px; border:1px solid var(--line); border-radius:16px; background:linear-gradient(160deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)); }
-  .rh-ring{ position:relative; width:52px; height:52px; flex-shrink:0; }
-  .rh-ring svg{ width:52px; height:52px; }
-  .rh-ring .rr-bg{ fill:none; stroke:var(--line); stroke-width:4; }
-  .rh-ring .rr-fg{ fill:none; stroke:var(--green); stroke-width:4; stroke-linecap:round; transition:stroke-dasharray .5s ease; }
-  .rh-pct{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:12.5px; font-weight:700; color:var(--ink); }
-  .rh-info{ flex:1; min-width:0; }
-  .rh-title{ font-size:13px; font-weight:600; color:var(--ink); margin-bottom:7px; }
-  .rh-chips{ display:flex; flex-wrap:wrap; gap:6px; }
-  .rchip{ display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:600; padding:4px 9px; border-radius:999px; border:1px solid var(--line); }
-  .rchip .ico{ vertical-align:-0.1em; }
-  .rchip.done{ color:var(--green); border-color:rgba(111,168,138,0.4); }
-  .rchip.cancel{ color:var(--red-soft); border-color:rgba(201,122,106,0.4); }
-  .rchip.carry{ color:#7FA8C9; border-color:rgba(127,168,201,0.4); }
-  .rgroup{ margin-bottom:16px; }
+  /* ---- resolved popup: clean summary + tappable rows ---- */
+  .rsummary{ padding:16px; margin-bottom:18px; border:1px solid var(--line); border-radius:16px; background:linear-gradient(160deg, rgba(201,151,74,0.07), rgba(255,255,255,0.012)); }
+  .rs-top{ display:flex; align-items:baseline; gap:11px; margin-bottom:13px; }
+  .rs-pct{ font-family:var(--font-display); font-size:30px; font-weight:600; color:var(--ink); line-height:1; }
+  .rs-pctSign{ font-size:0.5em; opacity:0.55; }
+  .rsum-cap{ font-size:12px; color:var(--ink-dim); }
+  .rs-bar{ display:flex; height:8px; border-radius:999px; overflow:hidden; background:rgba(255,255,255,0.06); gap:2px; }
+  .rs-seg{ height:100%; border-radius:999px; min-width:4px; }
+  .rs-seg.done{ background:var(--green); } .rs-seg.carry{ background:#7FA8C9; } .rs-seg.cancel{ background:var(--red-soft); }
+  .rs-legend{ display:flex; flex-wrap:wrap; gap:15px; margin-top:12px; }
+  .rs-leg{ display:flex; align-items:center; gap:6px; font-size:11px; color:var(--ink-dim); }
+  .rs-leg .dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .rs-leg b{ color:var(--ink); font-family:var(--font-mono); font-weight:600; }
+  .rgroup{ margin-bottom:18px; }
   .rgroup:last-child{ margin-bottom:0; }
-  .rgroup-head{ display:flex; align-items:center; gap:8px; font-size:10px; font-weight:700; letter-spacing:0.09em; text-transform:uppercase; color:var(--ink-faint); margin:0 2px 9px; }
+  .rgroup-head{ display:flex; align-items:center; gap:8px; font-size:10px; font-weight:700; letter-spacing:0.09em; text-transform:uppercase; color:var(--ink-faint); margin:0 2px 10px; }
   .rgroup-head .rg-count{ display:inline-flex; align-items:center; justify-content:center; min-width:17px; height:17px; padding:0 5px; border-radius:999px; background:rgba(255,255,255,0.06); color:var(--ink-dim); font-size:10px; }
-  .rcard{ position:relative; overflow:hidden; display:flex; align-items:center; gap:12px; border:1px solid var(--line); border-radius:14px; padding:11px 12px 11px 14px; margin-bottom:8px; background:var(--bg); transition:border-color .15s; }
-  .rcard::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:3px; }
-  .rcard.s-completed::before{ background:var(--green); } .rcard.s-cancelled::before{ background:var(--red-soft); } .rcard.s-carried::before{ background:#7FA8C9; }
-  .rc-ic{ width:34px; height:34px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-  .rcard.s-completed .rc-ic{ background:rgba(111,168,138,0.16); color:var(--green); }
-  .rcard.s-cancelled .rc-ic{ background:rgba(201,122,106,0.16); color:var(--red-soft); }
-  .rcard.s-carried .rc-ic{ background:rgba(127,168,201,0.16); color:#7FA8C9; }
-  .rc-main{ flex:1; min-width:0; }
-  .rc-top{ display:flex; align-items:center; gap:8px; margin-bottom:3px; }
-  .rc-time{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-dim); font-weight:600; }
-  .rcard.s-completed .rc-title{ text-decoration:line-through; text-decoration-color:rgba(111,168,138,0.5); }
-  .rcard.s-cancelled .rc-title{ text-decoration:line-through; text-decoration-color:rgba(201,122,106,0.5); }
-  .rc-title{ font-size:13px; font-weight:600; color:var(--ink); word-break:break-word; line-height:1.3; }
-  .rc-meta{ font-size:11px; color:var(--ink-faint); margin-top:2px; font-family:var(--font-mono); }
-  .rc-reset{ flex-shrink:0; display:inline-flex; align-items:center; gap:5px; background:transparent; border:1px solid var(--line); color:var(--ink-dim); font-size:11px; font-weight:600; font-family:inherit; padding:7px 10px; border-radius:999px; cursor:pointer; transition:border-color .15s, color .15s; }
-  .rc-reset:hover{ border-color:var(--brass); color:var(--brass); }
-  .rc-reset .ico{ vertical-align:-0.12em; }
+  .rrow{ position:relative; overflow:hidden; display:flex; align-items:center; gap:12px; width:100%; text-align:left; border:1px solid var(--line); border-radius:14px; padding:12px 12px 12px 15px; margin-bottom:8px; background:var(--bg); cursor:pointer; font-family:inherit; transition:border-color .15s, background .15s; }
+  .rrow:hover{ border-color:#3a383d; background:var(--bg-card); }
+  .rrow::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:3px; }
+  .rrow.s-completed::before{ background:var(--green); } .rrow.s-cancelled::before{ background:var(--red-soft); } .rrow.s-carried::before{ background:#7FA8C9; }
+  .rr-ic{ width:33px; height:33px; border-radius:10px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+  .rrow.s-completed .rr-ic{ background:rgba(111,168,138,0.16); color:var(--green); }
+  .rrow.s-cancelled .rr-ic{ background:rgba(201,122,106,0.16); color:var(--red-soft); }
+  .rrow.s-carried .rr-ic{ background:rgba(127,168,201,0.16); color:#7FA8C9; }
+  .rr-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .rr-title{ font-size:13.5px; font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rrow.s-completed .rr-title{ text-decoration:line-through; text-decoration-color:rgba(111,168,138,0.5); }
+  .rrow.s-cancelled .rr-title{ text-decoration:line-through; text-decoration-color:rgba(201,122,106,0.5); }
+  .rr-sub{ font-size:11px; color:var(--ink-faint); font-family:var(--font-mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rr-chev{ flex-shrink:0; display:flex; color:var(--ink-faint); transition:color .15s, transform .15s; }
+  .rrow:hover .rr-chev{ color:var(--brass); transform:translateX(2px); }
 
   /* ---- delayed / recurring badges ---- */
   .task.delayed .task-card{ border-color: rgba(217,100,90,0.55); }
@@ -3697,23 +3693,21 @@
       resolved.forEach(t=>{ const s=taskState(t); if(counts[s]!=null) counts[s]++; });
       const totalDay=data.tasks.length;
       const rate = totalDay ? Math.round(counts.completed/totalDay*100) : 0;
-      const C=2*Math.PI*20, dash=(rate/100)*C;
-      const hero='<div class="rhero">'+
-        '<div class="rh-ring"><svg viewBox="0 0 48 48"><circle class="rr-bg" cx="24" cy="24" r="20"/><circle class="rr-fg" cx="24" cy="24" r="20" stroke-dasharray="'+dash.toFixed(1)+' '+(C-dash).toFixed(1)+'" transform="rotate(-90 24 24)"/></svg><span class="rh-pct">'+rate+'%</span></div>'+
-        '<div class="rh-info"><div class="rh-title">'+counts.completed+' of '+totalDay+' completed</div>'+
-        '<div class="rh-chips">'+
-          (counts.completed?'<span class="rchip done">'+svgIco('check',11)+counts.completed+' done</span>':'')+
-          (counts.carried?'<span class="rchip carry">'+svgIco('move',11)+counts.carried+' carried</span>':'')+
-          (counts.cancelled?'<span class="rchip cancel">'+svgIco('x',11)+counts.cancelled+' cancelled</span>':'')+
-        '</div></div></div>';
-      function cardHtml(t){
+      const pctOf=n=> totalDay? (n/totalDay*100):0;
+      const seg=(cls,n)=> n? '<div class="rs-seg '+cls+'" style="flex:'+n+'"></div>' : '';
+      const leg=(cls,n,lbl)=> n? '<span class="rs-leg"><span class="dot" style="background:'+cls+'"></span><b>'+n+'</b> '+lbl+'</span>' : '';
+      const hero='<div class="rsummary">'+
+        '<div class="rs-top"><span class="rs-pct">'+rate+'<span class="rs-pctSign">%</span></span><span class="rsum-cap">'+counts.completed+' of '+totalDay+' tasks completed</span></div>'+
+        '<div class="rs-bar">'+seg('done',counts.completed)+seg('carry',counts.carried)+seg('cancel',counts.cancelled)+'</div>'+
+        '<div class="rs-legend">'+leg('var(--green)',counts.completed,'done')+leg('#7FA8C9',counts.carried,'carried')+leg('var(--red-soft)',counts.cancelled,'cancelled')+'</div>'+
+      '</div>';
+      function rowHtml(t){
         const s=taskState(t);
-        let ic, cls, label, detail;
-        if(s==='completed'){ cls='s-completed'; ic=svgIco('check',16); label='Completed'; const sp=Math.round(spentMsOf(t)/60000); detail=(t.completedAt?('done '+fmtClock(t.completedAt)):'')+(sp?(' · '+sp+'m spent'):''); }
-        else if(s==='cancelled'){ cls='s-cancelled'; ic=svgIco('x',16); label='Cancelled'; detail='removed from today'; }
-        else { cls='s-carried'; ic=svgIco('move',16); label='Carried'; detail=t.carriedTo?('moved to '+t.carriedTo):'moved'; }
-        const tagCls = s==='completed'?'done':(s==='cancelled'?'cancel':'carry');
-        return `<div class="rcard ${cls}" data-id="${t.id}"><div class="rc-ic">${ic}</div><div class="rc-main"><div class="rc-top"><span class="rc-time">${escapeHtml(fmtTime(t.time))}</span><span class="rtag ${tagCls}">${label}</span></div><div class="rc-title">${highlightTitle(t.title)}</div><div class="rc-meta">${escapeHtml(detail)}</div></div><button class="rc-reset rrestore" data-id="${t.id}" title="Send back to the timeline">${svgIco('repeat',12)}<span>Reset</span></button></div>`;
+        let ic, cls, detail;
+        if(s==='completed'){ cls='s-completed'; ic=svgIco('check',15); const sp=Math.round(spentMsOf(t)/60000); detail=(t.completedAt?('done '+fmtClock(t.completedAt)):'completed')+(sp?(' · '+sp+'m'):''); }
+        else if(s==='cancelled'){ cls='s-cancelled'; ic=svgIco('x',15); detail='cancelled'; }
+        else { cls='s-carried'; ic=svgIco('move',15); detail=t.carriedTo?('moved to '+t.carriedTo):'carried forward'; }
+        return '<button class="rrow '+cls+'" data-id="'+t.id+'"><span class="rr-ic">'+ic+'</span><span class="rr-body"><span class="rr-title">'+highlightTitle(t.title)+'</span><span class="rr-sub">'+escapeHtml(fmtTime(t.time)+' · '+detail)+'</span></span><span class="rr-chev">'+svgIco('chevR',15)+'</span></button>';
       }
       const groups=[
         {label:'Completed', items:resolved.filter(t=>taskState(t)==='completed')},
@@ -3721,14 +3715,10 @@
         {label:'Cancelled', items:resolved.filter(t=>taskState(t)==='cancelled')}
       ];
       let body='';
-      groups.forEach(g=>{ if(!g.items.length) return; body+='<div class="rgroup"><div class="rgroup-head">'+escapeHtml(g.label)+'<span class="rg-count">'+g.items.length+'</span></div>'+g.items.map(cardHtml).join('')+'</div>'; });
+      groups.forEach(g=>{ if(!g.items.length) return; body+='<div class="rgroup"><div class="rgroup-head">'+escapeHtml(g.label)+'<span class="rg-count">'+g.items.length+'</span></div>'+g.items.map(rowHtml).join('')+'</div>'; });
       resolvedList.innerHTML=hero+body;
-      resolvedList.querySelectorAll('.rrestore').forEach(btn=>{
-        btn.addEventListener('click',(e)=>{ e.stopPropagation(); restoreResolved(btn.getAttribute('data-id')); });
-      });
-      resolvedList.querySelectorAll('.rcard').forEach(card=>{
-        card.style.cursor='pointer';
-        card.addEventListener('click',()=>{ const t=resolved.find(x=>x.id===card.getAttribute('data-id')); if(t) openTaskAudit(t); });
+      resolvedList.querySelectorAll('.rrow').forEach(row=>{
+        row.addEventListener('click',()=>{ const t=resolved.find(x=>x.id===row.getAttribute('data-id')); if(t) openTaskAudit(t); });
       });
     }
     resolvedOverlay.classList.add('open');
