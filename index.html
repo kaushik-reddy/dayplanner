@@ -3309,6 +3309,26 @@
     if(typeof syncMarkDirty==='function') syncMarkDirty();
   }
 
+  // One-time repair: earlier versions persisted recurring task instances just from VIEWING a future
+  // day, which then polluted the audit/timeline. Strip those untouched recurring phantoms from any
+  // future-dated day (keep real future tasks + any recurring instance the user actually started).
+  function cleanupFuturePhantoms(){
+    const todayKey=dateKey(new Date()); let dirty=false;
+    const keys=[]; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k && k.indexOf(STORAGE_PREFIX)===0) keys.push(k); }
+    keys.forEach(k=>{
+      const dk=k.slice(STORAGE_PREFIX.length); if(dk<=todayKey) return; // only future days
+      let data; try{ data=JSON.parse(localStorage.getItem(k)); }catch(e){ return; }
+      const tasks=(data&&data.tasks)||[];
+      const kept=tasks.filter(t=> !(t.recurId && taskState(t)==='pending'));
+      if(kept.length!==tasks.length){
+        dirty=true;
+        if(kept.length===0 && !(data&&data.closed)) localStorage.removeItem(k);
+        else { data.tasks=kept; try{ localStorage.setItem(k, JSON.stringify(data)); }catch(e){} }
+      }
+    });
+    if(dirty && typeof syncMarkDirty==='function') syncMarkDirty();
+  }
+
   function seedExampleIfEmpty(){
     // No demo data — start with a clean planner.
   }
@@ -3468,7 +3488,10 @@
     // auto-sort every day's tasks by time, and persist the order
     const beforeOrder=data.tasks.map(t=>t.id).join('|');
     data.tasks.sort((a,b)=>timeToMinutes(a.time)-timeToMinutes(b.time));
-    if(migrated || data.tasks.map(t=>t.id).join('|')!==beforeOrder) saveDay(d, data);
+    // NEVER persist just from viewing a future day — recurring tasks are shown in-memory only,
+    // so browsing ahead doesn't materialize phantom tasks that pollute the audit/timeline.
+    const isFutureDay = dateKey(d) > dateKey(new Date());
+    if(!isFutureDay && (migrated || data.tasks.map(t=>t.id).join('|')!==beforeOrder)) saveDay(d, data);
 
     // header label
     const today=new Date(), tmrw=new Date(); tmrw.setDate(today.getDate()+1);
@@ -4461,11 +4484,14 @@
     return 0;
   }
   function allPlannerDays(){
+    const todayKey=dateKey(new Date());
     const days=[];
     for(let i=0;i<localStorage.length;i++){
       const k=localStorage.key(i);
       if(k && k.indexOf(STORAGE_PREFIX)===0){
-        try{ const data=JSON.parse(localStorage.getItem(k)); days.push({key:k.slice(STORAGE_PREFIX.length), data}); }catch(e){}
+        const dk=k.slice(STORAGE_PREFIX.length);
+        if(dk>todayKey) continue; // audit/history only counts days up to today — never future-dated days
+        try{ const data=JSON.parse(localStorage.getItem(k)); days.push({key:dk, data}); }catch(e){}
       }
     }
     days.sort((a,b)=> a.key<b.key?1:-1); // newest first
@@ -5439,6 +5465,7 @@
         Object.keys(data.booking).forEach(k=>{ try{ localStorage.setItem(k, data.booking[k]); }catch(e){} });
       }
     } finally { applyingRemote=false; }
+    cleanupFuturePhantoms();
     renderStructure();
     if(typeof startBookingLoops==='function' && localStorage.getItem('planner_book_enabled')==='1') startBookingLoops();
   }
@@ -6212,6 +6239,7 @@
 
   // ---------- boot ----------
   heroDotEls = buildDotBar(heroDots, 14);
+  cleanupFuturePhantoms();
   renderStructure();
   refreshSwapBtn();
   syncInit();
