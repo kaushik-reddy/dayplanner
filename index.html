@@ -1882,6 +1882,18 @@
   .meet-pop-acts{ display:flex; gap:10px; justify-content:center; margin-top:22px; }
   .meet-pop-acts .btn{ flex:1; }
   .meet-pop-hint{ font-size:11.5px; color:var(--ink-faint); margin-top:14px; }
+  /* post-meeting outcome popup */
+  .bk-outcome-acts{ display:flex; flex-direction:column; gap:9px; margin-top:20px; }
+  .bk-oc-btn{ display:flex; align-items:center; gap:11px; width:100%; text-align:left; background:var(--bg); border:1px solid var(--line); color:var(--ink); border-radius:12px; padding:13px 15px; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer; transition:border-color .15s, background .15s; }
+  .bk-oc-btn svg{ flex-shrink:0; color:var(--ink-dim); }
+  .bk-oc-btn:hover{ border-color:var(--brass); }
+  .bk-oc-btn.ok{ border-color:rgba(111,168,138,0.4); }
+  .bk-oc-btn.ok svg{ color:var(--green); }
+  .bk-oc-btn.ok:hover{ background:rgba(111,168,138,0.1); }
+  .bk-oc-skip{ margin-top:14px; background:transparent; border:none; color:var(--ink-faint); font-family:inherit; font-size:12.5px; cursor:pointer; }
+  .bk-oc-skip:hover{ color:var(--ink-dim); }
+  .sb-item.review{ border-color:rgba(201,151,74,0.45); }
+  .sb-badge.sb-pulse{ animation:meetPulse 1.6s ease-in-out infinite; }
   .bk-sec{ display:flex; align-items:center; gap:9px; }
   .bk-count{ font-family:var(--font-mono); font-size:11px; font-weight:700; color:#15110A; background:var(--brass); min-width:18px; height:18px; padding:0 5px; border-radius:9px; display:inline-flex; align-items:center; justify-content:center; }
   .bk-count:empty{ display:none; }
@@ -2349,6 +2361,24 @@
       <div class="meet-pop-sub">Share this private link anywhere — guests only ever see your open slots.</div>
       <div class="bk-linkbox" style="margin-top:18px"><span class="bk-linkurl" id="linkShareUrl"></span></div>
       <div class="meet-pop-acts"><button type="button" class="btn btn-secondary" id="linkShareCopy">Copy link</button><button type="button" class="btn btn-primary" id="linkShareShare">Share</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Owner: post-meeting outcome popup -->
+<div class="overlay" id="bkOutcomeOverlay">
+  <div class="modal modal-meet">
+    <div class="meet-pop">
+      <div class="meet-pop-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l2.5 2.5"/><circle cx="12" cy="12" r="9"/></svg></div>
+      <div class="meet-pop-title">How did it go?</div>
+      <div class="meet-pop-sub" id="bkOutcomeWhen"></div>
+      <div class="bk-outcome-acts">
+        <button type="button" class="bk-oc-btn ok" data-oc="completed"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"/></svg>It happened — completed</button>
+        <button type="button" class="bk-oc-btn" data-oc="no_show"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19a6.5 6.5 0 0 1 13 0"/></svg>Guest didn&rsquo;t join</button>
+        <button type="button" class="bk-oc-btn" data-oc="missed"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>I couldn&rsquo;t make it</button>
+        <button type="button" class="bk-oc-btn" data-oc="not_held"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>It didn&rsquo;t happen</button>
+      </div>
+      <button type="button" class="bk-oc-skip" id="bkOutcomeSkip">Skip for now</button>
     </div>
   </div>
 </div>
@@ -5620,7 +5650,7 @@
     const set=new Set(imported);
     const dismissed=new Set(bkDismissed());
     // bookings the owner deleted locally are treated as inactive (never re-imported)
-    const active=(bookings||[]).filter(b=> b.status!=='declined' && b.status!=='cancelled' && !dismissed.has(b.id));
+    const active=(bookings||[]).filter(b=> BK_ACTIVE_ST.indexOf(b.status||'pending')>=0 && !dismissed.has(b.id));
     const activeIds=new Set(active.map(b=>b.id));
     const serverIds=new Set((bookings||[]).map(b=>b.id));
     let added=0, lastName='', changed=false;
@@ -5696,6 +5726,48 @@
     flashToast('Booking with '+((b&&b.name)||'guest')+' cancelled');
   }
 
+  // ----- post-meeting outcome (mark how an accepted meeting went -> history of connections) -----
+  function bkEndPassed(b){ try{ const end=new Date(b.date+'T'+(b.time||'00:00')).getTime()+((b.duration||30)*60000); return Date.now()>end; }catch(e){ return false; } }
+  function bkNeedsReview(b){ return (b.status||'')==='accepted' && bkEndPassed(b); }
+  let bkOutcomeId=null; const bkReviewSkipped=new Set();
+  const bkOutcomeOverlay=document.getElementById('bkOutcomeOverlay');
+  const BK_OC_LABEL={ completed:'Completed', no_show:'Guest didn\u2019t join', missed:'You couldn\u2019t make it', not_held:'Didn\u2019t happen' };
+  function bkPendingReviews(){
+    const today=dateKey(new Date()); const dismissed=new Set(bkDismissed());
+    // only nudge for meetings that ended within the last 14 days, soonest-first
+    const cut=Date.now()-14*86400000;
+    return (bkLastBookings||[]).filter(b=> bkNeedsReview(b) && !dismissed.has(b.id) && !bkReviewSkipped.has(b.id) && (new Date(b.date+'T'+(b.time||'00:00')).getTime()>cut))
+      .sort((a,b)=> (a.date+a.time) < (b.date+b.time) ? -1 : 1);
+  }
+  function maybePromptOutcome(){
+    if(!bkOutcomeOverlay || bkOutcomeOverlay.classList.contains('open')) return;
+    if(bkDetailOverlay && bkDetailOverlay.classList.contains('open')) return;
+    const list=bkPendingReviews(); if(!list.length) return;
+    openOutcome(list[0].id);
+  }
+  function openOutcome(id){
+    const b=(bkLastBookings||[]).find(x=>x.id===id); if(!b||!bkOutcomeOverlay) return;
+    bkOutcomeId=id;
+    const dur=b.duration||30; const endT=minToTime(timeToMinutes(b.time)+dur);
+    document.getElementById('bkOutcomeWhen').innerHTML='<b>'+escapeHtml(b.name||'Guest')+'</b> · '+escapeHtml(bkDShort(b.date))+' · '+escapeHtml(fmtTime(b.time))+'\u2013'+escapeHtml(fmtTime(endT));
+    bkOutcomeOverlay.classList.add('open');
+  }
+  function closeOutcome(){ if(bkOutcomeOverlay) bkOutcomeOverlay.classList.remove('open'); bkOutcomeId=null; }
+  async function recordOutcome(id, outcome){
+    const b=(bkLastBookings||[]).find(x=>x.id===id);
+    const res=await manageBooking('outcome', id, { outcome });
+    if(res.error){ flashToast('Could not save — try again','err'); return; }
+    reconcileBookings(bkLastBookings); refreshBookings();
+    flashToast((BK_OC_LABEL[outcome]||'Saved')+' — moved to history');
+  }
+  if(bkOutcomeOverlay){
+    bkOutcomeOverlay.querySelectorAll('.bk-oc-btn').forEach(btn=>btn.addEventListener('click',()=>{
+      const id=bkOutcomeId, oc=btn.dataset.oc; closeOutcome(); if(id&&oc) recordOutcome(id, oc); setTimeout(maybePromptOutcome, 500);
+    }));
+    const sk=document.getElementById('bkOutcomeSkip'); if(sk) sk.addEventListener('click',()=>{ if(bkOutcomeId) bkReviewSkipped.add(bkOutcomeId); closeOutcome(); setTimeout(maybePromptOutcome, 300); });
+    bkOutcomeOverlay.addEventListener('click', e=>{ if(e.target===bkOutcomeOverlay){ if(bkOutcomeId) bkReviewSkipped.add(bkOutcomeId); closeOutcome(); } });
+  }
+
   async function rescheduleBooking(id, date, time, dur){
     let tz=''; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone||''; }catch(e){}
     const res=await manageBooking('reschedule', id, { date, time, duration:dur, tz });
@@ -5737,26 +5809,30 @@
       const res=await r.json(); const bookings=res.bookings||[];
       bkLastBookings=bookings; reconcileBookings(bookings);
       bkGoogleConnected=!!res.googleConnected;
-      if(bookingsView && bookingsView.style.display!=='none' && !bkEditId){ fillBookingLists(); if(document.getElementById('bkCalWrap')) renderBookingDay(); if(typeof renderMeetBtn==='function') renderMeetBtn(); }
+      if(bookingsView && bookingsView.style.display!=='none' && !bkEditId){ fillBookingLists(); if(document.getElementById('bkCalWrap')) renderBookingDay(); if(typeof renderMeetBtn==='function') renderMeetBtn(); if(typeof maybePromptOutcome==='function') setTimeout(maybePromptOutcome, 400); }
       return bookings;
     }catch(e){ return bkLastBookings; }
   }
 
   let bkEditId=null;
   let bkGoogleConnected=false;
-  const BK_STATUS={ pending:{t:'Pending',c:'amber'}, accepted:{t:'Accepted',c:'green'}, reschedule_proposed:{t:'Awaiting guest',c:'blue'}, declined:{t:'Declined',c:'red'}, cancelled:{t:'Cancelled',c:'red'} };
+  const BK_STATUS={ pending:{t:'Pending',c:'amber'}, accepted:{t:'Accepted',c:'green'}, reschedule_proposed:{t:'Awaiting guest',c:'blue'}, declined:{t:'Declined',c:'red'}, cancelled:{t:'Cancelled',c:'red'}, completed:{t:'Completed',c:'green'}, no_show:{t:'No-show',c:'red'}, missed:{t:'You missed',c:'amber'}, not_held:{t:'Not held',c:'red'} };
+  const BK_ACTIVE_ST=['pending','accepted','reschedule_proposed'];
+  const BK_OUTCOME_ST=['completed','no_show','missed','not_held'];
   function bkDShort(dk){ try{ return new Date(dk+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }catch(e){ return dk; } }
   function bkDLong(dk){ try{ return new Date(dk+'T00:00:00').toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'}); }catch(e){ return dk; } }
   function bookingRowHtml(b, today, readonly){
-    const st=b.status||'pending'; const meta=BK_STATUS[st]||BK_STATUS.pending;
-    const when=bkDShort(b.date); const past=b.date<today; const dur=b.duration||30; const dead=(st==='declined'||st==='cancelled');
-    return '<button type="button" class="sb-item'+(past||dead?' past':'')+'" data-id="'+escapeHtml(b.id)+'"><div class="sb-row">'
+    const st=b.status||'pending'; let meta=BK_STATUS[st]||BK_STATUS.pending;
+    const needsRev=bkNeedsReview(b);
+    if(needsRev) meta={t:'Needs review',c:'amber'};
+    const when=bkDShort(b.date); const past=b.date<today; const dur=b.duration||30; const dead=(st==='declined'||st==='cancelled'||BK_OUTCOME_ST.indexOf(st)>=0);
+    return '<button type="button" class="sb-item'+((past||dead)&&!needsRev?' past':'')+(needsRev?' review':'')+'" data-id="'+escapeHtml(b.id)+'"><div class="sb-row">'
       +'<div class="sb-ic">'+svgIco('calendar',16)+'</div>'
       +'<div class="sb-main"><div class="sb-name"><span class="sb-nm">'+escapeHtml(b.name||'Guest')+'</span></div>'
       +'<div class="sb-when">'+escapeHtml(when)+' · '+escapeHtml(fmtTime(b.time))+' · '+dur+'m</div>'
       +((b.reason||b.note)?'<div class="sb-note">'+(b.reason?'<span class="sb-reason">'+escapeHtml(b.reason)+'</span>':'')+(b.note?escapeHtml(b.note):'')+'</div>':'')
       +'</div>'
-      +'<div class="sb-end">'+(b.meetLink?'<span class="sb-join" data-meet="'+escapeHtml(b.meetLink)+'" title="Join Google Meet" role="button" tabindex="0"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="13" height="12" rx="2.5"/><path d="M15.5 10l5-3v10l-5-3z"/></svg></span>':'')+'<span class="sb-badge sb-'+meta.c+'">'+meta.t+'</span><span class="sb-chev">'+svgIco('chevR',16)+'</span></div>'
+      +'<div class="sb-end">'+(b.meetLink&&!dead?'<span class="sb-join" data-meet="'+escapeHtml(b.meetLink)+'" title="Join Google Meet" role="button" tabindex="0"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="13" height="12" rx="2.5"/><path d="M15.5 10l5-3v10l-5-3z"/></svg></span>':'')+'<span class="sb-badge sb-'+meta.c+(needsRev?' sb-pulse':'')+'">'+meta.t+'</span><span class="sb-chev">'+svgIco('chevR',16)+'</span></div>'
       +'</div></button>';
   }
   function wireBookingContainer(el){
@@ -5774,7 +5850,7 @@
     const sel=bkCalDate;
     const dismissed=new Set(bkDismissed());
     const all=(bkLastBookings||[]).filter(b=>!dismissed.has(b.id) && b.date===sel);
-    const isActive=b=>{ const s=b.status||'pending'; return s!=='declined' && s!=='cancelled'; };
+    const isActive=b=>{ const s=b.status||'pending'; return BK_ACTIVE_ST.indexOf(s)>=0; };
     const active=all.filter(isActive).sort((a,b)=> a.time < b.time ? -1 : 1);
     const history=all.filter(b=>!isActive(b)).sort((a,b)=> a.time < b.time ? 1 : -1);
     renderBookingsInto(document.getElementById('bkPageActive'), active, false);
@@ -5795,7 +5871,8 @@
     created:{t:'Request sent',c:'amber'}, accepted:{t:'You accepted',c:'green'}, declined:{t:'You declined',c:'red'},
     proposed:{t:'You proposed a new time',c:'blue'}, reschedule_accepted:{t:'Guest accepted the new time',c:'green'},
     reschedule_declined:{t:'Guest declined the new time',c:'red'}, cancelled:{t:'Guest cancelled',c:'red'},
-    auto_cancelled:{t:'Auto-cancelled — no response in time',c:'red'}
+    auto_cancelled:{t:'Auto-cancelled — no response in time',c:'red'},
+    completed:{t:'Marked completed',c:'green'}, no_show:{t:'Guest didn\u2019t join',c:'red'}, missed:{t:'You couldn\u2019t make it',c:'amber'}, not_held:{t:'Meeting didn\u2019t happen',c:'red'}
   };
   function bkHistRow(h){
     const meta=BK_HIST[h.action]||{t:h.action,c:'amber'};
@@ -5805,7 +5882,8 @@
   function renderBookingDetail(){
     const b=(bkLastBookings||[]).find(x=>x.id===bkdId); if(!b){ closeBkDetail(); return; }
     const st=b.status||'pending'; const meta=BK_STATUS[st]||BK_STATUS.pending;
-    const today=dateKey(new Date()); const past=b.date<today; const dead=(st==='declined'||st==='cancelled'); const readonly=past||dead;
+    const today=dateKey(new Date()); const past=b.date<today; const dead=(st==='declined'||st==='cancelled'||BK_OUTCOME_ST.indexOf(st)>=0);
+    const needsRev=bkNeedsReview(b); const readonly=(past||dead)&&!needsRev;
     const dur=b.duration||30; const endT=minToTime(timeToMinutes(b.time)+dur);
     const hist=(b.history||[]); const moveCount=hist.filter(h=>h.action==='proposed'||h.action==='reschedule_accepted').length;
     document.getElementById('bkdName').innerHTML=escapeHtml(b.name||'Guest')+' <span class="sb-badge sb-'+meta.c+'">'+meta.t+'</span>';
@@ -5834,6 +5912,7 @@
     document.getElementById('bkdBody').innerHTML=body;
     let foot='';
     if(editing){ foot='<button type="button" class="btn btn-secondary" data-act="recancel">Discard</button><button type="button" class="btn btn-primary" data-act="resave">Propose time</button>'; }
+    else if(needsRev){ foot='<button type="button" class="btn btn-danger" data-act="cancel">Cancel</button><button type="button" class="btn btn-primary" data-act="outcome">Log outcome</button>'; }
     else if(!readonly){
       if(st==='pending'){ foot='<button type="button" class="btn btn-danger" data-act="decline">Decline</button><button type="button" class="btn btn-secondary" data-act="resch">Suggest time</button><button type="button" class="btn btn-primary" data-act="accept">Accept</button>'; }
       else if(st==='accepted'){ foot='<button type="button" class="btn btn-danger" data-act="cancel">Cancel</button><button type="button" class="btn btn-primary" data-act="resch">Reschedule</button>'; }
@@ -5843,6 +5922,7 @@
     document.getElementById('bkdFoot').querySelectorAll('[data-act]').forEach(btn=>btn.addEventListener('click',()=>{
       const act=btn.dataset.act; const id=bkdId;
       if(act==='accept'){ closeBkDetail(); acceptBooking(id); }
+      else if(act==='outcome'){ closeBkDetail(); openOutcome(id); }
       else if(act==='decline'){ const nm=(b&&b.name)||'this guest'; closeBkDetail(); askConfirm('Decline request?', '\u201C'+nm+'\u201D will be notified and the slot frees up.', 'Decline', ()=>declineBooking(id)); }
       else if(act==='cancel'){ const nm=(b&&b.name)||'this guest'; closeBkDetail(); if(dead){ askConfirm('Remove from history?', 'This removes \u201C'+nm+'\u201D from your list. It can\u2019t be undone.', 'Remove', ()=>cancelBooking(id)); } else { askConfirm('Cancel this booking?', '\u201C'+nm+'\u201D will be notified and the slot frees up.', 'Cancel booking', ()=>cancelBooking(id)); } }
       else if(act==='resch'){ bkEditId=bkdId; renderBookingDetail(); }
