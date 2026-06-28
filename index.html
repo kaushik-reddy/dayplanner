@@ -1942,6 +1942,8 @@
   .bk-ev.booked{ background:rgba(110,163,201,0.18); border-color:rgba(110,163,201,0.5); color:var(--ink); cursor:pointer; }
   .bk-ev.booked:hover{ background:rgba(110,163,201,0.3); }
   .bk-ev.bk-st-pending{ border-style:dashed; }
+  .bk-ev.bk-st-cancelled{ background:rgba(196,108,98,0.12); border-color:rgba(196,108,98,0.4); border-style:dashed; opacity:0.62; }
+  .bk-ev.bk-st-cancelled .bk-ev-n{ text-decoration:line-through; }
   .bk-ev-t{ font-size:10px; font-family:var(--font-mono); color:var(--ink-faint); }
   .bk-ev-n{ font-size:11.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .bk-cal-empty{ position:absolute; left:48px; right:2px; top:50%; transform:translateY(-50%); text-align:center; font-size:12.5px; color:var(--ink-faint); pointer-events:none; }
@@ -3697,7 +3699,7 @@
 
       const head=document.createElement('div'); head.className='task-head';
       let _bookBadge='';
-      if(task.booked){ const _bs=task.bookingStatus||'pending'; const _bm=({pending:['Pending','amber'],accepted:['Accepted','green'],reschedule_proposed:['Awaiting guest','blue']})[_bs]||['Pending','amber']; _bookBadge='<span class="sb-badge sb-'+_bm[1]+'">'+_bm[0]+'</span>'; }
+      if(task.booked){ const _bs=task.bookingStatus||'pending'; const _bm=({pending:['Pending','amber'],accepted:['Accepted','green'],reschedule_proposed:['Awaiting guest','blue'],cancelled:['Cancelled','red']})[_bs]||['Pending','amber']; _bookBadge='<span class="sb-badge sb-'+_bm[1]+'">'+_bm[0]+'</span>'; }
       head.innerHTML='<div class="task-titlewrap"><span class="task-title">'+highlightTitle(task.title)+'</span>'+_bookBadge+'</div>'+prioHtml(task.priority);
       body.appendChild(head);
       if(task.sub){ const sub=document.createElement('div'); sub.className='task-sub'; sub.textContent=task.sub; body.appendChild(sub); }
@@ -5851,13 +5853,13 @@
   function bookingSub(b){ const bits=[]; if(b.reason) bits.push(b.reason); if(b.note) bits.push(b.note); if(b.email) bits.push(b.email); return bits.join(' · '); }
 
   // Keep the planner in sync with the server's bookings: add new, move/update rescheduled, remove cancelled.
-  function bookingTitle(b){ return (b.status==='accepted'?'Booking · ':'Request · ')+(b.name||'Guest'); }
+  function bookingTitle(b){ return (b.status==='cancelled'?'Cancelled · ':b.status==='accepted'?'Booking · ':'Request · ')+(b.name||'Guest'); }
   function reconcileBookings(bookings){
     let imported=[]; try{ imported=JSON.parse(localStorage.getItem(BK_IMPORTED_KEY)||'[]'); }catch(e){}
     const set=new Set(imported);
     const dismissed=new Set(bkDismissed());
     // bookings the owner deleted locally are treated as inactive (never re-imported)
-    const active=(bookings||[]).filter(b=> BK_ACTIVE_ST.indexOf(b.status||'pending')>=0 && !dismissed.has(b.id));
+    const active=(bookings||[]).filter(b=> BK_SHOWN_ST.indexOf(b.status||'pending')>=0 && !dismissed.has(b.id));
     const activeIds=new Set(active.map(b=>b.id));
     const serverIds=new Set((bookings||[]).map(b=>b.id));
     let added=0, lastName='', changed=false;
@@ -5865,20 +5867,20 @@
       const loc=findBookedTask(b.id); const sub=bookingSub(b); const title=bookingTitle(b);
       if(!loc){
         const d=new Date(b.date+'T00:00:00'); const data=loadDay(d); data.tasks=data.tasks||[];
-        data.tasks.push({ id:'booked_'+b.id, time:b.time, duration:b.duration||30, title, sub, categories:['#meeting'], priority:(b.priority||'high'), booked:true, bookingId:b.id, bookingStatus:b.status||'pending', createdAt:Date.now() });
+        data.tasks.push({ id:'booked_'+b.id, time:b.time, duration:b.duration||30, title, sub, categories:['#meeting'], priority:(b.priority||'high'), booked:true, bookingId:b.id, bookingStatus:b.status||'pending', cancelled:(b.status==='cancelled'), createdAt:Date.now() });
         saveDay(d, data);
-        if(!set.has(b.id)){ added++; lastName=b.name||lastName; }
+        if(!set.has(b.id) && (b.status||'pending')!=='cancelled'){ added++; lastName=b.name||lastName; }
         changed=true;
       } else {
-        const t=loc.data.tasks[loc.idx]; const needMove = loc.key !== b.date;
-        if(t.time!==b.time || (t.duration||30)!==(b.duration||30) || t.sub!==sub || t.title!==title || t.bookingStatus!==b.status || needMove){
+        const t=loc.data.tasks[loc.idx]; const needMove = loc.key !== b.date; const _bcan=(b.status==='cancelled');
+        if(t.time!==b.time || (t.duration||30)!==(b.duration||30) || t.sub!==sub || t.title!==title || t.bookingStatus!==b.status || !!t.cancelled!==_bcan || needMove){
           if(needMove){
             loc.data.tasks.splice(loc.idx,1); saveDay(new Date(loc.key+'T00:00:00'), loc.data);
             const d2=new Date(b.date+'T00:00:00'); const data2=loadDay(d2); data2.tasks=data2.tasks||[];
-            data2.tasks.push(Object.assign(t,{ time:b.time, duration:b.duration||30, sub, title, bookingStatus:b.status }));
+            data2.tasks.push(Object.assign(t,{ time:b.time, duration:b.duration||30, sub, title, bookingStatus:b.status, cancelled:_bcan }));
             saveDay(d2, data2);
           } else {
-            t.time=b.time; t.duration=b.duration||30; t.sub=sub; t.title=title; t.bookingStatus=b.status; saveDay(new Date(loc.key+'T00:00:00'), loc.data);
+            t.time=b.time; t.duration=b.duration||30; t.sub=sub; t.title=title; t.bookingStatus=b.status; t.cancelled=_bcan; saveDay(new Date(loc.key+'T00:00:00'), loc.data);
           }
           changed=true;
         }
@@ -6025,6 +6027,7 @@
   let bkGoogleConnected=false;
   const BK_STATUS={ pending:{t:'Pending',c:'amber'}, accepted:{t:'Accepted',c:'green'}, reschedule_proposed:{t:'Awaiting guest',c:'blue'}, declined:{t:'Declined',c:'red'}, cancelled:{t:'Cancelled',c:'red'}, completed:{t:'Completed',c:'green'}, no_show:{t:'No-show',c:'red'}, missed:{t:'You missed',c:'amber'}, not_held:{t:'Not held',c:'red'} };
   const BK_ACTIVE_ST=['pending','accepted','reschedule_proposed'];
+  const BK_SHOWN_ST=['pending','accepted','reschedule_proposed','cancelled']; // cancelled stays in the timeline (struck-through)
   const BK_OUTCOME_ST=['completed','no_show','missed','not_held'];
   function bkDShort(dk){ try{ return new Date(dk+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }catch(e){ return dk; } }
   function bkDLong(dk){ try{ return new Date(dk+'T00:00:00').toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'}); }catch(e){ return dk; } }
