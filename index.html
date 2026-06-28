@@ -5823,6 +5823,7 @@
     bkEnsureKeys();
     const tok=localStorage.getItem(BK_TOKEN_KEY), sec=localStorage.getItem(BK_SECRET_KEY);
     const cfg=bkCfg(); const busy=computeBusy(cfg);
+    try{ cfg.tz=Intl.DateTimeFormat().resolvedOptions().timeZone||''; }catch(e){}
     try{ await fetch(BOOK_API+'?book='+encodeURIComponent(tok)+'&publish=1', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ownerSecret:sec, config:cfg, busy }) }); }catch(e){}
   }
 
