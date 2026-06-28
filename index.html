@@ -1091,7 +1091,7 @@
   .wt-pct.g{ color:var(--green); } .wt-pct.a{ color:var(--brass); } .wt-pct.r{ color:var(--red-soft); }
   @media (max-width:560px){ .bk-stat-grid{ grid-template-columns:repeat(2,1fr); } .bks-val{ font-size:22px; } }
   @media print{
-    .topbar, #fabDock, .viewtabs, .audit-tools, #auditLog, .sync-toast, .overlay{ display:none !important; }
+    .topbar, #fabDock, .viewtabs, .audit-tools, #auditLog, #auditActivity, .sync-toast, .overlay{ display:none !important; }
     #plannerView{ display:none !important; }
     #auditView{ display:block !important; }
     .wrap{ max-width:100% !important; padding:0 !important; }
@@ -1100,6 +1100,19 @@
   }
 
   .section-title{ font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-dim); font-weight:600; margin:0 0 13px; }
+
+  /* ---- activity event feed (audit timeline log) ---- */
+  .act-feed{ background:var(--bg-card); border:1px solid var(--line); border-radius:16px; padding:6px 4px; margin-bottom:26px; overflow:hidden; }
+  .act-row{ display:flex; align-items:flex-start; gap:11px; padding:11px 14px; border-bottom:1px solid rgba(255,255,255,0.04); position:relative; animation:actIn .4s cubic-bezier(.22,1,.36,1) both; }
+  .act-row:last-child{ border-bottom:none; }
+  .act-row:hover{ background:rgba(255,255,255,0.02); }
+  @keyframes actIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+  .act-ic{ flex-shrink:0; width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+  .act-body{ flex:1; min-width:0; }
+  .act-text{ font-size:13px; color:var(--ink); line-height:1.4; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .act-text b{ font-weight:600; }
+  .act-detail{ font-size:11.5px; color:var(--ink-faint); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .act-time{ flex-shrink:0; font-size:11px; color:var(--ink-faint); font-variant-numeric:tabular-nums; margin-top:3px; }
 
   .log-row{
     display:flex; align-items:center; gap:12px;
@@ -2059,6 +2072,8 @@
   .tk-confirm-row .btn{ flex:1; margin-top:0; }
   .tk-meet-soon{ display:flex; align-items:flex-start; gap:9px; margin-top:18px; padding:13px 15px; border:1px dashed var(--line); border-radius:12px; background:var(--bg); font-size:12.5px; color:var(--ink-dim); line-height:1.45; text-align:left; }
   .tk-meet-soon svg{ flex-shrink:0; color:var(--brass); margin-top:1px; }
+  .tk-cancel-locked{ display:flex; align-items:center; gap:8px; margin-top:14px; padding:11px 14px; border:1px solid var(--line); border-radius:11px; background:var(--bg); font-size:12px; color:var(--ink-faint); line-height:1.4; text-align:left; }
+  .tk-cancel-locked svg{ flex-shrink:0; color:var(--ink-faint); }
   .tk-booklink{ display:flex; align-items:center; gap:8px; margin-top:18px; padding:11px 14px; border:1px solid var(--line); border-radius:11px; background:var(--bg); font-family:var(--font-mono); font-size:12px; color:var(--ink-dim); }
   .tk-booklink .ico{ color:var(--brass); flex-shrink:0; }
   .tk-booklink span{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -2116,6 +2131,90 @@
   .sb-prop{ font-size:11px; color:#7FA8C9; font-family:var(--font-mono); margin-top:3px; }
   .sb-act.ok:hover{ border-color:var(--green); color:var(--green); }
   .sb-edit-hint{ font-size:11px; color:var(--ink-faint); margin-top:9px; }
+
+  /* ============================================================
+     PREMIUM BOOKING — luxury overhaul + animations (matches iOS app)
+     additive overrides; placed after base rules so they win the cascade
+     ============================================================ */
+  body.booking-active{
+    background:
+      radial-gradient(135% 115% at 50% -18%, rgba(201,151,74,0.13) 0%, transparent 42%),
+      radial-gradient(120% 95% at 50% 0%, #19140d 0%, #0b0a08 68%);
+    min-height:100vh;
+  }
+  body.booking-active::before{
+    content:''; position:fixed; inset:-25% -15% auto -15%; height:70vh; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(58% 80% at 28% 18%, rgba(201,151,74,0.10), transparent 70%),
+      radial-gradient(48% 70% at 82% 6%, rgba(127,168,201,0.06), transparent 72%);
+    animation:bkAmbient 20s ease-in-out infinite alternate;
+    will-change:transform;
+  }
+  @keyframes bkAmbient{ 0%{ transform:translate3d(-3%,0,0) scale(1); } 100%{ transform:translate3d(4%,2.5%,0) scale(1.14); } }
+  .booking-view{ position:relative; z-index:1; }
+
+  /* premium card — gradient face, sheen, brass hairline, entrance */
+  .bk-card{
+    position:relative;
+    background:linear-gradient(180deg, rgba(28,25,19,0.55) 0%, var(--bg-card) 16%);
+    border:1px solid rgba(255,255,255,0.075);
+    box-shadow:0 34px 90px -24px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.04);
+    overflow:hidden;
+    animation:bkCardIn .6s cubic-bezier(.22,1,.36,1) both;
+  }
+  .bk-card::before{ content:''; position:absolute; left:0; right:0; top:0; height:130px; pointer-events:none; background:linear-gradient(180deg, rgba(255,255,255,0.05), transparent); }
+  .bk-card::after{ content:''; position:absolute; left:8%; right:8%; top:0; height:1px; pointer-events:none; background:linear-gradient(90deg, transparent, rgba(201,151,74,0.55), transparent); }
+  @keyframes bkCardIn{ from{ opacity:0; transform:translateY(22px) scale(.985); } to{ opacity:1; transform:none; } }
+  .bk-card > *{ position:relative; z-index:1; }
+  .bk-title{ text-shadow:0 1px 18px rgba(201,151,74,0.12); }
+  .bk-brand .ico{ animation:bkBrandFloat 3.6s ease-in-out infinite; }
+  @keyframes bkBrandFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-2px); } }
+
+  /* staggered section entrances */
+  .bk-durrow, .bk-dates, .bk-slots, .bk-form, .bk-custom, .bk-confirm-card{ animation:bkRise .5s cubic-bezier(.22,1,.36,1) both; }
+  .bk-durrow{ animation-delay:.04s; } .bk-dates{ animation-delay:.09s; } .bk-form{ animation-delay:.05s; }
+  @keyframes bkRise{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
+
+  /* date / slot / pill / chip micro-interactions */
+  .bk-date, .bk-slot, .bk-durpill, .bk-chip, .bk-prio-btn{ transition:transform .16s cubic-bezier(.22,1,.36,1), border-color .15s, background .15s, color .15s, box-shadow .18s; }
+  .bk-date:not(:disabled):active, .bk-slot:not(:disabled):active, .bk-durpill:active, .bk-chip:active, .bk-prio-btn:active{ transform:scale(.95); }
+  .bk-date:not(.sel):not(:disabled):hover, .bk-slot:not(.sel):not(.booked):hover, .bk-durpill:not(.sel):hover{ transform:translateY(-2px); box-shadow:0 9px 20px -11px rgba(201,151,74,0.6); }
+  .bk-date.sel, .bk-slot.sel, .bk-durpill.sel, .bk-chip.on{ box-shadow:0 7px 22px -7px rgba(201,151,74,0.6); animation:bkPop .28s cubic-bezier(.16,1.3,.4,1); }
+  @keyframes bkPop{ 0%{ transform:scale(.88); } 60%{ transform:scale(1.06); } 100%{ transform:scale(1); } }
+
+  /* primary buttons — gradient face + travelling sheen */
+  body.booking-active .btn-primary{
+    background:linear-gradient(135deg, #E6BB72 0%, #C9974A 52%, #AE7C34 100%);
+    border:none; color:#1c1305; position:relative; overflow:hidden;
+    box-shadow:0 12px 28px -12px rgba(201,151,74,0.65);
+    transition:transform .16s, box-shadow .2s, filter .2s;
+  }
+  body.booking-active .btn-primary:hover{ filter:brightness(1.05); box-shadow:0 16px 34px -12px rgba(201,151,74,0.8); }
+  body.booking-active .btn-primary:active{ transform:scale(.975); }
+  body.booking-active .btn-primary::after{
+    content:''; position:absolute; top:0; bottom:0; left:-60%; width:48%;
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,0.5), transparent); transform:skewX(-18deg);
+    animation:bkSheen 3.6s ease-in-out infinite;
+  }
+  @keyframes bkSheen{ 0%{ left:-60%; } 48%,100%{ left:150%; } }
+
+  /* confirmation flourish */
+  .bk-confirm-ic{ animation:bkConfirmPop .55s cubic-bezier(.16,1.3,.4,1) both; }
+  @keyframes bkConfirmPop{ 0%{ transform:scale(0) rotate(-14deg); opacity:0; } 60%{ transform:scale(1.14); } 100%{ transform:scale(1); opacity:1; } }
+  .bk-confirm-when{ animation:bkRise .5s .12s both; }
+
+  /* tracking page motion */
+  .tk-heroblock{ animation:bkRise .55s both; }
+  .tk-meet{ animation:bkRise .5s .08s both; }
+  .tk-meet.accent{ box-shadow:0 12px 30px -16px rgba(201,151,74,0.5); }
+  .tk-step.now .tk-step-dot{ animation:tkNowPulse 2.1s ease-in-out infinite; }
+  @keyframes tkNowPulse{ 0%,100%{ box-shadow:0 0 0 4px var(--brass-soft); } 50%{ box-shadow:0 0 0 8px rgba(201,151,74,0.05); } }
+  @media (prefers-reduced-motion: reduce){
+    body.booking-active::before, .bk-card, .bk-durrow, .bk-dates, .bk-slots, .bk-form, .bk-custom, .bk-confirm-card,
+    .bk-confirm-ic, .bk-confirm-when, .tk-heroblock, .tk-meet, .tk-step.now .tk-step-dot, .bk-brand .ico,
+    body.booking-active .btn-primary::after{ animation:none !important; }
+  }
+
   /* === booking page mobile polish === */
   @media (max-width: 560px){
     .booking-view{ padding:calc(18px + env(safe-area-inset-top)) 14px calc(40px + env(safe-area-inset-bottom)); }
@@ -2290,6 +2389,9 @@
     </div>
 
     <div class="section-title">Timeline log · every action recorded</div>
+    <div id="auditActivity"></div>
+
+    <div class="section-title">Your days · tasks by day</div>
     <div id="auditLog"></div>
   </div>
 
@@ -2945,7 +3047,7 @@
         +'<div class="bk-confirm-when">'+brandIco()+dlabel+' · '+fmt12(min)+' – '+fmt12(min+dur)+'</div>'
         +'<div class="bk-confirm-detail">Thanks, <b>'+esc(name)+'</b>. <b>'+esc(owner||'me')+'</b> will review your request. Track its status — and accept any new time they suggest — from your private link.</div>'
         +(trackUrl?('<a class="btn btn-primary bk-track-btn" href="'+esc(trackUrl)+'">Track my request '+arrowIco()+'</a>'):'')
-        +'<button class="btn btn-secondary" id="bkAgain" style="margin-top:10px">Request another time</button>'
+        +'<button class="btn btn-secondary" id="bkAgain" style="margin-top:16px">Request another time</button>'
         +'</div>');
       const a=document.getElementById('bkAgain'); if(a) a.addEventListener('click',()=>{ selSlot=null; selEnd=null; customOpen=false; refresh(true); });
     }
@@ -3028,13 +3130,19 @@
           +meetCard(r.date,r.time,r.duration,{muted:true,strike:true})
           +(bookUrl?btnLink(bookUrl,'Request a new time','secondary'):'');
       } else if(state==='accepted'){
-        const meetBtn = r.meet&&r.meet.ready
+        const meetReady = !!(r.meet && r.meet.ready);
+        const meetBtn = meetReady
           ? '<a class="btn btn-primary bk-track-btn" href="'+esc(r.meet.link)+'" target="_blank" rel="noopener"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="13" height="12" rx="2.5"/><path d="M15.5 10l5-3v10l-5-3z"/></svg>Join Google Meet</a>'
           : (r.meet&&!r.meet.ready ? '<div class="tk-meet-soon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>Your Google Meet link opens 10 minutes before the meeting — check back here.</div>' : '');
+        // cancellation allowed any time UNTIL the Google Meet link has been sent; once sent, no cancellation
+        const cancelBlock = !meetReady
+          ? '<button class="btn btn-secondary bk-track-btn" id="tkCancel" style="margin-top:14px">Cancel booking</button>'
+          : '<div class="tk-cancel-locked"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>Your meet link is ready — this booking can no longer be cancelled.</div>';
         h=header('Confirmed','ok')+steps(4,false)
           +hero('accepted','You\u2019re confirmed','<b>'+owner+'</b> accepted your booking. See you then!')
           +meetCard(r.date,r.time,r.duration,{accent:true,label:'Meeting with '+owner})
-          +meetBtn;
+          +meetBtn
+          +cancelBlock;
       } else if(state==='declined' || state==='cancelled'){
         const isCan=state==='cancelled';
         h=header(isCan?'Cancelled':'Declined','bad')+steps(0,true)
@@ -3046,7 +3154,7 @@
           +hero('reschedule_proposed','New time proposed','<b>'+owner+'</b> suggested a different time. Accept it, or pick another that suits you.')
           +'<div class="tk-diff">'+meetCard(r.date,r.time,r.duration,{muted:true,strike:true,label:'Originally'})+arrowDown()+meetCard(r.proposed.date,r.proposed.time,r.proposed.duration,{accent:true,label:'Proposed time'})+'</div>'
           +'<button class="btn btn-primary bk-track-btn" id="tkAccept" style="margin-top:20px">Accept new time</button>'
-          +(bookUrl?btnLink(bookUrl,'Pick another time instead','secondary','10px'):'')
+          +(bookUrl?btnLink(bookUrl,'Pick another time instead','secondary','14px'):'')
           +'<div id="tkMsg" class="bk-custom-msg" style="text-align:center"></div>';
       } else {
         h=header('Pending','pending')+steps(2,false)
@@ -3057,8 +3165,9 @@
       shell(h);
       const acc=document.getElementById('tkAccept'); if(acc) acc.addEventListener('click', ()=>act('accept'));
       const can=document.getElementById('tkCancel'); if(can) can.addEventListener('click', ()=>{
+        const isBooking = (last && last.status==='accepted');
         can.style.display='none';
-        can.insertAdjacentHTML('afterend','<div class="tk-confirm" id="tkConf"><div class="tk-confirm-q">Cancel this request?</div><div class="tk-confirm-row"><button class="btn btn-secondary" id="tkNo">Keep request</button><button class="btn btn-danger" id="tkYes">Yes, cancel</button></div></div>');
+        can.insertAdjacentHTML('afterend','<div class="tk-confirm" id="tkConf"><div class="tk-confirm-q">'+(isBooking?'Cancel this booking?':'Cancel this request?')+'</div><div class="tk-confirm-row"><button class="btn btn-secondary" id="tkNo">'+(isBooking?'Keep booking':'Keep request')+'</button><button class="btn btn-danger" id="tkYes">Yes, cancel</button></div></div>');
         document.getElementById('tkYes').addEventListener('click', ()=>act('cancel'));
         document.getElementById('tkNo').addEventListener('click', ()=>{ const c=document.getElementById('tkConf'); if(c) c.remove(); can.style.display=''; });
       });
@@ -3309,6 +3418,19 @@
     if(typeof syncMarkDirty==='function') syncMarkDirty();
   }
 
+  // ---------- activity timeline log (shared with the iOS app via sync) ----------
+  const ACTIVITY_KEY='planner_activity';
+  function loadActivity(){ try{ const a=JSON.parse(localStorage.getItem(ACTIVITY_KEY)||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; } }
+  function saveActivity(arr){ try{ localStorage.setItem(ACTIVITY_KEY, JSON.stringify((arr||[]).slice(0,300))); }catch(e){} }
+  // type: created/edited/started/paused/resumed/completed/cancelled/reopened/moved/swapped/carried/deleted/closed
+  function logActivity(type, task, dayKey, detail){
+    const arr=loadActivity();
+    arr.unshift({ id:'a'+Date.now().toString(36)+Math.random().toString(36).slice(2,7), ts:Date.now(), type:type, title:(task&&task.title)||'Task', time:task&&task.time, day:dayKey||'', detail:detail||'' });
+    if(arr.length>300) arr.length=300;
+    saveActivity(arr);
+    if(typeof syncMarkDirty==='function') syncMarkDirty();
+  }
+
   // One-time repair: earlier versions persisted recurring task instances just from VIEWING a future
   // day, which then polluted the audit/timeline. Strip those untouched recurring phantoms from any
   // future-dated day (keep real future tasks + any recurring instance the user actually started).
@@ -3545,7 +3667,7 @@
       checkbox.innerHTML=`<svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6 11.5L13 4.5" stroke="#0A0A0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
       checkbox.addEventListener('click',e=>{
         e.stopPropagation();
-        const commit=()=>{ if(task.runningSince){ task.accumMs=(task.accumMs||0)+(Date.now()-task.runningSince); task.runningSince=null; } task.done=true; task.completedAt=Date.now(); saveDay(d,data); renderStructure(); };
+        const commit=()=>{ if(task.runningSince){ task.accumMs=(task.accumMs||0)+(Date.now()-task.runningSince); task.runningSince=null; } task.done=true; task.completedAt=Date.now(); logActivity('completed',task,dateKey(d)); saveDay(d,data); renderStructure(); };
         animateResolve(row, 'done', commit);
       });
 
@@ -3677,14 +3799,14 @@
         actions.insertBefore(pill, actions.firstChild);
       } else if(st==='running'){
         const comp=document.createElement('button'); comp.className='mini-btn complete'; comp.textContent='Mark as complete';
-        comp.addEventListener('click',e=>{ e.stopPropagation(); const commit=()=>{ if(task.runningSince){ task.accumMs=(task.accumMs||0)+(Date.now()-task.runningSince); task.runningSince=null; } if(task.pausedSince){ task.pausedAccumMs=(task.pausedAccumMs||0)+(Date.now()-task.pausedSince); delete task.pausedSince; } task.completedAt=Date.now(); task.done=true; saveDay(d,data); renderStructure(); }; animateResolve(row, 'done', commit); });
+        comp.addEventListener('click',e=>{ e.stopPropagation(); const commit=()=>{ if(task.runningSince){ task.accumMs=(task.accumMs||0)+(Date.now()-task.runningSince); task.runningSince=null; } if(task.pausedSince){ task.pausedAccumMs=(task.pausedAccumMs||0)+(Date.now()-task.pausedSince); delete task.pausedSince; } task.completedAt=Date.now(); task.done=true; logActivity('completed',task,dateKey(d)); saveDay(d,data); renderStructure(); }; animateResolve(row, 'done', commit); });
         const pr=document.createElement('button');
         if(isPaused(task)){
           pr.className='mini-btn resume'; pr.textContent='Resume';
-          pr.addEventListener('click',e=>{ e.stopPropagation(); if(task.pausedSince){ task.pausedAccumMs=(task.pausedAccumMs||0)+(Date.now()-task.pausedSince); delete task.pausedSince; } task.runningSince=Date.now(); saveDay(d,data); renderStructure(); maybeResumeConflict(task.id); });
+          pr.addEventListener('click',e=>{ e.stopPropagation(); if(task.pausedSince){ task.pausedAccumMs=(task.pausedAccumMs||0)+(Date.now()-task.pausedSince); delete task.pausedSince; } task.runningSince=Date.now(); logActivity('resumed',task,dateKey(d)); saveDay(d,data); renderStructure(); maybeResumeConflict(task.id); });
         } else {
           pr.className='mini-btn pause'; pr.textContent='Pause';
-          pr.addEventListener('click',e=>{ e.stopPropagation(); if(task.runningSince){ task.accumMs=(task.accumMs||0)+(Date.now()-task.runningSince); task.runningSince=null; } task.pausedSince=Date.now(); saveDay(d,data); renderStructure(); });
+          pr.addEventListener('click',e=>{ e.stopPropagation(); if(task.runningSince){ task.accumMs=(task.accumMs||0)+(Date.now()-task.runningSince); task.runningSince=null; } task.pausedSince=Date.now(); logActivity('paused',task,dateKey(d)); saveDay(d,data); renderStructure(); });
         }
         actions.insertBefore(comp, actions.firstChild);
         actions.insertBefore(pr, actions.firstChild);
@@ -3692,13 +3814,13 @@
         if(task.recurId){ const sk=document.createElement('button'); sk.className='mini-btn skip'; sk.textContent='Skip today'; sk.addEventListener('click',e=>{ e.stopPropagation(); skipRecurrence(task); const dd=loadDay(currentDate); dd.tasks=dd.tasks.filter(x=>x.id!==task.id); saveDay(currentDate,dd); renderStructure(); flashToast('Skipped for today'); }); actions.insertBefore(sk, actions.firstChild); }
         if(_delayed){ const rb=document.createElement('button'); rb.className='mini-btn resched'; rb.textContent='Reschedule'; rb.addEventListener('click',e=>{ e.stopPropagation(); openReschedule(task.id); }); actions.insertBefore(rb, actions.firstChild); }
         const start=document.createElement('button'); start.className='mini-btn start'; start.textContent='Start';
-        start.addEventListener('click',e=>{ e.stopPropagation(); task.startedAt=Date.now(); task.runningSince=Date.now(); task.accumMs=0; delete task.completedAt; delete task.pausedAccumMs; delete task.pausedSince; task.done=false; saveDay(d,data); renderStructure(); });
+        start.addEventListener('click',e=>{ e.stopPropagation(); task.startedAt=Date.now(); task.runningSince=Date.now(); task.accumMs=0; delete task.completedAt; delete task.pausedAccumMs; delete task.pausedSince; task.done=false; logActivity('started',task,dateKey(d)); saveDay(d,data); renderStructure(); });
         actions.insertBefore(start, actions.firstChild);
       }
 
       if(!selectMode && !task.booked && (st==='running'||st==='pending')){
         const can=document.createElement('button'); can.className='mini-btn cancel-task'; can.innerHTML=svgIco('x',12)+' Cancel';
-        can.addEventListener('click',e=>{ e.stopPropagation(); askConfirm('Cancel this task?', '“'+String(task.title)+'” will move to Resolved as cancelled. You can restore it anytime.', 'Cancel task', ()=>{ animateResolve(row, 'cancel', ()=>{ task.cancelled=true; delete task.runningSince; delete task.pausedSince; saveDay(d,data); renderStructure(); flashToast('Task cancelled'); }); }); });
+        can.addEventListener('click',e=>{ e.stopPropagation(); askConfirm('Cancel this task?', '“'+String(task.title)+'” will move to Resolved as cancelled. You can restore it anytime.', 'Cancel task', ()=>{ animateResolve(row, 'cancel', ()=>{ task.cancelled=true; delete task.runningSince; delete task.pausedSince; logActivity('cancelled',task,dateKey(d)); saveDay(d,data); renderStructure(); flashToast('Task cancelled'); }); }); });
         actions.appendChild(can);
       }
 
@@ -4223,6 +4345,7 @@
     if(theTask) handleRecurrence(theTask, vals.repeat, vals.repeatDays, vals.repeatStart);
     const wasNew = !vals.editingId;
     const newId = theTask ? theTask.id : null;
+    if(theTask) logActivity(wasNew?'created':'edited', theTask, dateKey(currentDate));
     saveDay(currentDate,data); closeEditor(); renderStructure();
     flashToast(wasNew ? 'Task added' : 'Changes saved');
     if(newId){ const ref=taskEls.get(newId); if(ref && ref.row){ ref.row.classList.add('just-added'); setTimeout(()=>ref.row.classList.remove('just-added'), 1400); } }
@@ -4233,6 +4356,7 @@
     const task=(data.tasks||[]).find(t=>t.id===editingTaskId);
     const title = task ? task.title : 'this task';
     askConfirm('Delete this task?', '“'+String(title)+'” will be permanently removed. This can’t be undone.', 'Delete', ()=>{
+      if(task) logActivity('deleted', task, dateKey(currentDate));
       if(task && task.bookingId){
         // booked task: remove locally for sure + best-effort cancel on the server
         if(typeof removeBookingLocally==='function') removeBookingLocally(task.bookingId);
@@ -4441,6 +4565,7 @@
     const tmp=a.time; a.time=b.time; b.time=tmp;
     recordChange(a, 'swapped', tmp, a.time);
     recordChange(b, 'swapped', a.time, b.time);
+    logActivity('swapped', a, dateKey(currentDate), 'with '+(b.title||'task'));
     saveDay(currentDate,data);
     // 3. rebuild ("last")
     renderStructure();
@@ -4523,7 +4648,46 @@
     const tagHtml = tags.length ? '<div class="lt-chips">'+tags.join('')+'</div>' : '';
     return `<div class="log-row"><div class="log-status ${st}"></div><div class="log-main"><div class="log-title">${highlightTitle(t.title)}</div><div class="log-meta"><span>plan <b>${fmtTime(t.time)}</b></span><span>start <b>${started}</b></span><span>done <b>${completed}</b></span><span>spent <b>${spentMin?spentMin+'m':'—'}</b>${planned?' / '+planned+'m':''}</span></div>${tagHtml}</div><div class="log-delta ${dcls}">${delta}</div></div>`;
   }
+  // ---- activity event feed (mirrors the iOS app's "Recent activity") ----
+  const ACT_META={
+    created:{ic:'plus',color:'#7FA8C9',verb:'Added'},
+    edited:{ic:'pencil',color:'#9A968D',verb:'Edited'},
+    started:{ic:'play',color:'#C9974A',verb:'Started'},
+    paused:{ic:'pause',color:'#D9A85C',verb:'Paused'},
+    resumed:{ic:'play',color:'#C9974A',verb:'Resumed'},
+    completed:{ic:'check',color:'#6FA88A',verb:'Completed'},
+    cancelled:{ic:'x',color:'#C97A6A',verb:'Cancelled'},
+    reopened:{ic:'repeat',color:'#9A968D',verb:'Reopened'},
+    moved:{ic:'arrowRight',color:'#7FA8C9',verb:'Moved'},
+    swapped:{ic:'swap',color:'#7FA8C9',verb:'Swapped'},
+    carried:{ic:'move',color:'#D9A85C',verb:'Carried'},
+    deleted:{ic:'x',color:'#C97A6A',verb:'Deleted'},
+    closed:{ic:'moon',color:'#8E84C9',verb:'Closed day'}
+  };
+  function actRelTime(ts){ const s=Math.floor((Date.now()-ts)/1000); if(s<60) return 'just now'; const m=Math.floor(s/60); if(m<60) return m+'m ago'; const h=Math.floor(m/60); if(h<24) return h+'h ago'; const d=Math.floor(h/24); if(d<7) return d+'d ago'; return new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'}); }
+  function actIconSvg(name){
+    const paths={ plus:'<path d="M12 5v14M5 12h14"/>', pencil:'<path d="M4 20.5l4.5-1 9.5-9.5-3.5-3.5L5 16z"/><path d="M14 6l4 4"/>', play:'<path d="M7 5l11 7-11 7z"/>', pause:'<path d="M8 5v14M16 5v14"/>', check:'<path d="M5 12.5l4.2 4.2L19 7"/>', x:'<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>', repeat:'<path d="M17 3.5 21 7.5l-4 4"/><path d="M3 12V10a3.5 3.5 0 0 1 3.5-3.5H21"/><path d="M7 20.5 3 16.5l4-4"/><path d="M21 12v2a3.5 3.5 0 0 1-3.5 3.5H3"/>', arrowRight:'<path d="M4.5 12h14"/><path d="M13 6l6 6-6 6"/>', swap:'<path d="M7 4v15M7 4 3.5 7.5M7 4l3.5 3.5"/><path d="M17 20V5M17 20l3.5-3.5M17 20l-3.5-3.5"/>', move:'<path d="M4 12h14"/><path d="M13 6l6 6-6 6"/>', moon:'<path d="M20.5 13.2A8.3 8.3 0 1 1 11 3.4a6.4 6.4 0 0 0 9.5 9.8Z"/>' };
+    return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(paths[name]||paths.check)+'</svg>';
+  }
+  function renderActivityLog(){
+    const box=document.getElementById('auditActivity'); if(!box) return;
+    const acts=loadActivity();
+    if(!acts.length){ box.innerHTML='<div class="audit-empty">No activity yet. As you add, start and finish tasks — here and on your phone — every action shows up here.</div>'; return; }
+    let h='<div class="act-feed">';
+    acts.slice(0,80).forEach(a=>{
+      const m=ACT_META[a.type]||{ic:'check',color:'var(--ink-dim)',verb:a.type};
+      const tm=a.time?(' · '+fmtTime(a.time)):'';
+      h+='<div class="act-row"><span class="act-ic" style="background:'+m.color+'22;color:'+m.color+'">'+actIconSvg(m.ic)+'</span>'
+        +'<div class="act-body"><div class="act-text"><b style="color:'+m.color+'">'+escapeHtml(m.verb)+'</b> '+escapeHtml(a.title)+escapeHtml(tm)+'</div>'
+        +(a.detail?'<div class="act-detail">'+escapeHtml(a.detail)+'</div>':'')+'</div>'
+        +'<span class="act-time">'+escapeHtml(actRelTime(a.ts))+'</span></div>';
+    });
+    h+='</div>';
+    box.innerHTML=h;
+  }
+
   function renderAudit(animate){
+    renderActivityLog();
     const days=allPlannerDays();
     const all=[];
     days.forEach(dy=> (dy.data.tasks||[]).forEach(t=>{ normalizeTask(t); all.push(t); }));
@@ -4986,16 +5150,18 @@
       const id=row.getAttribute('data-id');
       const t=data.tasks.find(x=>x.id===id); if(!t) return;
       const carry = !!row.querySelector('.cc-btn.carry.active');
-      if(!carry){ t.cancelled=true; delete t.startedAt; return; }
+      if(!carry){ t.cancelled=true; delete t.startedAt; logActivity('cancelled',t,dateKey(currentDate)); return; }
       const dInput=row.querySelector('.cc-date').value, tInput=row.querySelector('.cc-time').value;
-      if(!dInput||!tInput){ t.cancelled=true; delete t.startedAt; return; }
+      if(!dInput||!tInput){ t.cancelled=true; delete t.startedAt; logActivity('cancelled',t,dateKey(currentDate)); return; }
       const cnt=(t.carryCount||0)+1;
       const newTask={ id:'t'+Date.now()+Math.floor(Math.random()*1000), time:tInput, duration:t.duration||null, title:t.title, sub:t.sub||'', categories:getCategories(t).slice(), poster:t.poster||'', createdAt:Date.now(), done:false, carryCount:cnt, carriedFromKey:dateKey(currentDate) };
       if(dInput===dateKey(currentDate)){ data.tasks.push(newTask); }
       else { const targetDate=new Date(dInput+'T00:00:00'); const tData=loadDay(targetDate); tData.tasks.push(newTask); saveDay(targetDate,tData); }
       t.carried=true; t.carriedTo=fmtTime(tInput)+' '+new Date(dInput+'T00:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric'}); t.carriedToKey=dInput; t.carriedCopyId=newTask.id; delete t.startedAt;
+      logActivity('carried',t,dateKey(currentDate),'to '+t.carriedTo);
     });
     data.closed=true; saveDay(currentDate,data);
+    logActivity('closed',{title:'Day'},dateKey(currentDate));
     closeOverlay.classList.remove('open');
     renderStructure();
     if(auditView.style.display!=='none') renderAudit();
@@ -5323,6 +5489,7 @@
         delete t.startedAt; delete t.runningSince; delete t.accumMs; delete t.pausedSince; delete t.pausedAccumMs; delete t.completedAt; t.done=false;
       }
       recordChange(t, wasMove?'moved':'rescheduled', oldTime, tInput, dateKey(currentDate), dInput);
+      logActivity(wasMove?'moved':'rescheduled', t, dateKey(currentDate), (dInput!==dateKey(currentDate)?('to '+dInput+' '):'to ')+tInput);
       if(dInput===dateKey(currentDate)){ t.time=tInput; saveDay(currentDate,data); }
       else {
         data.tasks=data.tasks.filter(x=>x.id!==reschedTargetId); saveDay(currentDate,data);
@@ -5448,6 +5615,7 @@
     ['planner_book_token','planner_book_secret','planner_book_config','planner_book_enabled','planner_book_imported','planner_book_dismissed'].forEach(k=>{ const v=localStorage.getItem(k); if(v!=null) booking[k]=v; });
     const out={ days, recurring: loadRecurring(), imgCache: imgCache };
     if(booking.planner_book_token) out.booking=booking;
+    const _act=loadActivity(); if(_act.length) out.activity=_act;
     return out;
   }
   function localHasData(){ const b=bundleLocal(); return Object.keys(b.days).some(k=>(b.days[k].tasks||[]).length) || (b.recurring||[]).length; }
@@ -5460,6 +5628,7 @@
       Object.keys(days).forEach(dk=>{ try{ localStorage.setItem(STORAGE_PREFIX+dk, JSON.stringify(days[dk])); }catch(e){} });
       saveRecurring((data&&data.recurring)||[]);
       if(data&&data.imgCache){ imgCache=data.imgCache; saveImgCache(); }
+      if(data&&Array.isArray(data.activity)){ saveActivity(data.activity); }
       // adopt the synced booking setup (same permanent link on every device)
       if(data && data.booking && data.booking.planner_book_token){
         Object.keys(data.booking).forEach(k=>{ try{ localStorage.setItem(k, data.booking[k]); }catch(e){} });
