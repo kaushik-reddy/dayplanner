@@ -3049,7 +3049,7 @@
         +'<div class="bk-confirm-when">'+brandIco()+dlabel+' · '+fmt12(min)+' – '+fmt12(min+dur)+'</div>'
         +'<div class="bk-confirm-detail">Thanks, <b>'+esc(name)+'</b>. <b>'+esc(owner||'me')+'</b> will review your request. Track its status — and accept any new time they suggest — from your private link.</div>'
         +(trackUrl?('<a class="btn btn-primary bk-track-btn" href="'+esc(trackUrl)+'">Track my request '+arrowIco()+'</a>'):'')
-        +'<button class="btn btn-secondary" id="bkAgain" style="margin-top:16px">Request another time</button>'
+        +'<button class="btn btn-secondary bk-track-btn" id="bkAgain" style="margin-top:12px">Request another time</button>'
         +'</div>');
       const a=document.getElementById('bkAgain'); if(a) a.addEventListener('click',()=>{ selSlot=null; selEnd=null; customOpen=false; refresh(true); });
     }
@@ -3088,7 +3088,7 @@
     function brandIco(){ return '<svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17M8 2.5v4M16 2.5v4"/></svg>'; }
     function slotLine(date,time,dur){ return dlabel(date)+' · '+fmt12(t2m(time))+' – '+fmt12(t2m(time)+(dur||30)); }
     function shell(inner){ view.innerHTML='<div class="bk-card">'+inner+'</div><div class="bk-footer">This private link updates automatically · it expires once the slot has passed</div>'; }
-    let last=null, busyAct=false;
+    let last=null, busyAct=false, lastSig=null;
 
     const ICONS={
       pending:{cls:'pending', svg:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/>'},
@@ -3201,8 +3201,11 @@
       try{
         const r=await fetch(BOOK_API+'?track='+encodeURIComponent(ref), { method:'GET' });
         const res=await r.json();
-        if(!res || res.ok===false){ last={ expired:true, status:'expired' }; render(); return; }
-        last=res; render();
+        if(!res || res.ok===false){ if(lastSig!=='__expired__'){ lastSig='__expired__'; last={ expired:true, status:'expired' }; render(); } return; }
+        // only re-render when something actually changed, so the 15s poll stays silent (no flicker / re-animation)
+        const sig=JSON.stringify([res.status, !!res.expired, res.meet&&res.meet.ready, res.meet&&res.meet.link, res.date, res.time, res.duration, res.proposed||null, res.owner]);
+        last=res;
+        if(sig!==lastSig){ lastSig=sig; render(); }
       }catch(e){ if(!last){ shell('<div class="bk-confirm-title">Couldn\'t load</div><div class="bk-confirm-detail">Please check your connection and try again.</div>'); } }
     }
 
