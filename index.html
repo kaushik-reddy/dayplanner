@@ -389,6 +389,7 @@
 
   .task-card{
     flex:1; min-width:0;
+    min-height: 78px;
     position:relative; overflow:hidden; isolation:isolate;
     background: var(--bg-card);
     border: 1px solid var(--line);
@@ -3120,6 +3121,23 @@
     }
     function btnLink(url,txt,kind,mt){ return '<a class="btn btn-'+kind+' bk-track-btn" style="margin-top:'+(mt||'16px')+'" href="'+esc(url)+'">'+txt+'</a>'; }
     function arrowDown(){ return '<div class="tk-diff-arrow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>'; }
+    // ----- "Add to calendar" (.ics, universal — Apple/Google/Outlook all import it) -----
+    function tzEpoch(date,time,tz){ const naive=Date.parse(date+'T'+(time||'00:00')+':00Z'); if(isNaN(naive)) return Date.now(); if(!tz) return naive; try{ const dtf=new Intl.DateTimeFormat('en-US',{timeZone:tz,hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}); const p=dtf.formatToParts(new Date(naive)).reduce((a,x)=>{a[x.type]=x.value;return a;},{}); const asUTC=Date.UTC(+p.year,+p.month-1,+p.day,(+p.hour===24?0:+p.hour),+p.minute,+p.second); return naive-(asUTC-naive); }catch(e){ return naive; } }
+    function icsDt(ep){ const d=new Date(ep); const p=n=>String(n).padStart(2,'0'); return d.getUTCFullYear()+p(d.getUTCMonth()+1)+p(d.getUTCDate())+'T'+p(d.getUTCHours())+p(d.getUTCMinutes())+p(d.getUTCSeconds())+'Z'; }
+    function addToCalendar(r){
+      const start=tzEpoch(r.date,r.time,r.tz), end=start+((r.duration||30)*60000);
+      const ce=s=>String(s==null?'':s).replace(/([\\;,])/g,'\\$1').replace(/\n/g,'\\n');
+      const title='Meeting with '+(r.owner||'them');
+      const desc=(r.reason?('Reason: '+r.reason+'\n'):'')+((r.meet&&r.meet.link)?('Join: '+r.meet.link):'Booked via your scheduling link.');
+      const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//DayPlanner//EN','CALSCALE:GREGORIAN','BEGIN:VEVENT','UID:'+ref+'@dayplanner','DTSTAMP:'+icsDt(Date.now()),'DTSTART:'+icsDt(start),'DTEND:'+icsDt(end),'SUMMARY:'+ce(title),'DESCRIPTION:'+ce(desc)];
+      if(r.meet&&r.meet.link) lines.push('URL:'+ce(r.meet.link));
+      lines.push('END:VEVENT','END:VCALENDAR');
+      try{
+        const blob=new Blob([lines.join('\r\n')],{type:'text/calendar;charset=utf-8'});
+        const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='meeting.ics';
+        document.body.appendChild(a); a.click(); setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); },1500);
+      }catch(e){}
+    }
 
     function render(){
       if(!last){ shell(header('','')+'<div class="tk-skel"></div>'); return; }
@@ -3143,6 +3161,7 @@
         h=header('Confirmed','ok')+steps(4,false)
           +hero('accepted','You\u2019re confirmed','<b>'+owner+'</b> accepted your booking. See you then!')
           +meetCard(r.date,r.time,r.duration,{accent:true,label:'Meeting with '+owner})
+          +'<button class="btn btn-secondary bk-track-btn" id="tkCal" style="margin-top:14px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17M8 2.5v4M16 2.5v4"/></svg>Add to my calendar</button>'
           +meetBtn
           +cancelBlock;
       } else if(state==='declined' || state==='cancelled'){
@@ -3176,6 +3195,7 @@
       }
       shell(h);
       const acc=document.getElementById('tkAccept'); if(acc) acc.addEventListener('click', ()=>act('accept'));
+      const cal=document.getElementById('tkCal'); if(cal) cal.addEventListener('click', ()=>addToCalendar(r));
       const can=document.getElementById('tkCancel'); if(can) can.addEventListener('click', ()=>{
         const isBooking = (last && last.status==='accepted');
         can.style.display='none';
