@@ -3122,7 +3122,7 @@
     function render(){
       if(!last){ shell(header('','')+'<div class="tk-skel"></div>'); return; }
       const r=last; const owner=esc(r.owner||'them'); const _pf=(r.name||r.email)?('&pn='+encodeURIComponent(r.name||'')+'&pe='+encodeURIComponent(r.email||'')):''; const bookUrl=r.bookToken?(location.origin+location.pathname+'?book='+r.bookToken+_pf):'';
-      let state=r.status||'pending'; if(r.expired && state!=='accepted' && state!=='cancelled' && state!=='declined') state='expired';
+      let state=r.status||'pending'; const TERMINAL_TK=['accepted','cancelled','declined','completed','no_show','missed','not_held']; if(r.expired && TERMINAL_TK.indexOf(state)<0) state='expired';
       let h='';
       if(state==='expired'){
         h=header('Expired','grey')
@@ -3156,6 +3156,16 @@
           +'<button class="btn btn-primary bk-track-btn" id="tkAccept" style="margin-top:20px">Accept new time</button>'
           +(bookUrl?btnLink(bookUrl,'Pick another time instead','secondary','14px'):'')
           +'<div id="tkMsg" class="bk-custom-msg" style="text-align:center"></div>';
+      } else if(state==='completed'){
+        h=header('Completed','ok')+steps(4,false)
+          +hero('accepted','Meeting completed','Thanks for meeting with <b>'+owner+'</b> \u2014 hope it went well!')
+          +meetCard(r.date,r.time,r.duration,{muted:true,label:'Your meeting'})
+          +(bookUrl?btnLink(bookUrl,'Book another time','secondary','14px'):'');
+      } else if(state==='no_show' || state==='missed' || state==='not_held'){
+        h=header('Not held','grey')
+          +hero('expired','This meeting wasn\u2019t held','It looks like this booking didn\u2019t take place.'+(bookUrl?' You can book another time below.':''))
+          +meetCard(r.date,r.time,r.duration,{muted:true,strike:true})
+          +(bookUrl?btnLink(bookUrl,'Book another time','primary','12px'):'');
       } else {
         h=header('Pending','pending')+steps(2,false)
           +hero('pending','Awaiting confirmation','<b>'+owner+'</b> has your request and will reply soon. This page refreshes on its own \u2014 keep the link handy.')
