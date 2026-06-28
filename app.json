@@ -1,18 +1,32 @@
 {
   "expo": {
-    "name": "dayplanner-ios",
+    "name": "Day Planner",
     "slug": "dayplanner-ios",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "dayplannerios",
-    "userInterfaceStyle": "automatic",
+    "scheme": "dayplanner",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#15120C",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "bundleIdentifier": "com.kaushik4432.dayplanner",
+      "supportsTablet": false,
+      "icon": "./assets/expo.icon",
+      "infoPlist": {
+        "NSSupportsLiveActivities": true,
+        "NSSupportsLiveActivitiesFrequentUpdates": true,
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "entitlements": {
+        "com.apple.security.application-groups": [
+          "group.com.kaushik4432.dayplanner",
+          "group.com.kaushik4432.dayplanner"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#15120C",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -28,17 +42,53 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#15120C",
           "android": {
             "image": "./assets/images/splash-icon.png",
             "imageWidth": 76
           }
         }
-      ]
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "16.4"
+          }
+        }
+      ],
+      "@bacons/apple-targets",
+      "expo-font",
+      "expo-asset",
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "bundleIdentifier": "com.kaushik4432.dayplanner.widget",
+                  "targetName": "DayPlannerWidget",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.com.kaushik4432.dayplanner"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "projectId": "c0bb8137-84b6-4f52-90c9-f43c09ad899e"
+      }
+    },
+    "owner": "solodevloper"
   }
 }
